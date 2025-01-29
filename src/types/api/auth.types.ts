@@ -9,7 +9,7 @@ export const registerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirm_password: z
     .string()
-    .min(6, "Confirm password must be at least 6 characters"),
+    .min(6, "Confirm password must be at least 6 characters").optional(),
   role: z.enum(["student", "adviser"], { message: "Role must be either 'student' or 'adviser'" }),
 }).refine((data) => data.password === data.confirm_password, {
   message: "Passwords do not match",
@@ -18,7 +18,7 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().email({ message: "Email address is required" }),
-  password: z.string().min(8, { message: "Password is required" }),
+  password: z.string().min(6, { message: "Password is required" }),
 });
 
 export type RegisterSchemaType = z.infer<typeof registerSchema>;
