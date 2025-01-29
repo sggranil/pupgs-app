@@ -84,7 +84,7 @@ export default function RegistrationPage() {
                         />
                         <div className="flex flex-col">
                             <span className="text-xl font-bold text-textPrimary">PUP Graduate Thesis Monitoring System</span>
-                            <span className="text-sm font-normal text-textPrimary">{type} Registration Form</span>
+                            <span className="text-sm font-normal text-textPrimary">{type.toLocaleUpperCase()} REGISTRATION FORM</span>
                         </div>
                     </div>
 
