@@ -74,7 +74,7 @@ export default function LoginPage() {
                         />
                         <div className="flex flex-col">
                             <span className="text-xl font-bold text-textPrimary">PUP Graduate Thesis Monitoring System</span>
-                            <span className="text-sm font-normal text-textPrimary">{type} Login Form</span>
+                            <span className="text-sm font-normal text-textPrimary">{type.toLocaleUpperCase()} LOGIN FORM</span>
                         </div>
                     </div>
 
