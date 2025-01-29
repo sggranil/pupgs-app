@@ -99,7 +99,6 @@ const SideNav = ({
             <div className="flex-1 flex flex-col md:ml-64">
                 <Navbar setIsOpen={setIsOpen}/>
                 <div className="p-4">
-                    // Should be responsive, when in desktop mode, this contents should appear, not behind sidenav
                     {children}
                 </div>
             </div>
