@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/utilities/TokenUtilities';
+import { setCookie } from '@/utilities/AuthUtilities';
 
 const prisma = new PrismaClient();
 
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
 
         if (!email || !password) {
             return NextResponse.json(
-                { error: "Email and password are required" },
+                { message: "Email and password are required" },
                 { status: 400 }
             );
         }
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json(
-                { error: "Invalid email or password" },
+                { message: "Invalid email or password" },
                 { status: 401 }
             );
         }
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return NextResponse.json(
-                { error: "Invalid email or password" },
+                { message: "Invalid email or password" },
                 { status: 401 }
             );
         }
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
             },
         );
 
-        return NextResponse.json({
+        const res = NextResponse.json({
             message: "Login successful",
             user: {
                 id: user.id,
@@ -56,10 +57,25 @@ export async function POST(request: NextRequest) {
             },
             token,
         });
+
+        setCookie(res, 'session', token, { maxAge: 60 * 60 * 24 * 7, path: '/' });
+
+        const userInfo = {
+            userId: user.id,
+            firstName: user.first_name,
+            role: user.role,
+            lastName: user.last_name,
+            position: user.position,
+            standing: user.standing
+        };
+
+        setCookie(res, 'user', JSON.stringify(userInfo), { maxAge: 60 * 60 * 24 * 7, path: '/' });
+
+        return res;
     } catch (err) {
         console.error(err);
         return NextResponse.json(
-            { error: "An error occurred during login" },
+            { message: "An error occurred during login" },
             { status: 500 }
         );
     }
