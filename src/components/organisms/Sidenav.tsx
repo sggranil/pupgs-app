@@ -1,14 +1,32 @@
 import React, { useState, useEffect } from "react";
 import ProfileCard from "../molecules/ProfileCard";
 import Navbar from "../molecules/Navbar";
+import { removeCookieClient, getCookie } from "@/utilities/AuthUtilities";
+import { useRouter } from "next/navigation"
 
-const SideNav = ({
+const getUserRoleFromCookies = () => {
+    const userCookie = getCookie(null, "user");
+    if (userCookie) {
+        try {
+            const user = JSON.parse(userCookie);
+            return user?.role || null;
+        } catch (e) {
+            console.error("Failed to parse user cookie", e);
+            return null;
+        }
+    }
+    return null;
+};
+
+const Sidenav = ({
     children
 }: Readonly<{
     children: React.ReactNode;
 }>) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const router = useRouter();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -18,6 +36,13 @@ const SideNav = ({
         if (isOpen && !(event.target instanceof Element && event.target.closest('.sidenav'))) {
             setIsOpen(false);
         }
+    };
+
+    const logoutUser = () => {
+        removeCookieClient("session");
+        removeCookieClient("user");
+
+        router.push('/login?type=student');
     };
 
     useEffect(() => {
@@ -44,6 +69,11 @@ const SideNav = ({
         };
     }, [isOpen]);
 
+    useEffect(() => {
+        const role = getUserRoleFromCookies();
+        setUserRole(role);
+    }, []);
+
     return (
         <div className="flex h-screen">
             {isOpen && !isDesktop && (
@@ -69,7 +99,7 @@ const SideNav = ({
                 </div>
                 <nav className="mt-4 p-3">
                     <a
-                        href="/dashboard"
+                        href={`/dashboard/${userRole}`}
                         className="block px-4 py-2 rounded-md hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
                     >
                         Dashboard
@@ -87,8 +117,8 @@ const SideNav = ({
                         Settings
                     </a>
                     <a
-                        href="#logout"
                         className="block px-4 py-2 rounded-md hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
+                        onClick={logoutUser}
                     >
                         Logout
                     </a>
@@ -106,4 +136,4 @@ const SideNav = ({
     );
 };
 
-export default SideNav;
+export default Sidenav;
