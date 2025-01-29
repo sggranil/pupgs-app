@@ -15,7 +15,6 @@ export function generateToken(payload: object): string {
     );
 }
 
-
 export function decodeToken(token: string): JwtPayload | null {
     try {
         return jwt.decode(token) as JwtPayload | null;
@@ -23,7 +22,6 @@ export function decodeToken(token: string): JwtPayload | null {
         return null;
     }
 }
-
 
 export function verifyToken(token: string): JwtPayload {
     try {
@@ -33,7 +31,6 @@ export function verifyToken(token: string): JwtPayload {
     }
 }
 
-
 export function isValidToken(token: string): boolean {
     try {
         verifyToken(token);
@@ -42,3 +39,4 @@ export function isValidToken(token: string): boolean {
         return false;
     }
 }
+

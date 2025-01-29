@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 
 import { generateToken } from '@/utilities/TokenUtilities';
 import { registerSchema } from '@/types/api/auth.types';
+import { setCookie } from '@/utilities/AuthUtilities';
 
 const prisma = new PrismaClient();
 
@@ -16,12 +17,12 @@ export async function POST(request: NextRequest) {
         const validation = registerSchema.safeParse(data);
         if (!validation.success) {
             return NextResponse.json(
-                { error: validation.error.errors[0].message },
+                { message: validation.error.errors[0].message },
                 { status: 400 }
             );
         }
 
-        const { first_name, middle_name, last_name, ext_name, email, password, role } = validation.data;
+        const { first_name, middle_name, last_name, email, password, role } = validation.data;
 
         const existingUser = await prisma.user.findUnique({
             where: { email },
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
 
         if (existingUser) {
             return NextResponse.json(
-                { error: "User with this email already exists" },
+                { message: "User with this email already exists" },
                 { status: 400 }
             );
         }
@@ -43,7 +44,6 @@ export async function POST(request: NextRequest) {
                 first_name,
                 middle_name: !middle_name ? "" : middle_name,
                 last_name,
-                ext_name: !ext_name ? "" : ext_name,
                 role,
                 tel_number: "",
                 standing: role === "student" ? "Student" : null,
@@ -69,15 +69,30 @@ export async function POST(request: NextRequest) {
             { userId: newUser.id, email: newUser.email, role: newUser.role },
         );
 
-        return NextResponse.json({
+        const res = NextResponse.json({
             message: "User created successfully",
             type: role,
             token,
         });
+
+        setCookie(res, 'session', token, { maxAge: 60 * 60 * 24 * 7, path: '/' });
+
+        const userInfo = {
+            userId: newUser.id,
+            firstName: newUser.first_name,
+            role: newUser.role,
+            lastName: newUser.last_name,
+            position: newUser.position,
+            standing: newUser.standing
+        };
+
+        setCookie(res, 'user', JSON.stringify(userInfo), { maxAge: 60 * 60 * 24 * 7, path: '/' });
+
+        return res;
     } catch (err) {
         console.error(err);
         return NextResponse.json(
-            { error: "An error occurred during registration" },
+            { message: "An error occurred during registration" },
             { status: 500 }
         );
     }
