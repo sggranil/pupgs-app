@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import ProfileCard from "../molecules/ProfileCard";
 import Navbar from "../molecules/Navbar";
 import { removeCookieClient, getCookie } from "@/utilities/AuthUtilities";
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname  } from "next/navigation"
+import Link from "next/link";
 
 const getUserRoleFromCookies = () => {
     const userCookie = getCookie(null, "user");
@@ -27,6 +28,8 @@ const Sidenav = ({
     const [isDesktop, setIsDesktop] = useState(false);
     const [userRole, setUserRole] = useState<string | null>(null);
     const router = useRouter();
+    
+    const pathname = usePathname();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -41,6 +44,7 @@ const Sidenav = ({
     const logoutUser = () => {
         removeCookieClient("session");
         removeCookieClient("user");
+        removeCookieClient("id");
 
         router.push('/login?type=student');
     };
@@ -98,26 +102,24 @@ const Sidenav = ({
                     </div>
                 </div>
                 <nav className="mt-4 p-3">
-                    <a
+                    <Link
                         href={`/dashboard/${userRole}`}
-                        className="block px-4 py-2 rounded-md hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
+                        className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
+                            pathname === `/dashboard/${userRole}` ? "bg-bgPrimary text-white" : ""
+                        }`}
                     >
                         Dashboard
-                    </a>
-                    <a
-                        href="#profile"
-                        className="block px-4 py-2 rounded-md hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
+                    </Link>
+                    <Link
+                        href="/profile"
+                        className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
+                            pathname === "/profile" ? "bg-bgPrimary text-white" : ""
+                        }`}
                     >
                         Profile
-                    </a>
+                    </Link>
                     <a
-                        href="#settings"
-                        className="block px-4 py-2 rounded-md hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
-                    >
-                        Settings
-                    </a>
-                    <a
-                        className="block px-4 py-2 rounded-md hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
+                        className="block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white"
                         onClick={logoutUser}
                     >
                         Logout

@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
         setCookie(res, 'session', token, { maxAge: 60 * 60 * 24 * 7, path: '/' });
 
         const userInfo = {
-            userId: user.id,
             firstName: user.first_name,
             role: user.role,
             lastName: user.last_name,
@@ -70,6 +69,7 @@ export async function POST(request: NextRequest) {
         };
 
         setCookie(res, 'user', JSON.stringify(userInfo), { maxAge: 60 * 60 * 24 * 7, path: '/' });
+        setCookie(res, 'id', user.id.toString(), { maxAge: 60 * 60 * 24 * 7, path: '/' });
 
         return res;
     } catch (err) {

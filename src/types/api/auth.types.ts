@@ -21,6 +21,17 @@ export const loginSchema = z.object({
   password: z.string().min(6, { message: "Password is required" }),
 });
 
+export const updateUserSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  middle_name: z.string().optional(),
+  ext_name: z.string().optional(),
+  standing: z.string().optional(),
+  position: z.string().optional(),
+  tel_number: z.string().optional(),
+})
+
 export type RegisterSchemaType = z.infer<typeof registerSchema>;
-export type LoginInput = z.infer<typeof loginSchema>;
+export type LoginSchemaType = z.infer<typeof loginSchema>;
+export type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 
