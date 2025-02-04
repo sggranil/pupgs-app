@@ -1,47 +1,42 @@
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from '@/utilities/TokenUtilities';
-
-import bcrypt from 'bcryptjs';
-import { getCookie } from '@/utilities/AuthUtilities';
+import { cookies } from "next/headers";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const userId = getCookie(null, "id");
+        const userId = (await cookies()).get("id")?.value;
 
-        const body = await request.json();
-        const {
-            first_name,
-            middle_name,
-            last_name,
-            ext_name,
-            tel_number,
-            standing,
-            position,
-        } = body;
+        const data = await request.json();
 
-        const updateData: { [key: string]: any } = {};
-        if (first_name) updateData.first_name = first_name;
-        if (middle_name) updateData.middle_name = middle_name;
-        if (last_name) updateData.last_name = last_name;
-        if (ext_name) updateData.ext_name = ext_name;
-        if (tel_number) updateData.tel_number = tel_number;
-        if (standing) updateData.standing = standing;
-        if (position) updateData.position = position;
+        if (!userId || isNaN(Number(userId))) {
+            return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
+        }
+
+        if (Object.keys(data).length === 0) {
+            return NextResponse.json({ error: "No data provided for update" }, { status: 400 });
+        }
+
+        const existingUser = await prisma.user.findUnique({
+            where: { id: Number(userId) },
+        });
+
+        if (!existingUser) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
 
         const updatedUser = await prisma.user.update({
             where: { id: Number(userId) },
-            data: updateData,
+            data,
         });
 
         return NextResponse.json({
             message: "User updated successfully",
-            data: updatedUser
+            data: updatedUser,
         });
     } catch (err) {
-        console.error(err);
+        console.error("Database error:", err);
         return NextResponse.json(
             { error: "An error occurred while updating the user" },
             { status: 500 }
