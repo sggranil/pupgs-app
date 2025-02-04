@@ -28,7 +28,7 @@ export default function Profile() {
 
     useEffect(() => {
         fetchUser();
-    }, []);
+    }, [showEdit]);
 
     return (
         <div className="w-full p-2 md:p-8">
@@ -51,7 +51,7 @@ export default function Profile() {
                             <h1 className="text-textPrimary text-2xl md:text-3xl font-bold">Loading...</h1>
                         ) : (
                             <h1 className="text-textPrimary text-2xl md:text-3xl font-bold">
-                                {userProfile?.first_name} {userProfile?.last_name}
+                                {userProfile?.first_name} {userProfile?.middle_name} {userProfile?.last_name} {userProfile?.ext_name}
                             </h1>
                         )}
                         <p className="text-textBlack text-md">
@@ -71,7 +71,7 @@ export default function Profile() {
             </div>
             
             { showEdit && 
-                <EditProfile userData={userProfile} />
+                <EditProfile isShowEdit={setShowEdit} userData={userProfile} />
             }
         </div>
     );
