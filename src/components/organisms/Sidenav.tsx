@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ProfileCard from "../molecules/ProfileCard";
 import Navbar from "../molecules/Navbar";
-import { removeCookieClient, getCookie } from "@/utilities/AuthUtilities";
+import { removeCookieClient, getUserRoleFromCookies } from "@/utilities/AuthUtilities";
 import { useRouter, usePathname  } from "next/navigation"
 import Link from "next/link";
-
-const getUserRoleFromCookies = () => {
-    const userCookie = getCookie(null, "user");
-    if (userCookie) {
-        try {
-            const user = JSON.parse(userCookie);
-            return user?.role || null;
-        } catch (e) {
-            console.error("Failed to parse user cookie", e);
-            return null;
-        }
-    }
-    return null;
-};
 
 const Sidenav = ({
     children
