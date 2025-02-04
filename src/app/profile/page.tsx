@@ -13,6 +13,7 @@ export default function Profile() {
     const [ userProfile, setUserProfile ] = useState<User | null>(null);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showEdit, setShowEdit ] = useState<boolean>(false);
+    const [ showUpdate, setShowUpdate ] = useState<boolean>(false);
 
     const { getUser } = useUserRequest();
     const userId = getCookie(null, "id");
@@ -28,7 +29,7 @@ export default function Profile() {
 
     useEffect(() => {
         fetchUser();
-    }, [showEdit]);
+    }, [showUpdate]);
 
     return (
         <div className="w-full p-2 md:p-8">
@@ -71,8 +72,16 @@ export default function Profile() {
             </div>
             
             { showEdit && 
-                <EditProfile isShowEdit={setShowEdit} userData={userProfile} />
+                <EditProfile isUpdated={setShowUpdate} isShowEdit={setShowEdit} userData={userProfile} />
             }
+
+            <div className="w-full px-2 py-8">
+                <div className="border-b border-gray-200">
+                    <h1 className="text-textPrimary text-xl font-bold p-2">
+                        Your Thesis
+                    </h1>
+                </div>
+            </div>
         </div>
     );
 }

@@ -12,11 +12,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 interface EditProfileProps {
     userData: User | null;
     isShowEdit: (showEdit: boolean) => void;
+    isUpdated: (showUpdate: boolean) => void;
 }
 
 type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 
-const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit }) => {
+const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdated }) => {
     const [loading, setLoading] = useState<boolean>(false)
     const { updateUser } = useUserRequest();
 
@@ -31,6 +32,7 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit }) => {
     async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         removeToasts();
+        isUpdated(false);
         setLoading(true);
     
         try {
@@ -57,6 +59,7 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit }) => {
             }
         } finally {
             isShowEdit(false);
+            isUpdated(true);
             setLoading(false);
         }
     }
