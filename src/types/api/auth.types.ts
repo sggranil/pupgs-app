@@ -17,18 +17,21 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email({ message: "Email address is required" }),
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
   password: z.string().min(6, { message: "Password is required" }),
 });
 
 export const updateUserSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
   middle_name: z.string().optional(),
   ext_name: z.string().optional(),
   standing: z.string().optional(),
   position: z.string().optional(),
   tel_number: z.string().optional(),
+  old_password: z.string().optional(),
+  password: z.string().optional(),
+  confirm_password: z.string().optional(),
 })
 
 export type RegisterSchemaType = z.infer<typeof registerSchema>;
