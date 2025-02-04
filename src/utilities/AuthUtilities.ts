@@ -1,6 +1,20 @@
 import cookie from 'cookie';
 import { NextResponse } from 'next/server';
 
+export const getUserRoleFromCookies = () => {
+    const userCookie = getCookie(null, "user");
+    if (userCookie) {
+        try {
+            const user = JSON.parse(userCookie);
+            return user?.role || null;
+        } catch (e) {
+            console.error("Failed to parse user cookie", e);
+            return null;
+        }
+    }
+    return null;
+};
+
 export const isClientAuthorized = () => {
   const sessionToken = getCookie(null, "session");
   return !!sessionToken;
