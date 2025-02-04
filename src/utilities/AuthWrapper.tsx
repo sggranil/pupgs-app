@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCookie } from "@/utilities/AuthUtilities";
-
-const isClientAuthorized = () => {
-  const sessionToken = getCookie(null, "session");
-  return !!sessionToken;
-};
+import { isClientAuthorized } from "@/utilities/AuthUtilities";
 
 export const withAuth = (WrappedComponent: React.ComponentType<any>) => {
   const WithAuthWrapper = (props: any) => {

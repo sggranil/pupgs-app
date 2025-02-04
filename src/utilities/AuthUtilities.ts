@@ -1,7 +1,12 @@
 import cookie from 'cookie';
 import { NextResponse } from 'next/server';
 
-export const isAuthorized = (req: { headers: { cookie: string | undefined }; }) => {
+export const isClientAuthorized = () => {
+  const sessionToken = getCookie(null, "session");
+  return !!sessionToken;
+};
+
+export const isServerAuthorized = (req: { headers: { cookie: string | undefined }; }) => {
   const sessionToken = getCookie(req, 'session');
   return !!sessionToken;
 };

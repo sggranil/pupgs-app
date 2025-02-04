@@ -1,10 +1,22 @@
 import React from "react";
 import Image from "next/image";
+import { getCookie } from "@/utilities/AuthUtilities";
 
 const UserInfoCard = () => {
+  const userCookie = getCookie(null, "user");
+  let userData = null;
+
+  if (userCookie) {
+    try {
+      userData = JSON.parse(userCookie);
+    } catch (error) {
+      console.error("Error parsing user cookie:", error);
+    }
+  }
+
   const imageUrl = "/user.svg";
-  const userName = "John Doe";
-  const userRole = "Administrator";
+  const userName = userData ? `${userData.firstName} ${userData.lastName}` : "Guest";
+  const userRole = userData ? `${userData.standing}` : `${userData.position}`;
 
   return (
     <div className="absolute bottom-4 w-full px-4">
