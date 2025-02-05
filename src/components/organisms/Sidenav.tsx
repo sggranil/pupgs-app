@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ProfileCard from "../molecules/ProfileCard";
 import Navbar from "../molecules/Navbar";
 import { removeCookieClient, getUserRoleFromCookies } from "@/utilities/AuthUtilities";
 import { useRouter, usePathname  } from "next/navigation"
@@ -32,7 +31,7 @@ const Sidenav = ({
         removeCookieClient("user");
         removeCookieClient("id");
 
-        router.push('/login?type=student');
+        router.push(`/login?type=${userRole}`);
     };
 
     useEffect(() => {
@@ -111,7 +110,6 @@ const Sidenav = ({
                         Logout
                     </a>
                 </nav>
-                <ProfileCard />
             </div>
 
             <div className="flex-1 flex flex-col md:ml-64">

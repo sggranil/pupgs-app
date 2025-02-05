@@ -74,14 +74,6 @@ export default function Profile() {
             { showEdit && 
                 <EditProfile isUpdated={setShowUpdate} isShowEdit={setShowEdit} userData={userProfile} />
             }
-
-            <div className="w-full px-2 py-8">
-                <div className="border-b border-gray-200">
-                    <h1 className="text-textPrimary text-xl font-bold p-2">
-                        Your Thesis
-                    </h1>
-                </div>
-            </div>
         </div>
     );
 }

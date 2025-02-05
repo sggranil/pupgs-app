@@ -11,9 +11,12 @@
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.2.1",
+    "@shadcn/ui": "^0.0.4",
     "bcryptjs": "^2.4.3",
+    "busboy": "^1.6.0",
     "cookie": "^1.0.2",
     "dotenv": "^16.4.7",
+    "formidable": "^3.5.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "next": "15.1.6",
@@ -27,6 +30,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/bcryptjs": "^2.4.6",
+    "@types/busboy": "^1.5.4",
+    "@types/formidable": "^3.4.5",
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^20",

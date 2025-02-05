@@ -32,6 +32,7 @@ model Student {
   user    User     @relation(fields: [user_id], references: [id])
   user_id Int      @unique
   thesis  Thesis[]
+  enrolled_subject  EnrolledSubject[]
 }
 
 model Adviser {
@@ -39,16 +40,40 @@ model Adviser {
   user    User     @relation(fields: [user_id], references: [id])
   user_id Int      @unique
   thesis  Thesis[]
+  panelists   Thesis[]  @relation("ThesisPanelists")
 }
 
 model Thesis {
-  id           Int     @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   thesis_title String
-  student      Student @relation(fields: [student_id], references: [id])
+  student      Student    @relation(fields: [student_id], references: [id])
   student_id   Int
-  adviser      Adviser @relation(fields: [adviser_id], references: [id])
+  adviser      Adviser    @relation(fields: [adviser_id], references: [id])
   adviser_id   Int
-  is_confirmed Boolean
-  user         User    @relation(fields: [user_id], references: [id])
+  is_confirmed Boolean?
+  user         User       @relation(fields: [user_id], references: [id])
   user_id      Int
+  proposals    Proposal[]
+  panelists    Adviser[]  @relation("ThesisPanelists")
+  defense_date DateTime?
+  defense_time DateTime?
+}
+
+model Proposal {
+  id          Int      @id @default(autoincrement())
+  thesis      Thesis   @relation(fields: [thesis_id], references: [id])
+  thesis_id   Int
+  file_url    String
+  uploaded_at DateTime @default(now())
+}
+
+model EnrolledSubject {
+  id            Int      @id @default(autoincrement())
+  student       Student  @relation(fields: [student_id], references: [id])
+  student_id    Int
+  subject_name  String
+  or_number     String
+  attachment    String
+  is_confirmed  Boolean?
+  enrolled_at   DateTime @default(now())
 }
