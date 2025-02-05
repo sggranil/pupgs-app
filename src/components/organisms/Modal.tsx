@@ -14,11 +14,11 @@ const Modal = ({ title, isModalOpen, setModalOpen, children }: ModalProps) => {
         <div className="flex flex-col items-center justify-center min-h-screen">
             {isModalOpen && (
                 <div
-                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
                     onClick={() => setModalOpen(false)}
                 >
                     <div
-                        className="bg-white p-6 rounded-lg shadow-lg w-1/2"
+                        className="bg-white p-6 rounded-lg shadow-lg w-full md:w-1/2"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between border-b border-gray-200 py-2">
