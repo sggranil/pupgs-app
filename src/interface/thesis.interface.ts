@@ -11,3 +11,13 @@ export interface Thesis {
     user: User;
     user_id: number;
 }
+
+export interface EnrolledSubject {
+    id: number;
+    student_id: number;
+    subject_name: string;
+    or_number: string;
+    attachment: string;
+    is_confirmed: boolean | null;
+    enrolled_at: string;
+}
