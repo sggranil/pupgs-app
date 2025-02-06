@@ -44,20 +44,21 @@ model Adviser {
 }
 
 model Thesis {
-  id           Int        @id @default(autoincrement())
-  thesis_title String
-  student      Student    @relation(fields: [student_id], references: [id])
-  student_id   Int
-  adviser      Adviser    @relation(fields: [adviser_id], references: [id])
-  adviser_id   Int
-  is_confirmed Boolean?
-  user         User       @relation(fields: [user_id], references: [id])
-  user_id      Int
-  proposals    Proposal[]
-  panelists    Adviser[]  @relation("ThesisPanelists")
-  defense_date DateTime?
-  defense_time DateTime?
+  id              Int        @id @default(autoincrement())
+  thesis_title    String
+  student         Student?    @relation(fields: [student_id], references: [id])
+  student_id      Int?
+  adviser         Adviser?    @relation(fields: [adviser_id], references: [id])
+  adviser_id      Int?
+  is_confirmed    Boolean?
+  user            User?       @relation(fields: [user_id], references: [id])
+  user_id         Int?
+  proposals       Proposal[]
+  panelists       Adviser[]  @relation("ThesisPanelists")
+  defense_date    DateTime?
+  defense_time    DateTime?
 }
+
 
 model Proposal {
   id          Int      @id @default(autoincrement())
