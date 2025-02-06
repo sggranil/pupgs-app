@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
             data: updatedUser,
         });
     } catch (err) {
-        console.error("Database error:", err);
         return NextResponse.json(
             { error: "An error occurred while updating the user" },
             { status: 500 }
