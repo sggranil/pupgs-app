@@ -13,9 +13,10 @@ import EnrolledSubjectModal from "./EnrolledSubjectModal";
 interface SubjectCardListProps {
     isUpdated: boolean;
     setIsUpdated: (isUpdated: boolean) => void;
+    setSubjectData: (subjectData: EnrolledSubject[]) => void;
 }
 
-const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdated }) => {
+const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdated, setSubjectData }) => {
     const [ enrolledSubjectModal, setEnrolledSubjectModal ] = useState<boolean>(false);
     const [ selectedSubject, setSelectedSubject ] = useState<EnrolledSubject | null>(null);
     const [ userSubject, setUserSubject ] = useState<EnrolledSubject[] | null>([]);
@@ -27,6 +28,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
         setLoading(true);
         const response = await getSubject(Number(userId));
         if (response) {
+            setSubjectData(response.data);
             setUserSubject(response.data);
         }
         setLoading(false);
@@ -41,21 +43,28 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
         <div className="h-24">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 py-2">
                 {loading ? (
-                    <p>Loading...</p>
+                    <div className="h-48 col-span-full flex justify-center items-center">
+                        <p>Loading...</p>
+                    </div>
                 ) : userSubject && userSubject.length > 0 ? (
                     userSubject.map((subject) => (
                         <div 
+                            className={`${!subject.is_confirmed} ? "cursor-pointer"`}
                             key={subject.id} 
                             onClick={() => {
-                                setSelectedSubject(subject);
-                                setEnrolledSubjectModal(true);
+                                if (!subject.is_confirmed) {
+                                    setSelectedSubject(subject);
+                                    setEnrolledSubjectModal(true);
+                                }
                             }}
                         >
                             <SubjectCard userData={subject} />
                         </div>
                     ))
                 ) : (
-                    <p>No subjects found.</p>
+                    <div className="h-48 col-span-full flex justify-center items-center">
+                        <p>No subjects found.</p>
+                    </div>
                 )}
             </div>
             <Modal title="Upload Documents" isModalOpen={enrolledSubjectModal} setModalOpen={setEnrolledSubjectModal}>
@@ -69,6 +78,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
             </Modal>
         </div>
     );
+    
 };
 
 export default SubjectCardList;
