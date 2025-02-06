@@ -37,7 +37,7 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
     return (
         <div className="h-full">
             <div className="flex align-center justify-between py-2 border-b border-gray-200">
-                <h1 className="text-lg font-semibold p-2">
+                <h1 className="text-md font-semibold p-2">
                     Paper Proposal
                 </h1>
                 <button
