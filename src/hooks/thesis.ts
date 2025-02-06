@@ -2,6 +2,14 @@ import { requestHandler } from "@/services/RequestServices";
 import { THESIS_API } from "@/constants/urls";
 
 const useThesisRequest = () => {
+    const fetchThesis= async (id: number) => {
+        const response = await requestHandler({
+            method: 'GET',
+            url: THESIS_API.FETCH_THESIS_URL(id)
+        })
+        return response.json()
+    }
+
     const getThesis= async (id: number) => {
         const response = await requestHandler({
             method: 'GET',
@@ -37,6 +45,7 @@ const useThesisRequest = () => {
     }
 
     return {
+        fetchThesis,
         getThesis,
         addThesis,
         updateThesis,

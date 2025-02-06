@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
 
@@ -22,6 +23,8 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
     const [ loading, setLoading ] = useState<boolean>(false);
     const { getThesis } = useThesisRequest();
     const userId = Cookies.get("id");
+
+    const router = useRouter();
 
     const fetchThesis = async () => {
         setLoading(true);
@@ -50,8 +53,12 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
                             className="cursor-pointer"
                             key={thesis.id}
                             onClick={() => {
-                                setSelectedThesis(thesis);
-                                setThesisModal(true);
+                                if (!thesis.is_confirmed) {
+                                    setSelectedThesis(thesis);
+                                    setThesisModal(true);
+                                } else {
+                                    router.push(`/thesis/?id=${thesis.id}`)
+                                }
                             }}
                         >
                             <ThesisCard thesisData={thesis} />
