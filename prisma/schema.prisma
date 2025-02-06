@@ -21,6 +21,7 @@ model User {
   role        String
   tel_number  String?
   standing    String?
+  program     String?
   position    String?
   thesis      Thesis[]
   adviser     Adviser? @relation
