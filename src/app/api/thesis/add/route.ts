@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         );
     } catch (err) {
         return NextResponse.json(
-            { message: "An error occurred during login" },
+            { message: "An error occurred during uploading" },
             { status: 500 }
         );
     }
