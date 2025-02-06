@@ -41,10 +41,13 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
         <div className="w-full h-24">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 py-2">
                 {loading ? (
-                    <p>Loading...</p>
+                    <div className="h-48 col-span-full flex justify-center items-center">
+                        <p>Loading...</p>
+                    </div>
                 ) : userThesis && userThesis.length > 0 ? (
                     userThesis.map((thesis) => (
                         <div
+                            className="cursor-pointer"
                             key={thesis.id}
                             onClick={() => {
                                 setSelectedThesis(thesis);
@@ -55,7 +58,9 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
                         </div>
                     ))
                 ) : (
-                    <p>No thesis found.</p>
+                    <div className="h-48 col-span-full flex justify-center items-center">
+                        <p>No thesis found.</p>
+                    </div>
                 )}
             </div>
             <Modal title="Edit Thesis" isModalOpen={thesistModal} setModalOpen={setThesisModal}>
