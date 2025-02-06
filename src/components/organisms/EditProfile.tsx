@@ -34,24 +34,22 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
         removeToasts();
         isUpdated(false);
         setLoading(true);
-    
+
         try {
             const formData = getValues();
             const responseData = await updateUser(formData);
-    
+
             if (!responseData) {
                 throw new Error("No response received from the server.");
             }
-    
+
             if (responseData.error) {
                 throw new Error(responseData.error);
             }
-    
+
             showToast(responseData.message || "Updated Successfully", "success");
             isShowEdit(false);
-        } catch (error: unknown) {
-            console.error("An error occurred:", error);
-    
+        } catch (error) {
             if (error instanceof Error) {
                 showToast(error.message, "error");
             } else {
@@ -63,7 +61,7 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
             setLoading(false);
         }
     }
-    
+
 
     return (
         <form
@@ -127,6 +125,17 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                             />
                         </div>
                     }
+
+                    <div>
+                        <label className="block text-textPrimary font-semibold mb-1">Program</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                            placeholder="Program"
+                            {...register("program")}
+                            defaultValue={userData?.program}
+                        />
+                    </div>
                     {userData?.position &&
                         <div>
                             <label className="block text-textPrimary font-semibold mb-1">Position</label>
