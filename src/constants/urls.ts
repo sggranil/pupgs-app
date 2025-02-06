@@ -9,9 +9,11 @@ export const USER_API = {
 }
 
 export const SUBJECT_API = {
+    GET_ALL_SUBJECT_URL: "/subject/get",
     GET_SUBJECT_URL: (id: number) => `/subject/get/${id}`,
     ADD_SUBJECT_URL: "/subject/add",
     UPDATE_SUBJECT_URL: "/subject/update",
+    CONFIRMED_SUBJECT_URL: "/subject/confirmed",
     DELETE_SUBJECT_URL: (id: number) => `/subject/delete/${id}`,
 }
 
