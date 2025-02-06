@@ -8,7 +8,7 @@ interface Subject {
 
 const SubjectCard: React.FC<Subject> = ({ userData }) => {
     return (
-        <div className="w-full cursor-pointer">
+        <div className="w-full">
             <div className="flex items-center justify-between p-3 bg-white rounded-md shadow-md">
                 <div>
                     <h2 className="text-md font-semibold text-textPrimary">{userData.subject_name}</h2>
