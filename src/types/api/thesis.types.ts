@@ -6,4 +6,10 @@ export const enrolledSubjectSchema = z.object({
     attachment: z.string().min(6, "OR Attachment is required."),
 });
 
+export const addThesisSchema = z.object({
+    thesis_title: z.string().min(6, "Thesis title is required."),
+    file_url: z.string().min(6, "Concept paper attachment is required."),
+})
+
 export type EnrolledSubjectSchemaType = z.infer<typeof enrolledSubjectSchema>;
+export type AddThesisSchemaType = z.infer<typeof addThesisSchema>;

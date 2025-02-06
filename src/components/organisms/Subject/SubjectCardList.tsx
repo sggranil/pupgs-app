@@ -38,7 +38,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
     }, [isUpdated]);
 
     return (
-        <div className="h-64">
+        <div className="h-24">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 py-2">
                 {loading ? (
                     <p>Loading...</p>

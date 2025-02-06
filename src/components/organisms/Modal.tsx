@@ -11,7 +11,7 @@ interface ModalProps {
 const Modal = ({ title, isModalOpen, setModalOpen, children }: ModalProps) => {
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center">
             {isModalOpen && (
                 <div
                     className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"

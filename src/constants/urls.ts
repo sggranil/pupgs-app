@@ -15,6 +15,13 @@ export const SUBJECT_API = {
     DELETE_SUBJECT_URL: (id: number) => `/subject/delete/${id}`,
 }
 
+export const THESIS_API = {
+    GET_THESIS_URL: (id: number) => `/thesis/get/${id}`,
+    ADD_THESIS_URL: "/thesis/add",
+    UPDATE_THESIS_URL: "/thesis/update",
+    DELETE_THESIS_URL: (id: number) => `/thesis/delete/${id}`,
+}
+
 export const UPLOAD_API = {
     UPLOAD_FILE_API: "/file/upload"
 }
