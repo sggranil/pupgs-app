@@ -3,43 +3,43 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { removeToasts, showToast } from "@/components/organisms/Toast";
-import { enrolledSubjectSchema, EnrolledSubjectSchemaType } from "@/types/api/thesis.types";
-import useSubjectRequest from "@/hooks/subject";
+import { addThesisSchema, AddThesisSchemaType } from "@/types/api/thesis.types";
+import useThesisRequest from "@/hooks/thesis";
 
-interface EnrolledSubjectProps {
+
+interface AddThesisProps {
     setIsModalOpen: (modalOpen: boolean) => void;
     setIsUpdated: (isUpdated: boolean) => void;
-    subjectData?: any;
+    thesisData?: any;
 }
 
-const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, setIsUpdated, setIsModalOpen }) => {
+const AddThesisModal: React.FC<AddThesisProps> = ({ thesisData, setIsUpdated, setIsModalOpen }) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [deleteSubjectData, setDeleteSubjectData] = useState<boolean>(false);
+    const [deleteThesisData, setDeleteThesisData] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const { addSubject, updateSubject, deleteSubject } = useSubjectRequest();
+    const { addThesis, updateThesis, deleteThesis } = useThesisRequest();
 
     const {
         register,
         getValues,
         setValue,
         formState: { errors },
-    } = useForm<EnrolledSubjectSchemaType>({
-        resolver: zodResolver(enrolledSubjectSchema),
+    } = useForm<AddThesisSchemaType>({
+        resolver: zodResolver(addThesisSchema),
         defaultValues: {
-            subject_name: subjectData?.subject_name || "",
-            or_number: subjectData?.or_number || "",
-            attachment: subjectData?.attachment || "",
+            thesis_title: thesisData?.thesis_title || "",
+            file_url: thesisData?.proposals[0].file_url || "",
         },
     });
 
-    const [filePath, setFilePath] = useState<string>(subjectData?.attachment || "");
+    const [filePath, setFilePath] = useState<string>(thesisData?.proposals[0].file_url || "");
 
     useEffect(() => {
-        if (subjectData?.attachment) {
-            setFilePath(subjectData.attachment);
-            setValue("attachment", subjectData.attachment);
+        if (thesisData?.proposals[0].file_url) {
+            setFilePath(thesisData.proposals[0].file_url);
+            setValue("file_url", thesisData.proposals[0].file_url);
         }
-    }, [subjectData, setValue]);
+    }, [thesisData, setValue]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -81,7 +81,7 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
         removeToasts();
 
         if (!selectedFile && !filePath) {
-            showToast("Please upload an OR attachment", "error");
+            showToast("Please upload an attachment", "error");
             return;
         }
 
@@ -92,7 +92,7 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
             let uploadedFileUrl = filePath;
 
             if (selectedFile) {
-                const existingFilename = subjectData?.attachment?.split("/").pop();
+                const existingFilename = thesisData?.proposals[0].file_url?.split("/").pop();
                 const uploadData = await uploadFile(selectedFile, existingFilename);
 
                 if (!uploadData.fileUrl) {
@@ -101,24 +101,22 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
 
                 uploadedFileUrl = uploadData.fileUrl;
                 setFilePath(uploadedFileUrl);
-                setValue("attachment", uploadedFileUrl);
+                setValue("file_url", uploadedFileUrl);
             }
 
             const textData = {
-                id: subjectData?.id,
-                subject_name: values.subject_name,
-                or_number: values.or_number,
-                attachment: uploadedFileUrl,
+                id: thesisData?.id,
+                thesis_title: values.thesis_title,
+                file_url: uploadedFileUrl,
             };
 
-            if (subjectData) {
-                await updateSubject(textData);
+            if (thesisData) {
+                await updateThesis(textData);
                 showToast("Subject updated successfully!", "success");
             } else {
-                await addSubject(textData);
+                await addThesis(textData);
                 showToast("Subject added successfully!", "success");
             }
-
             setIsUpdated(true);
             setIsModalOpen(false);
         } catch (error) {
@@ -128,11 +126,11 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
         }
     }
 
-    async function handleDeleteSubject() {
-        setDeleteSubjectData(true);
+    async function handleDeleteThesis() {
+        setDeleteThesisData(true);
         try {
-            setDeleteSubjectData(true);
-            const response = await deleteSubject(subjectData?.id);
+            setDeleteThesisData(true);
+            const response = await deleteThesis(thesisData?.id);
             if (response) {
                 showToast("Subject updated successfully!", "success");
                 setIsUpdated(true);
@@ -145,7 +143,7 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
         } catch (error) {
             showToast("An error occurred. Please try again.", "error");
         } finally {
-            setDeleteSubjectData(false);
+            setDeleteThesisData(false);
         }
     }
 
@@ -154,36 +152,20 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
             <div className="w-full py-4">
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
-                        Currently Enrolled Subject *
-                    </label>
-                    <select
-                        className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        {...register("subject_name")}
-                    >
-                        <option value="" disabled>
-                            Select Subject
-                        </option>
-                        <option value="Thesis Writing 1">Thesis Writing 1</option>
-                        <option value="Thesis Writing 2">Thesis Writing 2</option>
-                    </select>
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-textPrimary font-semibold mb-1">
-                        Official Receipt No. *
+                        Thesis Title *
                     </label>
                     <input
                         type="text"
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        placeholder="OR Number"
-                        {...register("or_number")}
-                        defaultValue={subjectData?.or_number}
+                        placeholder="Your proposed thesis title"
+                        {...register("thesis_title")}
+                        defaultValue={thesisData?.thesis_title}
                     />
                 </div>
 
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
-                        OR Attachment *
+                        Thesis/Concept Paper Attachment *
                     </label>
                     <input
                         type="file"
@@ -211,7 +193,7 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
                     )}
                 </div>
 
-                <input type="hidden" {...register("attachment")} value={filePath} />
+                <input type="hidden" {...register("file_url")} value={filePath} />
 
                 <div className="flex flex-row gap-2">
                     <button
@@ -219,16 +201,16 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
                         disabled={!filePath || loading}
                         className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
                     >
-                        {loading ? "Uploading..." : subjectData ? "Update" : "Upload"}
+                        {loading ? "Submitting..." : thesisData ? "Update" : "Submit"}
                     </button>
-                    {subjectData && (
+                    {thesisData && (
                         <button
                             type="button"
-                            disabled={deleteSubjectData}
-                            onClick={handleDeleteSubject}
+                            disabled={deleteThesisData}
+                            onClick={handleDeleteThesis}
                             className="w-full mt-6 py-2 border-2 border-bgPrimary text-bgPrimary bg-transparent font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
                         >
-                            {deleteSubjectData ? "Deleting..." : "Delete"}
+                            {deleteThesisData ? "Deleting..." : "Delete"}
                         </button>
                     )}
                 </div>
@@ -237,4 +219,4 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
     );
 };
 
-export default EnrolledSubjectModal;
+export default AddThesisModal;
