@@ -62,13 +62,37 @@ export default function ThesisPage() {
                         <div className="col-span-12 md:col-span-7 p-4">
                             <ProposalCardList thesisId={thesisId} />
                         </div>
-                        <div className="col-span-12 md:col-span-5 bg-gray-100 rounded-md p-2 px-4">
-                            <h1 className='border-b border-gray-300 py-2 font-semibold'>Downloadables</h1>
-                            <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">
-                                <FormDownloadableCard itemNo={1} title="Concept Paper Adviser Endorsement Form" link="#" />
-                                <FormDownloadableCard itemNo={2} title="Thesis Dissertation Advising Contract" link="#" />
-                                <FormDownloadableCard itemNo={3} title="Thesis Dissertation Consultation and Monitoring Form" link="#" />
-                                <FormDownloadableCard itemNo={4} title="Thesis Dissertation Adviser Appointment and Acknowledgement Form" link="#" />
+                        <div className="col-span-12 md:col-span-5">
+                            <div className='bg-gray-100 rounded-md p-2 px-4 mb-4'>
+                                <h4 className='border-b border-gray-300 py-2 font-semibold'>Information</h4>
+                                <div className='py-4'>
+                                    <p className='border-b border-gray-300 pb-2'>
+                                        <strong>Defense Date:</strong> <span>{thesisData?.defense_date ? thesisData?.defense_date : "To be Announced"}</span>
+                                    </p>
+                                    <p className='border-b border-gray-300 py-2'>
+                                        <strong>Defense Time:</strong> <span>{thesisData?.defense_time ? thesisData?.defense_time : "To be Announced"}</span>
+                                    </p>
+                                    <p className="border-b border-gray-300 py-2">
+                                        <strong>Panelist:</strong>{" "}
+                                        {!thesisData?.panelists || thesisData.panelists.length === 0 ? (
+                                            <span>No Panelist Assigned</span>
+                                        ) : (
+                                            thesisData.panelists.map((data, index) => (
+                                                <span key={index} className="block">{index}</span>
+                                            ))
+                                        )}
+                                    </p>
+
+                                </div>
+                            </div>
+                            <div className='bg-gray-100 rounded-md p-2 px-4'>
+                                <h1 className='border-b border-gray-300 py-2 font-semibold'>Downloadables</h1>
+                                <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">
+                                    <FormDownloadableCard itemNo={1} title="Concept Paper Adviser Endorsement Form" link="#" />
+                                    <FormDownloadableCard itemNo={2} title="Thesis Dissertation Advising Contract" link="#" />
+                                    <FormDownloadableCard itemNo={3} title="Thesis Dissertation Consultation and Monitoring Form" link="#" />
+                                    <FormDownloadableCard itemNo={4} title="Thesis Dissertation Adviser Appointment and Acknowledgement Form" link="#" />
+                                </div>
                             </div>
                         </div>
                     </div>
