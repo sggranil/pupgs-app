@@ -18,9 +18,16 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             include: {
                 proposals: true,
                 student: true,
-                adviser: true,
-                user: true,
-                panelists: true,
+                adviser: {
+                    include: {
+                        user: true,
+                    }
+                },
+                panelists: {
+                    include: {
+                        user: true,
+                    }
+                },
             },
         });
 
