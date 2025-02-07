@@ -5,16 +5,17 @@ export interface User {
     email: string;
     password: string;
     first_name: string;
-    middle_name?: string | null;
+    middle_name?: string;
     last_name: string;
-    ext_name?: string | null;
+    ext_name?: string;
     role: string;
-    tel_number?: string | null;
-    standing?: string | null;
-    position?: string | null;
+    tel_number?: string;
+    standing?: string;
+    position?: string;
+    program?: string;
     thesis: Thesis[];
-    adviser?: Adviser | null;
-    student?: Student | null;
+    adviser?: Adviser;
+    student?: Student;
 }
 
 export interface Student {

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
-import fs from 'fs'; // Node.js filesystem module
+import fs from 'fs';
 
 const prisma = new PrismaClient();
 

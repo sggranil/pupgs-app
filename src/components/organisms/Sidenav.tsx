@@ -90,7 +90,7 @@ const Sidenav = ({
                     <Link
                         href={`/dashboard/${userRole}`}
                         className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
-                            pathname === `/dashboard/${userRole}` ? "bg-bgPrimary text-white" : ""
+                            pathname === `/dashboard/${userRole}` || pathname === `/thesis` ? "bg-bgPrimary text-white" : ""
                         }`}
                     >
                         Dashboard

@@ -13,7 +13,7 @@ export async function GET(request: NextRequest,
 
         if (!subject) {
             return NextResponse.json(
-                { message: "User not found." },
+                { message: "Subject not found." },
                 { status: 401 }
             );
         }

@@ -28,6 +28,7 @@ export const updateUserSchema = z.object({
   ext_name: z.string().optional(),
   standing: z.string().optional(),
   position: z.string().optional(),
+  program: z.string().optional(),
   tel_number: z.string().optional(),
   old_password: z.string().optional(),
   password: z.string().optional(),

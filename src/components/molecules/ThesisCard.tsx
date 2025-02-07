@@ -8,7 +8,7 @@ interface ThesisProp {
 
 const ThesisCard: React.FC<ThesisProp> = ({ thesisData }) => {
     return (
-        <div className="w-full cursor-pointer">
+        <div className="w-full">
             <div className="flex items-center justify-between p-3 bg-white rounded-md shadow-md">
                 <div>
                     <h2 className="text-md font-semibold text-textPrimary">{thesisData.thesis_title}</h2>
