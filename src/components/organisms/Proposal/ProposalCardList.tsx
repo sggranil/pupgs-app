@@ -8,6 +8,7 @@ import useProposalRequest from "@/hooks/proposal";
 import ProposalCard from "@/components/molecules/ProposalCard";
 import Modal from "../Modal";
 import AddRevisedProposalModal from "./AddRevisedProposalModal";
+import { getUserRoleFromCookies } from "@/utilities/AuthUtilities";
 
 interface ProposalCardList {
     thesisId: string;
@@ -18,6 +19,8 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ proposalModal, setProposalModal ] = useState<boolean>(false);
     const [ isUpdated, setIsUpdated ] = useState<boolean>(false);
+
+    const userRole = getUserRoleFromCookies();
 
     const { getProposal } = useProposalRequest();
 
@@ -40,12 +43,14 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
                 <h1 className="text-md font-semibold p-2">
                     Paper Proposal
                 </h1>
-                <button
-                    onClick={() => setProposalModal(true)}
-                    className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
-                >
-                    Add Documents
-                </button>
+                {userRole === "student" && (
+                    <button
+                        onClick={() => setProposalModal(true)}
+                        className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
+                    >
+                        Add Documents
+                    </button>
+                )}
 
             </div>
             <div className="grid grid-cols-2 gap-2 py-2">

@@ -11,7 +11,7 @@ import Modal from "../Modal";
 import EnrolledSubjectModal from "./EnrolledSubjectModal";
 import { getUserRoleFromCookies } from "@/utilities/AuthUtilities";
 
-import SubjectTable from "../../molecules/SubjectTable";
+import SubjectTable from "./SubjectTable";
 
 interface SubjectCardListProps {
     isUpdated: boolean;
