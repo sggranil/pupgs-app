@@ -34,14 +34,7 @@ export default function AdviserDashboard() {
                         Thesis
                     </h1>
                 </div>
-                {isSubjectConfirmed ? (
-                    <ThesistCardList setIsUpdated={setIsThesisUpdated} isUpdated={isThesisUpdated} />
-                ) : (
-                    <div className="h-48 col-span-full flex justify-center items-center">
-                        <p>You must enroll first on Thesis Writing 1 or 2.</p>
-                    </div>
-                )}
-                
+                <ThesistCardList setIsUpdated={setIsThesisUpdated} isUpdated={isThesisUpdated} />
             </div>
             <div className="h-0">
                 <Modal title="Upload Documents" isModalOpen={enrolledSubjectModal} setModalOpen={setEnrolledSubjectModal}>
