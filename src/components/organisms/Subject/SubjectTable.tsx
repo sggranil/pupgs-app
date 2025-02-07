@@ -3,7 +3,7 @@
 import { EnrolledSubject } from "@/interface/thesis.interface";
 import { useState } from "react";
 import useSubjectRequest from "@/hooks/subject";
-import { showToast } from "../organisms/Toast";
+import { showToast } from "../Toast";
 
 interface Subject {
     setIsUpdated: (isUpdated: boolean) => void;
@@ -28,27 +28,23 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
     });
 
     const handleCheckboxChange = async (subject: EnrolledSubject, index: number) => {
-        // Toggle the confirmation status
         const newStatus = !(statusUpdate.get(index) ?? subject.is_confirmed);
     
-        // Update the local state with the new status
         const updatedStatus = new Map(statusUpdate);
         updatedStatus.set(index, newStatus);
         setStatusUpdate(updatedStatus);
     
-        // Prepare data to send to the backend
         const data = {
             id: subject.id,
-            is_confirmed: newStatus, // Send the new status
+            is_confirmed: newStatus,
         };
     
         try {
-            // Call the backend to update the confirmation status
             const response = await confirmedSubject(data);
     
             if (response) {
                 showToast("Subject updated successfully", "success");
-                setIsUpdated(true); // Optional: Trigger UI updates or re-fetch
+                setIsUpdated(true);
             } else {
                 showToast(response.message || "Subject update failed", "error");
             }
@@ -126,7 +122,6 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                                     className="form-checkbox"
                                 />
                             </td>
-
                         </tr>
                     ))}
                 </tbody>
