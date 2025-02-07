@@ -5,15 +5,15 @@ export interface Thesis {
     thesis_title: string;
     student: Student;
     student_id: number;
-    adviser?: Adviser | null;
-    adviser_id?: number | null;
-    is_confirmed?: boolean | null;
+    adviser?: Adviser;
+    adviser_id?: number;
+    is_confirmed?: boolean;
     user: User;
     user_id: number;
     proposals: Proposal[];
     panelists: Adviser[];
-    defense_date?: string | null;
-    defense_time?: string | null;
+    defense_date?: string;
+    defense_time?: string
   }
   
   export interface Proposal {
