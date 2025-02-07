@@ -53,6 +53,15 @@ const useThesisRequest = () => {
         return response.json()
     }
 
+    const scheduleThesis = async (body: object) => {
+        const response = await requestHandler({
+            method: 'POST',
+            body: JSON.stringify(body),
+            url: THESIS_API.SCHEDULE_THESIS_URL
+        })
+        return response.json()
+    }
+
     const deleteThesis = async (id: number) => {
         const response = await requestHandler({
             method: 'POST',
@@ -68,6 +77,7 @@ const useThesisRequest = () => {
         addThesis,
         updateThesis,
         confirmedThesis,
+        scheduleThesis,
         deleteThesis
     }
 }

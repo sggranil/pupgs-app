@@ -24,6 +24,7 @@ export const THESIS_API = {
     ADD_THESIS_URL: "/thesis/add",
     UPDATE_THESIS_URL: "/thesis/update",
     CONFIRM_THESIS_URL: "/thesis/confirmed",
+    SCHEDULE_THESIS_URL: "/thesis/update/schedule",
     DELETE_THESIS_URL: (id: number) => `/thesis/delete/${id}`,
 }
 
