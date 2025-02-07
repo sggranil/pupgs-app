@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "next": "15.1.6",
     "pdf-lib": "^1.17.1",
+    "pdf2html": "^3.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",

@@ -63,6 +63,7 @@ const ScheduleThesisModal: React.FC<Props> = ({ thesisData, adviserData, setIsMo
             panelists: selectedAdvisers,
         }
 
+        setIsUpdated(false);
         setLoading(true);
 
         try {
@@ -70,12 +71,12 @@ const ScheduleThesisModal: React.FC<Props> = ({ thesisData, adviserData, setIsMo
 
             if (response) {
                 showToast("Thesis scheduled updated successfully.", "success")
+                setIsUpdated(true);
             } else {
                 showToast(response.message || "Thesis scheduled updated failed.", "error")
-            }
+            };
 
-            setIsUpdated(true);
-            setIsModalOpen(false);
+            setIsModalOpen(false)
         } catch (error) {
             console.error("Error updating thesis:", error);
         } finally {
