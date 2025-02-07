@@ -17,7 +17,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             where: { id: thesisId },
             include: {
                 proposals: true,
-                student: true,
+                student: {
+                    include: {
+                        user: true
+                    }
+                },
                 adviser: {
                     include: {
                         user: true,
