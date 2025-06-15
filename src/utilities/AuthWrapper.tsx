@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUserRoleFromCookies } from "@/utilities/AuthUtilites/AuthServer";
-import { isClientAuthorized } from "@/utilities/AuthUtilites/AuthClient";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import { isClientAuthorized } from "@/utilities/AuthUtilities";
 
 export const withAuth = (WrappedComponent: React.ComponentType<any>, role?: string) => {
   const WithAuthWrapper = (props: any) => {
@@ -9,11 +9,11 @@ export const withAuth = (WrappedComponent: React.ComponentType<any>, role?: stri
     const router = useRouter();
 
     useEffect(() => {
-      const checkAuthorization = async () => {
-        const userRole = await getUserRoleFromCookies()
+      const checkAuthorization = () => {
+        const userRole = getUserInfoFromCookies('role')
 
         if (!isClientAuthorized()) {
-          router.push(`/login?type=${userRole}`);
+          router.push(`/login`);
           return;
         }
 
