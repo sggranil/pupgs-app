@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import useUserRequest from "@/hooks/user";
 
-import { getCookie } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { User } from "@/interface/user.interface";
 
 import EditProfile from "@/components/organisms/EditProfile";
@@ -16,7 +16,7 @@ export default function Profile() {
     const [ showUpdate, setShowUpdate ] = useState<boolean>(false);
 
     const { getUser } = useUserRequest();
-    const userId = getCookie(null, "id");
+    const userId = getUserInfoFromCookies('userId');
 
     const fetchUser = async () => {
         setLoading(true);

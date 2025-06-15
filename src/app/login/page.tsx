@@ -4,7 +4,9 @@ import React, { FormEvent, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+
+import { decodeToken } from "@/utilities/TokenUtilities";
 
 import { loginSchema } from "@/types/api/auth.types";
 import { removeToasts, showToast } from "@/components/organisms/Toast";
@@ -17,10 +19,7 @@ type LoginSchemaType = z.infer<typeof loginSchema>;
 export default function LoginPage() {
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
-    const searchParams = useSearchParams()
     const { loginUser } = useAuthRequest();
-
-    const type = searchParams.get('type') as "student" | "adviser";
 
     const {
         register,
@@ -40,8 +39,9 @@ export default function LoginPage() {
             const formData = getValues();
             const responseData = await loginUser(formData);
 
-            if (responseData && responseData.token) {
-                router.push(`/dashboard/${type}`);
+            if (responseData && responseData.access_token) {
+                const userData = decodeToken(responseData.access_token);
+                router.push(`/dashboard/${userData?.role}`);
             } else {
                 showToast(responseData?.message || "Login failed. Please try again.", "error");
             }
@@ -74,7 +74,7 @@ export default function LoginPage() {
                         />
                         <div className="flex flex-col">
                             <span className="text-xl font-bold text-textPrimary">PUP Graduate Thesis Monitoring System</span>
-                            <span className="text-sm font-normal text-textPrimary">{type.toLocaleUpperCase()} LOGIN FORM</span>
+                            <span className="text-sm font-normal text-textPrimary">LOGIN FORM</span>
                         </div>
                     </div>
 
