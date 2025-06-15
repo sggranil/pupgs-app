@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Thesis } from "@/interface/thesis.interface";
 import useThesisRequest from "@/hooks/thesis";
 import ThesisCard from "@/components/molecules/ThesisCard";
-import { getUserRoleFromCookies } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies  } from "@/utilities/AuthUtilities";
 import ThesisTable from "@/components/organisms/Thesis/ThesisTable"
 
 interface ThesisardListProps {
@@ -21,7 +21,7 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
     const [ loading, setLoading ] = useState<boolean>(false);
     const { getAllThesis } = useThesisRequest();
 
-    const userRole = getUserRoleFromCookies();
+    const userRole = getUserInfoFromCookies('role');
 
     const router = useRouter();
 

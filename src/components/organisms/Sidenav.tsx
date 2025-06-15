@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../molecules/Navbar";
-import { removeCookieClient, getUserRoleFromCookies } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import { removeCookie } from "@/utilities/AuthUtilities";
 import { useRouter, usePathname  } from "next/navigation"
 import Link from "next/link";
 
@@ -27,11 +28,10 @@ const Sidenav = ({
     };
 
     const logoutUser = () => {
-        removeCookieClient("session");
-        removeCookieClient("user");
-        removeCookieClient("id");
+        removeCookie("access_token");
+        removeCookie("refresh_token");
 
-        router.push(`/login?type=${userRole}`);
+        router.push(`/login`);
     };
 
     useEffect(() => {
@@ -59,8 +59,12 @@ const Sidenav = ({
     }, [isOpen]);
 
     useEffect(() => {
-        const role = getUserRoleFromCookies();
-        setUserRole(role);
+        const fetchUserRole = () => {
+            const role = getUserInfoFromCookies('role');
+            setUserRole(role);
+        };
+
+        fetchUserRole();
     }, []);
 
     return (

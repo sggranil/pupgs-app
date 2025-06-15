@@ -1,22 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import { getCookie } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 const UserInfoCard = () => {
-  const userCookie = getCookie(null, "user");
-  let userData = null;
-
-  if (userCookie) {
-    try {
-      userData = JSON.parse(userCookie);
-    } catch (error) {
-      console.error("Error parsing user cookie:", error);
-    }
-  }
-
+  // TODO: Fetch User Info
   const imageUrl = "/user.svg";
-  const userName = userData ? `${userData.firstName} ${userData.lastName}` : "Guest";
-  const userRole = userData ? `${userData.standing}` : `${userData.position}`;
+  const userRole = getUserInfoFromCookies("role");
 
   return (
     <div className="absolute bottom-4 w-full px-4">
@@ -29,7 +18,7 @@ const UserInfoCard = () => {
           className="rounded-full mr-4"
         />
         <div>
-          <p className="text-sm font-semibold text-textPrimary">{userName}</p>
+          <p className="text-sm font-semibold text-textPrimary">Lorem Ipsum</p>
           <p className="text-xs text-gray-500">{userRole}</p>
         </div>
       </div>

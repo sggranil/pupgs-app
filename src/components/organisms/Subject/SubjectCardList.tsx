@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-import Cookies from "js-cookie";
 import useSubjectRequest from "@/hooks/subject";
 
 import SubjectCard from "@/components/molecules/SubjectCard";
 import { EnrolledSubject } from "@/interface/thesis.interface";
 import Modal from "../Modal";
 import EnrolledSubjectModal from "./EnrolledSubjectModal";
-import { getUserRoleFromCookies } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies  } from "@/utilities/AuthUtilities";
 
 import SubjectTable from "./SubjectTable";
 
@@ -25,7 +24,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
     const [ userSubject, setUserSubject ] = useState<EnrolledSubject[] | null>([]);
     const [ loading, setLoading ] = useState<boolean>(false);
     const { getAllSubject } = useSubjectRequest();
-    const userRole = getUserRoleFromCookies();
+    const userRole = getUserInfoFromCookies('role');
 
     const fetchSubject = async () => {
         setLoading(true);
