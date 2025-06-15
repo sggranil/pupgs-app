@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
         setCookie(res, 'access_token', accessToken, { maxAge: 1800 });
         setCookie(res, 'refresh_token', refreshToken, { maxAge: 86400 });
 
-        return res
+        return res;
     } catch (err) {
         console.error(err);
         return NextResponse.json(
