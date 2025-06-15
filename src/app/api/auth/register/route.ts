@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs';
 
 import { generateToken } from '@/utilities/TokenUtilities';
 import { registerSchema } from '@/types/api/auth.types';
-import { setCookie } from '@/utilities/AuthUtilities';
 
 const prisma = new PrismaClient();
 
@@ -65,30 +64,20 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        const token = generateToken(
-            { userId: newUser.id, email: newUser.email, role: newUser.role },
-        );
-
-        const res = NextResponse.json({
-            message: "User created successfully",
-            type: role,
-            token,
-        });
-
-        setCookie(res, 'session', token, { maxAge: 60 * 60 * 24 * 7, path: '/' });
-
-        const userInfo = {
-            firstName: newUser.first_name,
+        const accessToken = generateToken({
+            userId: newUser.id,
+            email: newUser.email,
             role: newUser.role,
-            lastName: newUser.last_name,
-            position: newUser.position,
-            standing: newUser.standing
-        };
+        }, 1800); // 30 mins
 
-        setCookie(res, 'user', JSON.stringify(userInfo), { maxAge: 60 * 60 * 24 * 7, path: '/' });
-        setCookie(res, 'id', newUser.id.toString(), { maxAge: 60 * 60 * 24 * 7, path: '/' });
+        const refreshToken = generateToken({
+            userId: newUser.id,
+        }, 86400); // 1 day
 
-        return res;
+        return NextResponse.json({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+        });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

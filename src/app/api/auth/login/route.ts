@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/utilities/TokenUtilities';
-import { setCookie } from '@/utilities/AuthUtilities';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +22,7 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json(
-                { message: "Invalid email or password" },
+                { message: "No user found." },
                 { status: 401 }
             );
         }
@@ -31,47 +30,25 @@ export async function POST(request: NextRequest) {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return NextResponse.json(
-                { message: "Invalid email or password" },
+                { message: "Invalid credentials." },
                 { status: 401 }
             );
         }
 
-        const token = generateToken(
-            {
-                userId: user.id,
-                email: user.email,
-                role: user.role,
-            },
-        );
-
-        const res = NextResponse.json({
-            message: "Login successful",
-            user: {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                position: user.position,
-                standing: user.standing,
-                first_name: user.first_name,
-                last_name: user.last_name,
-            },
-            token,
-        });
-
-        setCookie(res, 'session', token, { maxAge: 60 * 60 * 24 * 7, path: '/' });
-
-        const userInfo = {
-            firstName: user.first_name,
+        const accessToken = generateToken({
+            userId: user.id,
+            email: user.email,
             role: user.role,
-            lastName: user.last_name,
-            position: user.position,
-            standing: user.standing
-        };
+        }, 1800); // 30 mins
 
-        setCookie(res, 'user', JSON.stringify(userInfo), { maxAge: 60 * 60 * 24 * 7, path: '/' });
-        setCookie(res, 'id', user.id.toString(), { maxAge: 60 * 60 * 24 * 7, path: '/' });
+        const refreshToken = generateToken({
+            userId: user.id,
+        }, 86400); // 1 day
 
-        return res;
+        return NextResponse.json({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+        });
     } catch (err) {
         console.error(err);
         return NextResponse.json(
