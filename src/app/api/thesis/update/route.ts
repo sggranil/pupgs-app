@@ -1,12 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
 
+import { getUserId } from '@/utilities/AuthUtilities';
+
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
         const { id, thesis_title, file_url } = await request.json();
-        const userIdCookie = request.cookies.get("id")?.value;
+        const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
             return NextResponse.json(

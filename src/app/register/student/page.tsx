@@ -10,7 +10,7 @@ import { registerSchema } from "@/types/api/auth.types";
 import { removeToasts, showToast } from "@/components/organisms/Toast";
 
 import useAuthRequest from "@/hooks/auth";
-import Layout from "./layout";
+import Layout from "../layout";
 
 type RegisterSchemaType = z.infer<typeof registerSchema>;
 
@@ -18,10 +18,7 @@ export default function RegistrationPage() {
     const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
-    const searchParams = useSearchParams()
     const { registerUser } = useAuthRequest();
-
-    const type = searchParams.get('type') as "student" | "adviser";
 
     const {
         register,
@@ -32,7 +29,7 @@ export default function RegistrationPage() {
         defaultValues: {
             middle_name: "",
             ext_name: "",
-            role: type ?? "student",
+            role: "student",
         },
     });
 
@@ -51,7 +48,7 @@ export default function RegistrationPage() {
             const responseData = await registerUser(formData);
 
             if (responseData && responseData.token) {
-                router.push(`/dashboard/${type}`);
+                router.push(`/dashboard/student`);
             } else {
                 showToast(responseData?.message || "Registration failed. Please try again.", "error");
             }
@@ -84,7 +81,7 @@ export default function RegistrationPage() {
                         />
                         <div className="flex flex-col">
                             <span className="text-xl font-bold text-textPrimary">PUP Graduate Thesis Monitoring System</span>
-                            <span className="text-sm font-normal text-textPrimary">{type.toLocaleUpperCase()} REGISTRATION FORM</span>
+                            <span className="text-sm font-normal text-textPrimary">REGISTRATION FORM</span>
                         </div>
                     </div>
 

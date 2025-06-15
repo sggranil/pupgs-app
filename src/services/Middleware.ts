@@ -1,12 +1,9 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { getCookie } from '@/utilities/AuthUtilities';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(req: Request) {
-    const cookieStore = await cookies(); 
-    const sessionToken = cookieStore.get('session');
-
-    if (!sessionToken) {
-        return NextResponse.redirect(new URL('/login?type=student', req.url));
+export async function middleware(req: NextRequest) {
+    if (!getCookie('access_token')) {
+        return NextResponse.redirect(new URL('/login', req.url));
     }
 
     return NextResponse.next();

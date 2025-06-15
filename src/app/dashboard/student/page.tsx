@@ -1,8 +1,8 @@
 "use client";
+import React from "react";
 import { useState } from "react";
 
 import Modal from "@/components/organisms/Modal";
-import React from "react";
 import AddThesisModal from "@/components/organisms/Thesis/AddThesisModal";
 import EnrolledSubjectModal from "@/components/organisms/Subject/EnrolledSubjectModal";
 import SubjectCardList from "@/components/organisms/Subject/SubjectCardList";

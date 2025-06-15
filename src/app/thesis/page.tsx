@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { getUserRoleFromCookies } from '@/utilities/AuthUtilities';
+import { getUserInfoFromCookies } from '@/utilities/AuthUtilities';
 
 import useThesisRequest from '@/hooks/thesis';
 import FormDownloadableCard from '@/components/molecules/Thesis/FormDownloadableCard';
@@ -15,10 +15,12 @@ export default function ThesisPage() {
     const [thesisData, setThesisData] = useState<Thesis | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [isUpdated, setIsUpdated] = useState<boolean>(false);
+
     const searchParams = useSearchParams();
     const thesisId = searchParams.get('id');
-    const userRole = getUserRoleFromCookies();
+
     const { fetchThesis } = useThesisRequest();
+    const userRole = getUserInfoFromCookies("role");
 
     const fetchThesisData = async () => {
         setLoading(true);

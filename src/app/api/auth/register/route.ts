@@ -65,28 +65,23 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        const token = generateToken(
-            { userId: newUser.id, email: newUser.email, role: newUser.role },
-        );
+        const accessToken = generateToken({
+            userId: newUser.id,
+            email: newUser.email,
+            role: newUser.role,
+        }, 1800); // 30 mins
+
+        const refreshToken = generateToken({
+            userId: newUser.id,
+        }, 86400); // 1 day
 
         const res = NextResponse.json({
-            message: "User created successfully",
-            type: role,
-            token,
+            access_token: accessToken,
+            refresh_token: refreshToken,
         });
 
-        setCookie(res, 'session', token, { maxAge: 60 * 60 * 24 * 7, path: '/' });
-
-        const userInfo = {
-            firstName: newUser.first_name,
-            role: newUser.role,
-            lastName: newUser.last_name,
-            position: newUser.position,
-            standing: newUser.standing
-        };
-
-        setCookie(res, 'user', JSON.stringify(userInfo), { maxAge: 60 * 60 * 24 * 7, path: '/' });
-        setCookie(res, 'id', newUser.id.toString(), { maxAge: 60 * 60 * 24 * 7, path: '/' });
+        setCookie(res, 'access_token', accessToken, { maxAge: 1800 });
+        setCookie(res, 'refresh_token', refreshToken, { maxAge: 86400 });
 
         return res;
     } catch (err) {
