@@ -1,12 +1,13 @@
+import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { PrismaClient } from "@prisma/client";
+
+import { getUserId } from '@/utilities/AuthUtilities';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const userId = (await cookies()).get("id")?.value;
+        const userId = await getUserId();
 
         const data = await request.json();
 
