@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/utilities/TokenUtilities';
+import { setCookie } from '@/utilities/AuthUtilites/AuthServer';
 
 const prisma = new PrismaClient();
 
@@ -45,10 +46,15 @@ export async function POST(request: NextRequest) {
             userId: user.id,
         }, 86400); // 1 day
 
-        return NextResponse.json({
+        const res = NextResponse.json({
             access_token: accessToken,
             refresh_token: refreshToken,
         });
+
+        setCookie(res, 'access_token', accessToken, { sameSite: 'strict', maxAge: 1800, path: '/' });
+        setCookie(res, 'refresh_token', refreshToken, { sameSite: 'strict', maxAge: 86400, path: '/' });
+
+        return res
     } catch (err) {
         console.error(err);
         return NextResponse.json(
