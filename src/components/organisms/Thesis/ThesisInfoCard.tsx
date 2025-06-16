@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Modal from "@/components/organisms/Modal";
 import { Thesis } from "@/interface/thesis.interface";
 import { Adviser } from "@/interface/user.interface";
-import { getUserRoleFromCookies } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import ScheduleThesisModal from "@/components/organisms/Thesis/ScheduleThesisModal";
 import useAdviserRequest from "@/hooks/adviser";
 
@@ -14,7 +14,7 @@ interface ThesisInfoCardProp {
 const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated }) => {
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
     const [adviserData, setAdviserData] = useState<Adviser[]>([]);
-    const userRole = getUserRoleFromCookies();
+    const userRole = getUserInfoFromCookies('role');
 
     const { getAllAdviser } = useAdviserRequest();
 
