@@ -8,7 +8,7 @@ import useProposalRequest from "@/hooks/proposal";
 import ProposalCard from "@/components/molecules/ProposalCard";
 import Modal from "../Modal";
 import AddRevisedProposalModal from "./AddRevisedProposalModal";
-import { getUserRoleFromCookies } from "@/utilities/AuthUtilities";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 interface ProposalCardList {
     thesisId: string;
@@ -20,7 +20,7 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
     const [ proposalModal, setProposalModal ] = useState<boolean>(false);
     const [ isUpdated, setIsUpdated ] = useState<boolean>(false);
 
-    const userRole = getUserRoleFromCookies();
+    const userRole = getUserInfoFromCookies('role');
 
     const { getProposal } = useProposalRequest();
 
