@@ -8,6 +8,7 @@ export interface Thesis {
     adviser?: Adviser;
     adviser_id?: number;
     is_confirmed?: boolean;
+    message?: string;
     user: User;
     user_id: number;
     proposals: Proposal[];
@@ -33,5 +34,6 @@ export interface Thesis {
     attachment: string;
     is_confirmed?: boolean | null;
     enrolled_at: string;
+    message?: string;
   }
   
