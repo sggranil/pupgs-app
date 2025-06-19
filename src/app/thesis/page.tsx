@@ -20,7 +20,7 @@ export default function ThesisPage() {
     const thesisId = searchParams.get('id');
 
     const { fetchThesis } = useThesisRequest();
-    const userRole = getUserInfoFromCookies("role");
+    const userData = getUserInfoFromCookies();
 
     const fetchThesisData = async () => {
         setLoading(true);
@@ -45,7 +45,7 @@ export default function ThesisPage() {
                 <>
                     <div className='p-4 border-b-2 border-gray-200'>
                         <h1 className='text-textPrimary text-xl md:text-2xl font-bold'>"{thesisData?.thesis_title}"</h1>
-                        {userRole === "adviser" && (
+                        {userData?.role === "adviser" && (
                             <>
                                 <span className='uppercase text-lg font-bold'>{thesisData?.student?.user?.first_name} {thesisData?.student?.user?.last_name}</span> | 
                                 <span className='uppercase text-lg font-bold'> {thesisData?.student?.user?.program}</span>
@@ -59,7 +59,7 @@ export default function ThesisPage() {
                         </div>
                         <div className="col-span-12 md:col-span-5">
                             <ThesisInfoCard setIsUpdated={setIsUpdated} thesisData={thesisData} />
-                            {userRole === "student" && (
+                            {userData?.role === "student" && (
                                 <div className='bg-gray-100 rounded-md p-2 px-4'>
                                     <h1 className='border-b border-gray-300 py-2 font-semibold'>Downloadables</h1>
                                     <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">

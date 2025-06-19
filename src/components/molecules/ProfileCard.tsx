@@ -5,7 +5,7 @@ import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 const UserInfoCard = () => {
   // TODO: Fetch User Info
   const imageUrl = "/user.svg";
-  const userRole = getUserInfoFromCookies("role");
+  const userData = getUserInfoFromCookies();
 
   return (
     <div className="absolute bottom-4 w-full px-4">
@@ -19,7 +19,7 @@ const UserInfoCard = () => {
         />
         <div>
           <p className="text-sm font-semibold text-textPrimary">Lorem Ipsum</p>
-          <p className="text-xs text-gray-500">{userRole}</p>
+          <p className="text-xs text-gray-500">{userData?.role}</p>
         </div>
       </div>
     </div>

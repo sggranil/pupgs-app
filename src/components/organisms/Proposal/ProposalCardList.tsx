@@ -20,7 +20,7 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
     const [ proposalModal, setProposalModal ] = useState<boolean>(false);
     const [ isUpdated, setIsUpdated ] = useState<boolean>(false);
 
-    const userRole = getUserInfoFromCookies('role');
+    const userData = getUserInfoFromCookies();
 
     const { getProposal } = useProposalRequest();
 
@@ -43,7 +43,7 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
                 <h1 className="text-md font-semibold p-2">
                     Paper Proposal
                 </h1>
-                {userRole === "student" && (
+                {userData?.role === "student" && (
                     <button
                         onClick={() => setProposalModal(true)}
                         className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
