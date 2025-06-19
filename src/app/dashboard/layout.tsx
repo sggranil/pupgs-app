@@ -3,8 +3,6 @@
 import Sidenav from "@/components/organisms/Sidenav";
 import { withAuth } from "@/utilities/AuthWrapper";
 import { Toaster } from "react-hot-toast";
-import { usePathname } from "next/navigation"
-
 
 function DashboardLayout({
     children,
@@ -21,4 +19,4 @@ function DashboardLayout({
     );
 }
 
-export default withAuth(DashboardLayout, "adviser");
+export default withAuth(DashboardLayout, ["adviser", "admin"]);
