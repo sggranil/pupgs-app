@@ -4,6 +4,8 @@ export const enrolledSubjectSchema = z.object({
     subject_name: z.string(),
     or_number: z.string().min(6, "OR Number is required."),
     attachment: z.string().min(6, "OR Attachment is required."),
+    is_confirmed: z.boolean().optional(),
+    message: z.string().optional(),
 });
 
 export const addThesisSchema = z.object({
