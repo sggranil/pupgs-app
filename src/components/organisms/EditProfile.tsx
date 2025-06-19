@@ -9,6 +9,8 @@ import { removeToasts, showToast } from "@/components/organisms/Toast";
 import { updateUserSchema } from "@/types/api/auth.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useRouter } from "next/navigation";
+
 interface EditProfileProps {
     userData: User | null;
     isShowEdit: (showEdit: boolean) => void;
@@ -20,6 +22,7 @@ type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdated }) => {
     const [loading, setLoading] = useState<boolean>(false)
     const { updateUser } = useUserRequest();
+    const router = useRouter();
 
     const {
         register,
@@ -160,6 +163,13 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                     </div>
                 </div>
             </div>
+            <button
+                type="button"
+                onClick={() => router.push("/profile/change-password")}
+                className="w-full mt-6 py-2 bg-white border border-red-700 text-textPrimary font-bold rounded-lg"
+            >
+                Change Password
+            </button>
             <button
                 type="submit"
                 disabled={loading}
