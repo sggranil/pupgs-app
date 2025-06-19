@@ -35,9 +35,11 @@ CREATE TABLE "Thesis" (
     "student_id" INTEGER,
     "adviser_id" INTEGER,
     "is_confirmed" BOOLEAN,
+    "message" TEXT,
     "user_id" INTEGER,
     "defense_date" DATETIME,
     "defense_time" DATETIME,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Thesis_student_id_fkey" FOREIGN KEY ("student_id") REFERENCES "Student" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "Thesis_adviser_id_fkey" FOREIGN KEY ("adviser_id") REFERENCES "Adviser" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "Thesis_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -60,6 +62,7 @@ CREATE TABLE "EnrolledSubject" (
     "or_number" TEXT NOT NULL,
     "attachment" TEXT NOT NULL,
     "is_confirmed" BOOLEAN,
+    "message" TEXT,
     "enrolled_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "EnrolledSubject_student_id_fkey" FOREIGN KEY ("student_id") REFERENCES "Student" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
