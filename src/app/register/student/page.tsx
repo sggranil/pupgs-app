@@ -4,13 +4,15 @@ import React, { FormEvent, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { registerSchema } from "@/types/api/auth.types";
 import { removeToasts, showToast } from "@/components/organisms/Toast";
 
 import useAuthRequest from "@/hooks/auth";
-import Layout from "../layout";
+import Layout from "./layout";
+
+import { decodeToken } from "@/utilities/TokenUtilities";
 
 type RegisterSchemaType = z.infer<typeof registerSchema>;
 
@@ -29,7 +31,7 @@ export default function RegistrationPage() {
         defaultValues: {
             middle_name: "",
             ext_name: "",
-            role: "student",
+            role: "admin",
         },
     });
 
@@ -47,8 +49,13 @@ export default function RegistrationPage() {
             const formData = getValues();
             const responseData = await registerUser(formData);
 
-            if (responseData && responseData.token) {
-                router.push(`/dashboard/student`);
+            if (responseData && responseData.access_token) {
+                const userData = decodeToken(responseData.access_token);
+                if (userData?.role == "student") {
+                    router.push(`/student/thesis`);
+                } else {
+                    router.push(`/dashboard`);
+                }
             } else {
                 showToast(responseData?.message || "Registration failed. Please try again.", "error");
             }
