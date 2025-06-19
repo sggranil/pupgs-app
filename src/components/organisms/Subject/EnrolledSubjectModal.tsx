@@ -10,13 +10,16 @@ interface EnrolledSubjectProps {
     setIsModalOpen: (modalOpen: boolean) => void;
     setIsUpdated: (isUpdated: boolean) => void;
     subjectData?: any;
+    receiptApproveCount?: number;
 }
 
-const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, setIsUpdated, setIsModalOpen }) => {
+const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, setIsUpdated, setIsModalOpen, receiptApproveCount }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [deleteSubjectData, setDeleteSubjectData] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const { addSubject, updateSubject, deleteSubject } = useSubjectRequest();
+
+    const count = receiptApproveCount ?? 0;
 
     const {
         register,
@@ -121,8 +124,8 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
 
             setIsUpdated(true);
             setIsModalOpen(false);
-        } catch (error) {
-            showToast("An error occurred. Please try again.", "error");
+        } catch (error: any) {
+            showToast(`An error occurred. Please try again.`, "error");
         } finally {
             setLoading(false);
         }
@@ -154,17 +157,18 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
             <div className="w-full py-4">
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
-                        Currently Enrolled Subject *
+                        Thesis/Dissertation Phases *
                     </label>
                     <select
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
                         {...register("subject_name")}
                     >
                         <option value="" disabled>
-                            Select Subject
+                            Select Defense Phase
                         </option>
-                        <option value="Thesis Writing 1">Thesis Writing 1</option>
-                        <option value="Thesis Writing 2">Thesis Writing 2</option>
+                        <option disabled={count > 1} value="Thesis Proposal">Thesis Proposal</option>
+                        <option disabled={count > 2} value="Pre-Oral Defense">Pre-Oral Defense</option>
+                        <option disabled={count > 3} value="Final Defense">Final Defense</option>
                     </select>
                 </div>
 
