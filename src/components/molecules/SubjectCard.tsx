@@ -9,11 +9,12 @@ interface Subject {
 const SubjectCard: React.FC<Subject> = ({ userData }) => {
     return (
         <div className="w-full">
-            <div className="flex items-center justify-between p-3 bg-white rounded-md shadow-md">
+            <div className="flex items-center justify-between py-4 p-3 bg-white rounded-md shadow-md">
                 <div>
-                    <h2 className="text-md font-semibold text-textPrimary">{userData.subject_name}</h2>
-                    <p className="text-xs text-gray-500">Status: {
-                        !userData.is_confirmed ? "Pending Review" : "Confirmed" 
+                    <h2 className="text-md font-bold text-textPrimary">{userData.subject_name}</h2>
+                    <p className="text-xs font-semibold text-textPrimary">OR #{userData.or_number}</p>
+                    <p className="text-xs text-gray-500 pt-2">Status: {
+                        !userData.is_confirmed ? userData.message ? "Denied" : "Pending Review" : "Confirmed" 
                     }</p>
                 </div>
             </div>
