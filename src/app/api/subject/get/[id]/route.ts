@@ -7,6 +7,16 @@ export async function GET(request: NextRequest,
     { params }: { params: { id: string } }
 ) {
     try {
+        const student = await prisma.student.findUnique({
+            where: { user_id: parseInt(params.id) },
+        });
+
+        if (!student) {
+            return NextResponse.json(
+                { message: "Student not found for this user." },
+                { status: 404 }
+            );
+        }
         const subject = await prisma.enrolledSubject.findMany({
             where: { student_id: parseInt(params.id) },
         });
@@ -18,9 +28,9 @@ export async function GET(request: NextRequest,
             );
         }
 
-        return NextResponse.json({ 
+        return NextResponse.json({
             data: subject,
-            status: 200 
+            status: 200
         });
     } catch (err) {
         return NextResponse.json(
