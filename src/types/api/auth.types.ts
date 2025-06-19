@@ -10,7 +10,7 @@ export const registerSchema = z.object({
   confirm_password: z
     .string()
     .min(6, "Confirm password must be at least 6 characters").optional(),
-  role: z.enum(["student", "adviser"], { message: "Role must be either 'student' or 'adviser'" }),
+  role: z.enum(["student", "adviser", "admin"], { message: "Role must be either 'student' or 'adviser'" }),
 }).refine((data) => data.password === data.confirm_password, {
   message: "Passwords do not match",
   path: ["confirm_password"],
@@ -21,19 +21,39 @@ export const loginSchema = z.object({
   password: z.string().min(6, { message: "Password is required" }),
 });
 
-export const updateUserSchema = z.object({
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  middle_name: z.string().optional(),
-  ext_name: z.string().optional(),
-  standing: z.string().optional(),
-  position: z.string().optional(),
-  program: z.string().optional(),
-  tel_number: z.string().optional(),
-  old_password: z.string().optional(),
-  password: z.string().optional(),
-  confirm_password: z.string().optional(),
-})
+export const updateUserSchema = z
+  .object({
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
+    middle_name: z.string().optional(),
+    ext_name: z.string().optional(),
+    standing: z.string().optional(),
+    position: z.string().optional(),
+    program: z.string().optional(),
+    tel_number: z.string().optional(),
+    old_password: z.string().optional(),
+    password: z.string().optional(),
+    confirm_password: z.string().optional(),
+  })
+  .refine((data) => {
+    if (data.password || data.confirm_password || data.old_password) {
+      return !!data.old_password && !!data.password && !!data.confirm_password;
+    }
+    return true;
+  }, {
+    message: "All password fields are required.",
+    path: ["old_password"],
+  })
+  .refine((data) => {
+    if (data.password || data.confirm_password) {
+      return data.password === data.confirm_password;
+    }
+    return true;
+  }, {
+    message: "Passwords do not match.",
+    path: ["confirm_password"],
+  });
+
 
 export type RegisterSchemaType = z.infer<typeof registerSchema>;
 export type LoginSchemaType = z.infer<typeof loginSchema>;
