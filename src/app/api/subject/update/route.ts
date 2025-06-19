@@ -7,7 +7,16 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, subject_name, or_number, attachment } = await request.json();
+        const body = await request.json();
+        const { id } = body;
+
+        if (!id) {
+            return NextResponse.json(
+                { message: "Missing subject ID." },
+                { status: 400 }
+            );
+        }
+
         const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
@@ -26,13 +35,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!id || !subject_name || !or_number || !attachment) {
-            return NextResponse.json(
-                { message: "All fields are required" },
-                { status: 400 }
-            );
-        }
-
         const user = await prisma.user.findUnique({
             where: { id: userId },
         });
@@ -46,12 +48,7 @@ export async function POST(request: NextRequest) {
 
         const updatedSubject = await prisma.enrolledSubject.update({
             where: { id },
-            data: {
-                subject_name,
-                or_number,
-                attachment,
-                is_confirmed: false,
-            },
+            data: body, 
         });
 
         return NextResponse.json(
