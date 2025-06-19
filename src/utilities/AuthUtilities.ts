@@ -1,6 +1,8 @@
-import cookie from 'cookie';
 import { NextResponse } from 'next/server';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
+import { JwtPayload } from 'jsonwebtoken';
+import cookie from 'cookie';
+
 import { decodeToken } from './TokenUtilities';
 
 type UserInfoType = 'userId' | 'role' | 'email';
@@ -63,24 +65,13 @@ export const getUserId = async (): Promise<string | null> => {
 
 
 // Client-side Cookie Utilities
-export const getUserInfoFromCookies = (type: UserInfoType): string | null => {
+export const getUserInfoFromCookies = (): JwtPayload | null => {
   const userCookie = getClientCookie('access_token');
 
   if (!userCookie) return null;
 
   try {
-    const user = decodeToken(userCookie);
-    switch (type) {
-      case 'userId':
-        return user?.userId || null;
-      case 'role':
-        return user?.role || null;
-      case 'email':
-        return user?.email || null;
-      default:
-        console.warn(`Unknown user info type requested: ${type}`);
-        return null;
-    }
+    return decodeToken(userCookie);
   } catch (e) {
     console.error('Failed to decode access_token:', e);
     return null;
