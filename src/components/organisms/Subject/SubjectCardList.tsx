@@ -38,7 +38,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
 
       if (userData?.role === "student") {
         const studentSubjects = allSubjects.filter(
-          (subject: any) => subject.student_id === userData?.userId
+          (subject: any) => subject.student.user_id === userData?.userId
         );
         setUserSubject(studentSubjects);
         setSubjectData(studentSubjects);
