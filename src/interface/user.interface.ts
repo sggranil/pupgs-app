@@ -32,4 +32,5 @@ export interface Adviser {
     user_id: number;
     thesis: Thesis[];
     panelists: Thesis[];
+    secretary: Thesis;
 }

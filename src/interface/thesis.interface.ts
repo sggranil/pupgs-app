@@ -13,6 +13,7 @@ export interface Thesis {
     user_id: number;
     proposals: Proposal[];
     panelists: Adviser[];
+    secretary: Adviser;
     defense_date?: string;
     defense_time?: string
   }
