@@ -37,7 +37,7 @@ const safeGetCookies = () => {
 
 export const getCookie = async (name: string): Promise<string | undefined> => {
   try {
-    const cookieStore = safeGetCookies();
+    const cookieStore = await safeGetCookies();
     return cookieStore.get(name)?.value;
   } catch (error) {
     console.warn('getCookie() called outside of App Router context');
