@@ -75,6 +75,14 @@ CREATE TABLE "_ThesisPanelists" (
     CONSTRAINT "_ThesisPanelists_B_fkey" FOREIGN KEY ("B") REFERENCES "Thesis" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- CreateTable
+CREATE TABLE "_ThesisSecretary" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
+    CONSTRAINT "_ThesisSecretary_A_fkey" FOREIGN KEY ("A") REFERENCES "Adviser" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "_ThesisSecretary_B_fkey" FOREIGN KEY ("B") REFERENCES "Thesis" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -89,3 +97,9 @@ CREATE UNIQUE INDEX "_ThesisPanelists_AB_unique" ON "_ThesisPanelists"("A", "B")
 
 -- CreateIndex
 CREATE INDEX "_ThesisPanelists_B_index" ON "_ThesisPanelists"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_ThesisSecretary_AB_unique" ON "_ThesisSecretary"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_ThesisSecretary_B_index" ON "_ThesisSecretary"("B");

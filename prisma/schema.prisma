@@ -42,6 +42,7 @@ model Adviser {
   user_id     Int         @unique
   thesis      Thesis[]
   panelists   Thesis[]    @relation("ThesisPanelists")
+  secretary   Thesis[]    @relation("ThesisSecretary")
 }
 
 model Thesis {
@@ -57,6 +58,7 @@ model Thesis {
   user_id         Int?
   proposals       Proposal[]
   panelists       Adviser[]   @relation("ThesisPanelists")
+  secretary       Adviser[]   @relation("ThesisSecretary")
   defense_date    DateTime?
   defense_time    DateTime?
   created_at      DateTime    @default(now())
