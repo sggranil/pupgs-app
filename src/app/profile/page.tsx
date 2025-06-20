@@ -110,7 +110,7 @@ export default function Profile() {
                             <button
                                 disabled={confirmedCount > 2}
                                 onClick={() => setEnrolledSubjectModal(true)}
-                                className={`w-1/4 h-10 px-4 text-sm font-normal rounded-md whitespace-nowrap disabled:opacity-50 bg-bgPrimary text-white`}
+                                className={`w-half h-10 px-4 text-sm font-normal rounded-md whitespace-nowrap disabled:opacity-50 bg-bgPrimary text-white`}
                             >
                                 Upload {confirmedCount > 1 ? 'Final Defense' : confirmedCount === 1 ? 'Pre-Oral' : 'Proposal'} Receipt
                             </button>
