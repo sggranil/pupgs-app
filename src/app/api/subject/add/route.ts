@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
+            include: { student: true },
         });
 
         if (!user) {
@@ -44,9 +45,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        if (!user?.student) {
+            return NextResponse.json(
+                { message: "No student profile found for user." },
+                { status: 401 }
+            );
+        }
+
+        const studentId = user.student.id;
+
         const uploadSubject = await prisma.enrolledSubject.create({
             data: {
-                student_id: userId,
+                student_id: studentId,
                 subject_name,
                 or_number,
                 attachment,
