@@ -14,7 +14,7 @@ interface ThesisInfoCardProp {
 const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated }) => {
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
     const [adviserData, setAdviserData] = useState<Adviser[]>([]);
-    const userRole = getUserInfoFromCookies('role');
+    const userData = getUserInfoFromCookies();
 
     const { getAllAdviser } = useAdviserRequest();
 
@@ -40,7 +40,7 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
         <div className='bg-gray-100 rounded-md p-2 px-4 mb-4'>
             <div className='flex align-center justify-between border-b border-gray-300 py-2'>
                 <h4 className='font-bold text-lg'>Information</h4>
-                {userRole === "adviser" && (
+                {userData?.role === "adviser" && (
                     <button
                         onClick={() => setModalOpen(true)}
                         className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
@@ -71,6 +71,12 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
                             <span key={index} className="block">{panelist.user?.first_name} {panelist.user?.last_name}</span>
                         ))
                     )}
+                </p>
+                <p className='border-b border-gray-300 py-2'>
+                    <strong>Secretary:</strong> 
+                    <span>
+                        {thesisData?.secretary.user?.first_name ? ` ${thesisData.secretary.user?.first_name} ${thesisData.secretary.user?.last_name}` : " No Adviser Assigned"}
+                    </span>
                 </p>
             </div>
             <Modal title="Update Information" isModalOpen={isModalOpen} setModalOpen={setModalOpen}>

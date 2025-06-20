@@ -5,32 +5,43 @@ import { useRouter } from "next/navigation";
 
 import { Thesis } from "@/interface/thesis.interface";
 import useThesisRequest from "@/hooks/thesis";
+
 import ThesisCard from "@/components/molecules/ThesisCard";
-import { getUserInfoFromCookies  } from "@/utilities/AuthUtilities";
 import ThesisTable from "@/components/organisms/Thesis/ThesisTable"
 
-interface ThesisardListProps {
+import { getUserInfoFromCookies  } from "@/utilities/AuthUtilities";
+
+interface ThesisCardListProps {
     isUpdated: boolean;
     setIsUpdated: (isUpdated: boolean) => void;
 }
 
-const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated }) => {
-    const [ thesistModal, setThesisModal ] = useState<boolean>(false);
+const ThesisCardList: React.FC<ThesisCardListProps> = ({ isUpdated, setIsUpdated }) => {
+    const [ thesisModal, setThesisModal ] = useState<boolean>(false);
     const [ selectedThesis, setSelectedThesis ] = useState<Thesis | null>(null);
     const [ userThesis, setUserThesis ] = useState<Thesis[] | null>([]);
     const [ loading, setLoading ] = useState<boolean>(false);
     const { getAllThesis } = useThesisRequest();
 
-    const userRole = getUserInfoFromCookies('role');
+    const userData = getUserInfoFromCookies();
 
     const router = useRouter();
 
     const fetchAllThesis = async () => {
         setLoading(true);
         const response = await getAllThesis();
-        if (response) {
-            setUserThesis(response.data);
+
+        if (response && Array.isArray(response.data)) {
+            const filtered = response.data.filter((data: any) => {
+                if (userData?.role === "admin") return true;
+                if (userData?.role === "adviser") return data.adviser.user_id === userData.userId;
+                if (userData?.role === "student") return data.student.user_id === userData.userId;
+                return false;
+            });
+
+            setUserThesis(filtered);
         }
+
         setLoading(false);
         setIsUpdated(false);
     };
@@ -40,25 +51,25 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
     }, [isUpdated]);
 
     return (
-        <div className="w-full h-24">
+        <div className="w-full h-24 mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 py-2">
                 {loading ? (
                     <div className="h-48 col-span-full flex justify-center items-center">
                         <p>Loading...</p>
                     </div>
                 ) : userThesis && userThesis.length > 0 ? (
-                    userRole === "student" ? (
+                    userData?.role === "student" || userData?.role === "adviser" ? (
                         userThesis.map((thesis) => (
                             <div
                                 className="cursor-pointer"
                                 key={thesis.id}
                                 onClick={() => {
-                                    if (!thesis.is_confirmed) {
-                                        setSelectedThesis(thesis);
-                                        setThesisModal(true);
-                                    } else {
+                                    // if (!thesis.is_confirmed && userData?.role === "student") {
+                                    //     setSelectedThesis(thesis);
+                                    //     setThesisModal(true);
+                                    // } else {
                                         router.push(`/thesis/?id=${thesis.id}`)
-                                    }
+                                    // }
                                 }}
                             >
                                 <ThesisCard thesisData={thesis} />
@@ -79,4 +90,4 @@ const ThesistCardList: React.FC<ThesisardListProps> = ({ isUpdated, setIsUpdated
     );
 };
 
-export default ThesistCardList;
+export default ThesisCardList;
