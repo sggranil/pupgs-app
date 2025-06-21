@@ -31,7 +31,7 @@ export default function RegistrationPage() {
         defaultValues: {
             middle_name: "",
             ext_name: "",
-            role: "admin",
+            role: "student",
         },
     });
 
@@ -51,8 +51,8 @@ export default function RegistrationPage() {
 
             if (responseData && responseData.access_token) {
                 const userData = decodeToken(responseData.access_token);
-                if (userData?.role == "student") {
-                    router.push(`/student/thesis`);
+                if (userData?.role == "student" || userData?.role == "adviser") {
+                    router.push(`/thesis`);
                 } else {
                     router.push(`/dashboard`);
                 }
