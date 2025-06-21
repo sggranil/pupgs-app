@@ -5,18 +5,11 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, is_confirmed, adviser_id } = await request.json();
+        const { id, is_confirmed, message, adviser_id } = await request.json();
 
         if (isNaN(id)) {
             return NextResponse.json(
                 { message: "Invalid ID" },
-                { status: 400 }
-            );
-        }
-
-        if (!id || !is_confirmed || !adviser_id) {
-            return NextResponse.json(
-                { message: "All fields are required" },
                 { status: 400 }
             );
         }
@@ -26,6 +19,7 @@ export async function POST(request: NextRequest) {
             data: {
                 adviser_id: adviser_id,
                 is_confirmed: is_confirmed,
+                message: message,
             },
         });
 
