@@ -34,6 +34,12 @@ export const PROPOSAL_API = {
     DELETE_PROPOSAL_URL: (id: number) => `/thesis/proposal/delete/${id}`,
 }
 
+export const ROOM_API = {
+    GET_ALL_ROOM_URL: "/room/get",
+    ADD_ROOM_URL: "/room/add",
+    DELETE_ROOM_URL: (id: number) => `/room/delete/${id}`,
+}
+
 export const ADVISER_API = {
     GET_ADVISERS_URL: "/adviser/get"
 }

@@ -9,11 +9,14 @@ export interface Thesis {
     adviser_id?: number;
     is_confirmed?: boolean;
     message?: string;
+    defense_phase?: string;
     user: User;
     user_id: number;
+    room?: Room;
+    room_id: number;
     proposals: Proposal[];
     panelists: Adviser[];
-    secretary: Adviser;
+    thesisSecretary: Adviser;
     defense_date?: string;
     defense_time?: string
   }
@@ -24,6 +27,14 @@ export interface Thesis {
     thesis_id: number;
     file_url: string;
     uploaded_at: string;
+  }
+
+  export interface Room {
+    id: number;
+    thesis?: Thesis[];
+    name: string;
+    location: string;
+    capacity?: number;
   }
   
   export interface EnrolledSubject {
