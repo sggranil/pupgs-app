@@ -1,79 +1,70 @@
 "use client";
+import React, { useEffect } from "react";
+import { useState } from "react";
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import Modal from "@/components/organisms/Modal";
+import AddThesisModal from "@/components/organisms/Thesis/AddThesisModal";
+import ThesisCardList from "@/components/organisms/Thesis/ThesisCardList";
+import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
+import useSubjectRequest from "@/hooks/subject";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
-import { getUserInfoFromCookies } from '@/utilities/AuthUtilities';
+export default function StudentDashboard() {
+    const [ thesisProposalModal, setThesisProposalModal ] = useState<boolean>(false);
+    const [ isThesisUpdated, setIsThesisUpdated ] = useState<boolean>(false);
+    const [ subjectData, setSubjectData ] = useState<EnrolledSubject[] | null>([]);
+    const { getAllSubject } = useSubjectRequest();
 
-import useThesisRequest from '@/hooks/thesis';
-import FormDownloadableCard from '@/components/molecules/Thesis/FormDownloadableCard';
-import ProposalCardList from '@/components/organisms/Proposal/ProposalCardList';
-import { Thesis } from '@/interface/thesis.interface';
-import ThesisInfoCard from '@/components/organisms/Thesis/ThesisInfoCard';
+    const fetchSubject = async () => {
+        const response = await getAllSubject();
+        if (response) {
+            setSubjectData(response.data);
+        }
+    };
 
-export default function ThesisPage() {
-    const [thesisData, setThesisData] = useState<Thesis | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [isUpdated, setIsUpdated] = useState<boolean>(false);
-
-    const searchParams = useSearchParams();
-    const thesisId = searchParams.get('id');
-
-    const { fetchThesis } = useThesisRequest();
     const userData = getUserInfoFromCookies();
 
-    const fetchThesisData = async () => {
-        setLoading(true);
-        const response = await fetchThesis(Number(thesisId));
-        if (response) {
-            setThesisData(response.data);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        if (thesisId) fetchThesisData();
-    }, [isUpdated]);
+    const isSubjectConfirmed = subjectData?.some(subject => subject.is_confirmed) ?? false;
     
-    return (
-        <div className='w-full py-4'>
-            {loading ? (
-                <div className="min-h-screen flex flex-col justify-center items-center">
-                    <p>Loading...</p>
-                </div>
-            ) : (
-                <>
-                    <div className='p-4 border-b-2 border-gray-200'>
-                        <h1 className='text-textPrimary text-xl md:text-2xl font-bold'>"{thesisData?.thesis_title}"</h1>
-                        {userData?.role === "adviser" && (
-                            <>
-                                <span className='uppercase text-lg font-bold'>{thesisData?.student?.user?.first_name} {thesisData?.student?.user?.last_name}</span> | 
-                                <span className='uppercase text-lg font-bold'> {thesisData?.student?.user?.program}</span>
-                            </>
-                        )}
-                    </div>
+    useEffect(() => {
+        fetchSubject();
+    }, []);
 
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                        <div className="col-span-12 md:col-span-7 p-4">
-                            <ProposalCardList thesisId={thesisId ?? ""} />
-                        </div>
-                        <div className="col-span-12 md:col-span-5">
-                            <ThesisInfoCard setIsUpdated={setIsUpdated} thesisData={thesisData} />
-                            {userData?.role === "student" && (
-                                <div className='bg-gray-100 rounded-md p-2 px-4'>
-                                    <h1 className='border-b border-gray-300 py-2 font-semibold'>Downloadables</h1>
-                                    <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">
-                                        <FormDownloadableCard itemNo={1} title="Concept Paper Adviser Endorsement Form" link="#" />
-                                        <FormDownloadableCard itemNo={2} title="Thesis Dissertation Advising Contract" link="#" />
-                                        <FormDownloadableCard itemNo={3} title="Thesis Dissertation Consultation and Monitoring Form" link="#" />
-                                        <FormDownloadableCard itemNo={4} title="Thesis Dissertation Adviser Appointment and Acknowledgement Form" link="#" />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+    return (
+        <div className="h-1/3">
+            <div className="w-full h-1/3 py-12 rounded-md"
+                style={{
+                    backgroundImage:
+                        "url('/maroon-bg.jpg')",
+                }}
+            >
+                <div className="flex align-center justify-between">
+                    <h1 className="text-white text-xl font-bold p-2 pl-4">
+                        Your Thesis
+                    </h1>
+                    {(isSubjectConfirmed && userData?.role == "student") && 
+                        <button
+                            onClick={() => setThesisProposalModal(true)}
+                            className="h-10 mx-2 px-3 py-2 text-sm font-semibold rounded-md whitespace-nowrap bg-white text-textPrimary"
+                        >
+                            Upload Proposal
+                        </button>
+                    }
+                </div>
+                {isSubjectConfirmed ? (
+                    <ThesisCardList setIsUpdated={setIsThesisUpdated} isUpdated={isThesisUpdated} />
+                ) : (
+                    <div className="h-48 col-span-full flex justify-center items-center">
+                        <p>Please upload the receipt on your profile page to confirm.</p>
                     </div>
-                </>
-            )}
+                )}
+                
+            </div>
+            <div className="h-0">
+                <Modal title="Add Thesis" isModalOpen={thesisProposalModal} setModalOpen={setThesisProposalModal}>
+                    <AddThesisModal setIsModalOpen={setThesisProposalModal} setIsUpdated={setIsThesisUpdated} />
+                </Modal>
+            </div>
         </div>
     );
 }
