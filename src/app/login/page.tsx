@@ -41,8 +41,8 @@ export default function LoginPage() {
 
             if (responseData && responseData.access_token) {
                 const userData = decodeToken(responseData.access_token);
-                if (userData?.role == "student") {
-                    router.push(`/student/thesis`);
+                if (userData?.role == "student" || userData?.role == "adviser") {
+                    router.push(`/thesis`);
                 } else {
                     router.push(`/dashboard`);
                 }
