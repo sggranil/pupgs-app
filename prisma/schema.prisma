@@ -26,6 +26,7 @@ model User {
   thesis      Thesis[]
   adviser     Adviser? @relation
   student     Student? @relation
+  is_deleted  Boolean  @default(false)
 }
 
 model Student {
@@ -43,6 +44,15 @@ model Adviser {
   thesis      Thesis[]
   panelists   Thesis[]    @relation("ThesisPanelists")
   secretary   Thesis[]    @relation("ThesisSecretary")
+  thesisSecretary ThesisSecretary[] @relation("AdviserThesisSecretary")
+}
+
+model Room {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  location    String?
+  capacity    Int?
+  thesis      Thesis[]
 }
 
 model Thesis {
@@ -52,6 +62,7 @@ model Thesis {
   student_id      Int?
   adviser         Adviser?    @relation(fields: [adviser_id], references: [id])
   adviser_id      Int?
+  defense_phase   String?
   is_confirmed    Boolean?
   message         String?
   user            User?       @relation(fields: [user_id], references: [id])
@@ -61,9 +72,20 @@ model Thesis {
   secretary       Adviser[]   @relation("ThesisSecretary")
   defense_date    DateTime?
   defense_time    DateTime?
+  room            Room?       @relation(fields: [room_id], references: [id])
+  room_id         Int?
+  thesisSecretary ThesisSecretary[]
   created_at      DateTime    @default(now())
 }
 
+model ThesisSecretary {
+  thesis        Thesis  @relation(fields: [thesis_id], references: [id])
+  thesis_id     Int
+  adviser       Adviser @relation(fields: [adviser_id], references: [id], name: "AdviserThesisSecretary")
+  adviser_id    Int
+  assigned_at   DateTime @default(now())
+  @@id([thesis_id, adviser_id])
+}
 
 model Proposal {
   id          Int         @id @default(autoincrement())
