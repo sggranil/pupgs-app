@@ -19,4 +19,4 @@ function DashboardLayout({
     );
 }
 
-export default withAuth(DashboardLayout, ["adviser", "admin"]);
+export default withAuth(DashboardLayout, ["admin"]);
