@@ -34,8 +34,8 @@ const ThesisCardList: React.FC<ThesisCardListProps> = ({ isUpdated, setIsUpdated
         if (response && Array.isArray(response.data)) {
             const filtered = response.data.filter((data: any) => {
                 if (userData?.role === "admin") return true;
-                if (userData?.role === "adviser") return data.adviser.user_id === userData.userId;
-                if (userData?.role === "student") return data.student.user_id === userData.userId;
+                if (userData?.role === "adviser") return data?.adviser?.user_id === userData.userId;
+                if (userData?.role === "student") return data?.student?.user_id === userData.userId;
                 return false;
             });
 
@@ -64,12 +64,7 @@ const ThesisCardList: React.FC<ThesisCardListProps> = ({ isUpdated, setIsUpdated
                                 className="cursor-pointer"
                                 key={thesis.id}
                                 onClick={() => {
-                                    // if (!thesis.is_confirmed && userData?.role === "student") {
-                                    //     setSelectedThesis(thesis);
-                                    //     setThesisModal(true);
-                                    // } else {
-                                        router.push(`/thesis/?id=${thesis.id}`)
-                                    // }
+                                    router.push(`/thesis/info/?id=${thesis.id}`)
                                 }}
                             >
                                 <ThesisCard thesisData={thesis} />

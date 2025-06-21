@@ -37,7 +37,7 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
     }, [setIsUpdated]);
 
     return (
-        <div className='bg-gray-100 rounded-md p-2 px-4 mb-4'>
+        <div className='border border-gray-200 rounded-md p-2 px-4 mb-4'>
             <div className='flex align-center justify-between border-b border-gray-300 py-2'>
                 <h4 className='font-bold text-lg'>Information</h4>
                 {userData?.role === "adviser" && (
@@ -50,32 +50,44 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
                 )}
             </div>
             <div className='py-4'>
-                <p className='border-b border-gray-300 pb-2'>
-                    <strong>Thesis Adviser: </strong>
-                    <span>
-                        {thesisData?.adviser?.user?.first_name ? `${thesisData.adviser.user?.first_name} ${thesisData.adviser.user?.last_name}` : "No Adviser Assigned"}
+                <p className='pb-1'>
+                    <span className="font-semibold text-sm text-gray-600">Thesis Adviser</span>
+                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.adviser?.user?.first_name ? `${thesisData.adviser.user?.first_name} ${thesisData.adviser.user?.last_name} (${thesisData.adviser.user?.position} - ${thesisData.adviser.user?.program ?? "Main" })` : "No Adviser Assigned"}
                     </span>
                 </p>
-                <p className='border-b border-gray-300 py-2'>
-                    <strong>Defense Date:</strong> <span>{thesisData?.defense_date ? new Date(thesisData.defense_date).toLocaleDateString() : "To be Announced"}</span>
+                <p className='py-1'>
+                    <span className="font-semibold text-sm text-gray-600">Defense Date</span> 
+                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.defense_date ? new Date(thesisData.defense_date).toDateString() : "To be Announced"}
+                    </span>
                 </p>
-                <p className='border-b border-gray-300 py-2'>
-                    <strong>Defense Time:</strong> <span>{thesisData?.defense_time ? new Date(thesisData.defense_time).toLocaleTimeString() : "To be Announced"}</span>
+                <p className='py-1'>
+                    <span className="font-semibold text-sm text-gray-600">Defense Time</span> 
+                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.defense_time ? `${new Date(thesisData.defense_time).toLocaleTimeString()} - ${new Date(new Date(thesisData.defense_time).getTime() + 60 * 60 * 1000).toLocaleTimeString()}` : "To be Announced"}
+                    </span>
                 </p>
-                <p className="border-b border-gray-300 py-2">
-                    <strong>Panelists:</strong>{" "}
+                <p className='py-1'>
+                    <span className="font-semibold text-sm text-gray-600">Assigned Room</span> 
+                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.room?.name ? thesisData?.room?.name : "To be Announced"}
+                    </span>
+                </p>
+                <p className="py-1">
+                    <span className="font-semibold text-sm text-gray-600">Panelists</span>{" "}
                     {!thesisData?.panelists || thesisData.panelists.length === 0 ? (
-                        <span>No Panelist Assigned</span>
+                        <span className="block ml-4 text-lg font-semibold text-textPrimary">No Panelist Assigned</span>
                     ) : (
                         thesisData.panelists.map((panelist, index) => (
-                            <span key={index} className="block">{panelist.user?.first_name} {panelist.user?.last_name}</span>
+                            <span key={index} className="block ml-4 text-lg font-semibold text-textPrimary">{panelist.user?.first_name} {panelist.user?.last_name}</span>
                         ))
                     )}
                 </p>
-                <p className='border-b border-gray-300 py-2'>
-                    <strong>Secretary:</strong> 
-                    <span>
-                        {thesisData?.secretary.user?.first_name ? ` ${thesisData.secretary.user?.first_name} ${thesisData.secretary.user?.last_name}` : " No Adviser Assigned"}
+                <p className='py-1'>
+                    <span className="font-semibold text-sm text-gray-600">Secretary</span> 
+                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.thesisSecretary?.user?.first_name ? ` ${thesisData?.thesisSecretary?.user?.first_name} ${thesisData?.thesisSecretary?.user?.last_name}` : " No Adviser Assigned"}
                     </span>
                 </p>
             </div>
