@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
                 role,
                 tel_number: "",
                 standing: role === "student" ? "Student" : null,
-                position: role === "adviser" ? "Official" : null,
+                position: role === "adviser" ? "Official" : role === "admin" ? "Admin" : null,
             },
         });
 
