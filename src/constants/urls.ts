@@ -5,6 +5,7 @@ export const AUTH_API = {
 
 export const USER_API = {
     GET_USER_URL: (id: number) => `/user/get/${id}`,
+    GET_ALL_USER_URL: "/user/get",
     UPDATE_USER_URL: "/user/update",
 }
 

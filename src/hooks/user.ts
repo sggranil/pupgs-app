@@ -2,6 +2,14 @@ import { requestHandler } from "@/services/RequestServices";
 import { USER_API } from "@/constants/urls";
 
 const useUserRequest = () => {
+    const getAllUser = async () => {
+        const response = await requestHandler({
+            method: 'GET',
+            url: USER_API.GET_ALL_USER_URL
+        })
+        return response.json()
+    }
+
     const getUser = async (id: number) => {
         const response = await requestHandler({
             method: 'GET',
@@ -20,6 +28,7 @@ const useUserRequest = () => {
     }
 
     return {
+        getAllUser,
         getUser,
         updateUser
     }
