@@ -10,6 +10,14 @@ const useRoomRequest = () => {
         return response.json()
     }
 
+    const getAvailableRoom = async (id: number, date: string) => {
+        const response = await requestHandler({
+            method: 'GET',
+            url: ROOM_API.AVAILABLE_ROOM_URL(id, date)
+        })
+        return response.json()
+    }
+
     const addRoom = async (body: object) => {
         const response = await requestHandler({
             method: 'POST',
@@ -29,6 +37,7 @@ const useRoomRequest = () => {
 
     return {
         getAllRooms,
+        getAvailableRoom,
         addRoom,
         deleteRoom
     }
