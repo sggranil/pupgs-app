@@ -1,73 +1,35 @@
-import { useEffect, useState } from "react";
-import { Room, Thesis } from "@/interface/thesis.interface";
+import { useState } from "react";
+import { EnrolledSubject, Room, Thesis } from "@/interface/thesis.interface";
 import { Adviser } from "@/interface/user.interface";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 import Modal from "@/components/organisms/Modal";
-import ScheduleThesisModal from "@/components/organisms/Thesis/ScheduleThesisModal";
-import useAdviserRequest from "@/hooks/adviser";
-import useRoomRequest from "@/hooks/room";
-import PDFDownloadWrapper from "@/components/wrapper/PDFExportWrapper";
-import ThesisHonorarium from "@/components/forms/ThesisHonorarium";
+import ScheduleThesisModal from "@/components/organisms/Thesis/ScheduleThesisModal"
 
 interface ThesisInfoCardProp {
     thesisData: Thesis | null;
+    adviserData: Adviser[];
+    roomData: Room[];
+    subjectData?: EnrolledSubject | null;
     setIsUpdated: (isUpdated: boolean) => void;
 }
 
-const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated }) => {
+const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, adviserData, roomData, subjectData, setIsUpdated }) => {
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
-    const [adviserData, setAdviserData] = useState<Adviser[]>([]);
-    const [roomData, setRoomData] = useState<Room[]>([]);
     const userData = getUserInfoFromCookies();
-
-    const { getAllAdviser } = useAdviserRequest();
-    const { getAllRooms, getAvailableRoom } = useRoomRequest();
-
-    const fetchRooms = async () => {
-        try {
-            const response = await getAllRooms();
-            setRoomData(response?.data || []);
-        } catch (error) {
-            console.error("Error fetching rooms:", error);
-            setRoomData([]);
-        }
-    };
-
-    const fetchAdvisers = async () => {
-        try {
-            const response = await getAllAdviser();
-            setAdviserData(response?.data || []);
-        } catch (error) {
-            console.error("Error fetching advisers:", error);
-            setAdviserData([]);
-        }
-    };
-
-    useEffect(() => {
-        fetchAdvisers();
-        fetchRooms();
-    }, [setIsUpdated]);
 
     return (
         <div className='border border-gray-200 rounded-md p-2 px-4 mb-4'>
             <div className='flex items-center justify-between border-b border-gray-300 py-2'>
                 <h4 className='font-bold text-lg'>Information</h4>
-                {userData?.role === "admin" ? (
+                {userData?.role === "admin" && (
                     <button
                         onClick={() => setModalOpen(true)}
                         className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
                     >
                         Update Info
                     </button>
-                ) : (
-                    <PDFDownloadWrapper
-                        document={<ThesisHonorarium />}
-                        fileName="thesis-honorarium.pdf"
-                        buttonLabel="Export Honorarium"
-                    />
                 )}
-                
             </div>
 
             <div className='py-4 space-y-3'>
