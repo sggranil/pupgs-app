@@ -51,7 +51,7 @@ const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLab
     const pageHeight = pdf.internal.pageSize.getHeight();
 
     const headerHeight = headerImg ? 80 : 0;
-    const footerHeight = footerImg ? 85 : 10;
+    const footerHeight = footerImg ? 85 : 20;
     const usableHeight = pageHeight - headerHeight - footerHeight;
 
     const ratio = pageWidth / imgWidth;

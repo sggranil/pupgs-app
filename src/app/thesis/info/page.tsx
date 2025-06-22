@@ -25,6 +25,7 @@ import useThesisRequest from '@/hooks/thesis';
 
 import { Adviser } from '@/interface/user.interface';
 import { EnrolledSubject, Room, Thesis } from '@/interface/thesis.interface';
+import FormHeader from '@/components/forms/component/FormHeader';
 
 export default function ThesisPage() {
     const [thesisData, setThesisData] = useState<Thesis | null>(null);
@@ -181,15 +182,18 @@ export default function ThesisPage() {
                             {userData?.role === "student" && (
                                 <div className='border border-gray-200 rounded-md p-2 px-4'>
                                     <h1 className='border-b border-gray-300 py-2 font-bold'>Thesis Files</h1>
-                                    <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col"><FormDownloadableCard
-                                        itemNo={1}
-                                        title="Concept Paper Adviser Endorsement Form"
-                                        document={<FormOne />}
-                                    />
+                                        <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">
+                                        <FormDownloadableCard
+                                            itemNo={1}
+                                            title="Concept Paper Adviser Endorsement Form"
+                                            document={<FormOne thesisData={thesisData} />}
+                                            header={<FormHeader title='TDW Form No. 1'/>}
+                                        />
                                         <FormDownloadableCard
                                             itemNo={2}
                                             title="Thesis Dissertation Advising Contract"
-                                            document={<FormTwo />}
+                                            document={<FormTwo thesisData={thesisData} />}
+                                            header={<FormHeader title='TDW Form No. 2'/>}
                                         />
                                         <FormDownloadableCard
                                             itemNo={3}
