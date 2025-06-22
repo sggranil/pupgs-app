@@ -5,6 +5,7 @@ export const AUTH_API = {
 
 export const USER_API = {
     GET_USER_URL: (id: number) => `/user/get/${id}`,
+    GET_ALL_USER_URL: "/user/get",
     UPDATE_USER_URL: "/user/update",
 }
 
@@ -32,6 +33,13 @@ export const PROPOSAL_API = {
     GET_PROPOSAL_URL: (id: number) => `/thesis/proposal/get/${id}`,
     ADD_PROPOSAL_URL: "/thesis/proposal/add",
     DELETE_PROPOSAL_URL: (id: number) => `/thesis/proposal/delete/${id}`,
+}
+
+export const ROOM_API = {
+    GET_ALL_ROOM_URL: "/room/get",
+    ADD_ROOM_URL: "/room/add",
+    DELETE_ROOM_URL: (id: number) => `/room/delete/${id}`,
+    AVAILABLE_ROOM_URL: (id: number, date: string) => `/room/availability/${id}/${date}`,
 }
 
 export const ADVISER_API = {

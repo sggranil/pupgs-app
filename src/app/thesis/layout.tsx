@@ -1,19 +1,22 @@
 "use client";
 
 import Sidenav from "@/components/organisms/Sidenav";
+import { withAuth } from "@/utilities/AuthWrapper";
 import { Toaster } from "react-hot-toast";
 
-export default function ThesisLayout({
-  children,
+function DashboardLayout({
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Sidenav>
-        {children}
-      </Sidenav>
-      <Toaster />
-    </>
-  );
+    return (
+        <>
+            <Sidenav>
+                {children}
+            </Sidenav>
+            <Toaster />
+        </>
+    );
 }
+
+export default withAuth(DashboardLayout, ["student", "adviser", "admin"]);

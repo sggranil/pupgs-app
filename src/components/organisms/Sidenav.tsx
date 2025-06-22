@@ -12,10 +12,11 @@ const Sidenav = ({
 }>) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
-    const [userRole, setUserRole] = useState<string | null>(null);
     const router = useRouter();
     
     const pathname = usePathname();
+
+    const userData = getUserInfoFromCookies();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -58,15 +59,6 @@ const Sidenav = ({
         };
     }, [isOpen]);
 
-    useEffect(() => {
-        const fetchUserRole = () => {
-            const role = getUserInfoFromCookies('role');
-            setUserRole(role);
-        };
-
-        fetchUserRole();
-    }, []);
-
     return (
         <div className="flex h-screen">
             {isOpen && !isDesktop && (
@@ -91,18 +83,28 @@ const Sidenav = ({
                     </div>
                 </div>
                 <nav className="mt-4 p-3">
-                    <Link
-                        href={`/dashboard/${userRole}`}
-                        className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
-                            pathname === `/dashboard/${userRole}` || pathname === `/thesis` ? "bg-bgPrimary text-white" : ""
-                        }`}
-                    >
-                        Dashboard
-                    </Link>
+                    {(userData?.role == "student" || userData?.role == "adviser") && ( 
+                        <Link
+                            href={`/thesis`}
+                            className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
+                            (pathname === `/thesis` || pathname.includes('/thesis/info')) ? "bg-bgPrimary text-white" : "" }`}
+                        >
+                            Thesis
+                        </Link>    
+                    )} 
+                    {userData?.role == "admin" && ( 
+                        <Link
+                            href={`/dashboard`}
+                            className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
+                            (pathname === `/dashboard` || pathname.includes('/thesis/info')) ? "bg-bgPrimary text-white" : "" }`}
+                        >
+                            Dashboard
+                        </Link>  
+                    )}
                     <Link
                         href="/profile"
                         className={`block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-75 hover:bg-bgPrimary hover:text-white active:bg-bgPrimary active:text-white ${
-                            pathname === "/profile" ? "bg-bgPrimary text-white" : ""
+                            pathname === "/profile" || pathname === "/profile/change-password" ? "bg-bgPrimary text-white" : ""
                         }`}
                     >
                         Profile

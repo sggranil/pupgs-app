@@ -16,6 +16,7 @@ export interface User {
     thesis: Thesis[];
     adviser?: Adviser;
     student?: Student;
+    is_deleted?: boolean;
 }
 
 export interface Student {
@@ -32,4 +33,5 @@ export interface Adviser {
     user_id: number;
     thesis: Thesis[];
     panelists: Thesis[];
+    secretary: Thesis;
 }

@@ -9,17 +9,24 @@ import { removeToasts, showToast } from "@/components/organisms/Toast";
 import { updateUserSchema } from "@/types/api/auth.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useRouter } from "next/navigation";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+
 interface EditProfileProps {
     userData: User | null;
+    fromUserProfile?: boolean | null;
     isShowEdit: (showEdit: boolean) => void;
     isUpdated: (showUpdate: boolean) => void;
 }
 
 type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 
-const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdated }) => {
+const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdated, fromUserProfile }) => {
     const [loading, setLoading] = useState<boolean>(false)
     const { updateUser } = useUserRequest();
+    const router = useRouter();
+
+    const userInfo = getUserInfoFromCookies();
 
     const {
         register,
@@ -37,7 +44,25 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
 
         try {
             const formData = getValues();
-            const responseData = await updateUser(formData);
+
+            const targetUserId = fromUserProfile
+                ? userInfo?.userId
+                : userData?.id;
+
+            if (!targetUserId) {
+                throw new Error("User ID is missing.");
+            }
+
+            const payload: any = {
+                ...formData,
+                id: targetUserId,
+            };
+
+            if (!fromUserProfile && userInfo?.role === "admin") {
+                payload.role = formData.role ? "admin" : "adviser";
+            }
+
+            const responseData = await updateUser(payload);
 
             if (!responseData) {
                 throw new Error("No response received from the server.");
@@ -61,6 +86,7 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
             setLoading(false);
         }
     }
+
 
 
     return (
@@ -158,8 +184,47 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                             defaultValue={userData?.tel_number}
                         />
                     </div>
+                    {userInfo?.role === "admin" && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mb-4">
+                            {/* Archive User */}
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="is_deleted"
+                                    {...register("is_deleted")}
+                                    defaultChecked={userData?.is_deleted}
+                                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                                />
+                                <label htmlFor="is_deleted" className="text-textPrimary font-medium">
+                                    Archive User
+                                </label>
+                            </div>
+
+                            {/* Make Admin */}
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="is_admin"
+                                    {...register("role")}
+                                    defaultChecked={userData?.role === "admin"}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <label htmlFor="is_admin" className="text-textPrimary font-medium">
+                                    Make Admin
+                                </label>
+                            </div>
+                        </div>
+
+                    )}
                 </div>
             </div>
+            <button
+                type="button"
+                onClick={() => router.push("/profile/change-password")}
+                className="w-full mt-6 py-2 bg-white border border-red-700 text-textPrimary font-bold rounded-lg"
+            >
+                Change Password
+            </button>
             <button
                 type="submit"
                 disabled={loading}

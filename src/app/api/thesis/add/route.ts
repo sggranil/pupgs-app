@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
-
 import { getUserId } from '@/utilities/AuthUtilities';
 
 const prisma = new PrismaClient();
@@ -33,6 +32,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check if user exists
         const user = await prisma.user.findUnique({
             where: { id: userId },
         });
@@ -44,12 +44,25 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Look up student record based on user_id
+        const student = await prisma.student.findUnique({
+            where: { user_id: userId },
+        });
+
+        if (!student) {
+            return NextResponse.json(
+                { message: "Student record not found for this user." },
+                { status: 404 }
+            );
+        }
+
+        // Create the thesis and link user + student + proposal
         const newThesis = await prisma.thesis.create({
             data: {
-                student: userId ? { connect: { id: userId } } : undefined,
-                user: userId ? { connect: { id: userId } } : undefined,
                 thesis_title,
                 is_confirmed: false,
+                user: { connect: { id: userId } },
+                student: { connect: { id: student.id } },
                 proposals: {
                     create: [{ file_url }],
                 },
@@ -63,9 +76,10 @@ export async function POST(request: NextRequest) {
             { message: "Thesis uploaded successfully", data: newThesis },
             { status: 201 }
         );
+
     } catch (err) {
         return NextResponse.json(
-            { message: "An error occurred during uploading" },
+            { message: "An error occurred during uploading: " + err },
             { status: 500 }
         );
     }

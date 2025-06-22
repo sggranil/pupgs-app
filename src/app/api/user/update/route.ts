@@ -1,17 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
-
 import { getUserId } from '@/utilities/AuthUtilities';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
         const userId = await getUserId();
-
         const data = await request.json();
 
-        if (!userId || isNaN(Number(userId))) {
+        if (!userId || !data.id || isNaN(Number(userId))) {
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
         }
 
@@ -20,25 +19,50 @@ export async function POST(request: NextRequest) {
         }
 
         const existingUser = await prisma.user.findUnique({
-            where: { id: Number(userId) },
+            where: { id: data.id ?? Number(userId) },
         });
 
         if (!existingUser) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        const {
+            old_password,
+            password,
+            confirm_password,
+            ...otherUpdates
+        } = data;
+
+        if (password || confirm_password) {
+            if (!old_password) {
+                return NextResponse.json({ error: "Old password is required" }, { status: 400 });
+            }
+
+            const isMatch = await bcrypt.compare(old_password, existingUser.password);
+            if (!isMatch) {
+                return NextResponse.json({ error: "Old password is incorrect" }, { status: 400 });
+            }
+
+            if (password !== confirm_password) {
+                return NextResponse.json({ error: "Passwords do not match" }, { status: 400 });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            otherUpdates.password = hashedPassword;
+        }
+
         const updatedUser = await prisma.user.update({
-            where: { id: Number(userId) },
-            data,
+            where: { id: data.id ?? Number(userId) },
+            data: otherUpdates,
         });
 
         return NextResponse.json({
             message: "User updated successfully",
             data: updatedUser,
         });
-    } catch (err) {
+    } catch (err: any) {
         return NextResponse.json(
-            { error: "An error occurred while updating the user" },
+            { error: `An error occurred while updating the user: ${err.message}` },
             { status: 500 }
         );
     }

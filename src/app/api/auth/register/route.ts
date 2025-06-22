@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
                 role,
                 tel_number: "",
                 standing: role === "student" ? "Student" : null,
-                position: role === "adviser" ? "Official" : null,
+                position: role === "adviser" ? "Official" : role === "admin" ? "Admin" : null,
             },
         });
 
@@ -80,8 +80,10 @@ export async function POST(request: NextRequest) {
             refresh_token: refreshToken,
         });
 
-        setCookie(res, 'access_token', accessToken, { maxAge: 1800 });
-        setCookie(res, 'refresh_token', refreshToken, { maxAge: 86400 });
+        if (!data.is_adviser_created || !data.is_adviser_created == null) {
+            setCookie(res, 'access_token', accessToken, { maxAge: 1800 });
+            setCookie(res, 'refresh_token', refreshToken, { maxAge: 86400 });
+        }
 
         return res;
     } catch (err) {

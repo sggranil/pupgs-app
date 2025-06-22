@@ -3,14 +3,14 @@ import { useRouter } from "next/navigation";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { isClientAuthorized } from "@/utilities/AuthUtilities";
 
-export const withAuth = (WrappedComponent: React.ComponentType<any>, role?: string) => {
+export const withAuth = (WrappedComponent: React.ComponentType<any>, role?: string[]) => {
   const WithAuthWrapper = (props: any) => {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
       const checkAuthorization = () => {
-        const userRole = getUserInfoFromCookies('role')
+        const userData = getUserInfoFromCookies()
 
         if (!isClientAuthorized()) {
           router.push(`/login`);
@@ -23,14 +23,14 @@ export const withAuth = (WrappedComponent: React.ComponentType<any>, role?: stri
         }
 
         try {
-          if (userRole === role) {
+          if (role.includes(userData?.role)) {
             setIsAuthorized(true);
           } else {
-            router.push(`/dashboard/${userRole}`);
+            router.push(`/profile`);
           }
         } catch (error) {
           console.error("Error parsing cookies", error);
-          router.push(`/dashboard/${userRole}`);
+          router.push(`/profile`);
         }
       };
 

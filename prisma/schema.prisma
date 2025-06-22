@@ -26,22 +26,32 @@ model User {
   thesis      Thesis[]
   adviser     Adviser? @relation
   student     Student? @relation
+  is_deleted  Boolean  @default(false)
 }
 
 model Student {
-  id      Int      @id @default(autoincrement())
-  user    User     @relation(fields: [user_id], references: [id])
-  user_id Int      @unique
-  thesis  Thesis[]
+  id                Int      @id @default(autoincrement())
+  user              User     @relation(fields: [user_id], references: [id])
+  user_id           Int      @unique
+  thesis            Thesis[]
   enrolled_subject  EnrolledSubject[]
 }
 
 model Adviser {
-  id      Int      @id @default(autoincrement())
-  user    User     @relation(fields: [user_id], references: [id])
-  user_id Int      @unique
-  thesis  Thesis[]
-  panelists   Thesis[]  @relation("ThesisPanelists")
+  id          Int         @id @default(autoincrement())
+  user        User        @relation(fields: [user_id], references: [id])
+  user_id     Int         @unique
+  thesis      Thesis[]
+  panelists   Thesis[]    @relation("ThesisPanelists")
+  secretary   Thesis[]    @relation("ThesisSecretary")
+}
+
+model Room {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  location    String?
+  capacity    Int?
+  thesis      Thesis[]
 }
 
 model Thesis {
@@ -51,31 +61,38 @@ model Thesis {
   student_id      Int?
   adviser         Adviser?    @relation(fields: [adviser_id], references: [id])
   adviser_id      Int?
+  defense_phase   String?
   is_confirmed    Boolean?
+  message         String?
   user            User?       @relation(fields: [user_id], references: [id])
   user_id         Int?
   proposals       Proposal[]
-  panelists       Adviser[]  @relation("ThesisPanelists")
+  panelists       Adviser[]   @relation("ThesisPanelists")  
+  secretary       Adviser?   @relation("ThesisSecretary", fields: [secretary_id], references: [id])
+  secretary_id    Int?
   defense_date    DateTime?
   defense_time    DateTime?
+  room            Room?       @relation(fields: [room_id], references: [id])
+  room_id         Int?
+  created_at      DateTime    @default(now())
 }
 
-
 model Proposal {
-  id          Int      @id @default(autoincrement())
-  thesis      Thesis   @relation(fields: [thesis_id], references: [id])
+  id          Int         @id @default(autoincrement())
+  thesis      Thesis      @relation(fields: [thesis_id], references: [id])
   thesis_id   Int
   file_url    String
-  uploaded_at DateTime @default(now())
+  uploaded_at DateTime    @default(now())
 }
 
 model EnrolledSubject {
-  id            Int      @id @default(autoincrement())
-  student       Student  @relation(fields: [student_id], references: [id])
+  id            Int         @id @default(autoincrement())
+  student       Student     @relation(fields: [student_id], references: [id])
   student_id    Int
   subject_name  String
   or_number     String
   attachment    String
   is_confirmed  Boolean?
-  enrolled_at   DateTime @default(now())
+  message       String?
+  enrolled_at   DateTime    @default(now())
 }

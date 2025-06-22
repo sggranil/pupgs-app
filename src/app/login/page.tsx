@@ -41,7 +41,11 @@ export default function LoginPage() {
 
             if (responseData && responseData.access_token) {
                 const userData = decodeToken(responseData.access_token);
-                router.push(`/dashboard/${userData?.role}`);
+                if (userData?.role == "student" || userData?.role == "adviser") {
+                    router.push(`/thesis`);
+                } else {
+                    router.push(`/dashboard`);
+                }
             } else {
                 showToast(responseData?.message || "Login failed. Please try again.", "error");
             }
