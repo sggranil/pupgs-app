@@ -15,19 +15,20 @@ import ThesisCardList from "@/components/organisms/Thesis/ThesisCardList";
 import EditProfile from "@/components/organisms/EditProfile";
 
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import UsersTable from "@/components/organisms/Users/UsersTable";
 
 export default function Profile() {
-    const [ userProfile, setUserProfile ] = useState<User | null>(null);
-    const [ subjectData, setSubjectData ] = useState<EnrolledSubject[] | null>([]);
+    const [userProfile, setUserProfile] = useState<User | null>(null);
+    const [subjectData, setSubjectData] = useState<EnrolledSubject[] | null>([]);
 
-    const [ enrolledSubjectModal, setEnrolledSubjectModal ] = useState<boolean>(false);
+    const [enrolledSubjectModal, setEnrolledSubjectModal] = useState<boolean>(false);
 
-    const [ isSubjectUpdated, setIsSubjectUpdated ] = useState<boolean>(false);
-    const [ isThesisUpdated, setIsThesisUpdated ] = useState<boolean>(false);
-    const [ loading, setLoading ] = useState<boolean>(false);
+    const [isSubjectUpdated, setIsSubjectUpdated] = useState<boolean>(false);
+    const [fromUserProfile, setFromUserProfile] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const [ showEdit, setShowEdit ] = useState<boolean>(false);
-    const [ showUpdate, setShowUpdate ] = useState<boolean>(false);
+    const [showEdit, setShowEdit] = useState<boolean>(false);
+    const [showUpdate, setShowUpdate] = useState<boolean>(false);
 
     const confirmedCount = subjectData?.filter(subject => subject.is_confirmed).length ?? 0;
 
@@ -64,13 +65,16 @@ export default function Profile() {
 
                     <button
                         disabled={loading}
-                        onClick={() => setShowEdit(prev => !prev)}
+                        onClick={() => {
+                            setShowEdit(prev => !prev)
+                            setFromUserProfile(true)
+                        }}
                         className={`w-28 h-10 mx-2 px-3 py-2 text-sm font-semibold rounded-md disabled:opacity-60 whitespace-nowrap bg-white text-textPrimary`}
-                        >
-                        { !showEdit ? "Edit Profile" : "Cancel" }
+                    >
+                        {!showEdit ? "Edit Profile" : "Cancel"}
                     </button>
                 </div>
-                
+
             </div>
             <div className="flex items-center justify-between rounded-md border border-gray-200 my-4">
                 <div className="flex flex-row items-center p-4">
@@ -95,8 +99,14 @@ export default function Profile() {
                             </h1>
                         )}
                         <p className="text-textBlack text-md">
-                            {loading ? "Loading..." : userProfile?.standing || userProfile?.position + ' - ' + userProfile?.program }
+                            {loading
+                                ? "Loading..."
+                                : userProfile?.standing
+                                || `${userProfile?.position || ""} - ${userProfile?.program || "Sta. Mesa Campus"}`
+                            }
                         </p>
+
+
                     </div>
                 </div>
             </div>
@@ -114,24 +124,19 @@ export default function Profile() {
                             >
                                 Upload {confirmedCount > 1 ? 'Final Defense' : confirmedCount === 1 ? 'Pre-Oral' : 'Proposal'} Receipt
                             </button>
-                        </div>            
+                        </div>
                         <div className="flex align-center justify-center py-2 border-b border-gray-200"></div>
                     </div>
                     <SubjectCardList setSubjectData={setSubjectData} setIsUpdated={setIsSubjectUpdated} isUpdated={isSubjectUpdated} />
                 </div>
             ) : (
                 <div className="w-full px-2 pb-6">
-                    <div className="flex align-center justify-between py-2 border-b border-gray-200">
-                        <h1 className="text-textPrimary text-xl font-bold p-2">
-                            Thesis Handled
-                        </h1>
-                    </div>
-                    <ThesisCardList setIsUpdated={setIsThesisUpdated} isUpdated={isThesisUpdated} />
+                    <UsersTable />
                 </div>
             )}
-        
+
             <Modal title="Edit Profile" isModalOpen={showEdit} setModalOpen={setShowEdit}>
-                <EditProfile isUpdated={setShowUpdate} isShowEdit={setShowEdit} userData={userProfile} />
+                <EditProfile isUpdated={setShowUpdate} isShowEdit={setShowEdit} userData={userProfile} fromUserProfile={fromUserProfile} />
             </Modal>
 
             <Modal title="Upload Documents" isModalOpen={enrolledSubjectModal} setModalOpen={setEnrolledSubjectModal}>
