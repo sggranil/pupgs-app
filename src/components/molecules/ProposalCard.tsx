@@ -2,6 +2,7 @@ import { Proposal } from "@/interface/thesis.interface";
 import { formatDate } from "@/utilities/DateUtilities";
 import useProposalRequest from "@/hooks/proposal";
 import { showToast } from "../organisms/Toast";
+import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 interface ProposalCardProps {
     index: number;
@@ -11,6 +12,8 @@ interface ProposalCardProps {
 }
 
 const ProposalCard: React.FC<ProposalCardProps> = ({ index, title, proposal, setIsUpdated }) => {
+    const userData = getUserInfoFromCookies();
+
     const { deleteProposal } = useProposalRequest();
 
     async function handleDeleteProposal() {
@@ -38,7 +41,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ index, title, proposal, set
                         Read Article
                     </a>
                 </div>
-                {index != 0 &&
+                {index != 0 && userData?.role === "student" &&
                     <button
                         onClick={handleDeleteProposal}
                         className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
