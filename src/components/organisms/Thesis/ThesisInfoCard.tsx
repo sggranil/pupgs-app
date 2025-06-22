@@ -7,6 +7,8 @@ import Modal from "@/components/organisms/Modal";
 import ScheduleThesisModal from "@/components/organisms/Thesis/ScheduleThesisModal";
 import useAdviserRequest from "@/hooks/adviser";
 import useRoomRequest from "@/hooks/room";
+import PDFDownloadWrapper from "@/components/wrapper/PDFExportWrapper";
+import ThesisHonorarium from "@/components/forms/ThesisHonorarium";
 
 interface ThesisInfoCardProp {
     thesisData: Thesis | null;
@@ -51,14 +53,21 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
         <div className='border border-gray-200 rounded-md p-2 px-4 mb-4'>
             <div className='flex items-center justify-between border-b border-gray-300 py-2'>
                 <h4 className='font-bold text-lg'>Information</h4>
-                {userData?.role === "admin" && (
+                {userData?.role === "admin" ? (
                     <button
                         onClick={() => setModalOpen(true)}
                         className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
                     >
                         Update Info
                     </button>
+                ) : (
+                    <PDFDownloadWrapper
+                        document={<ThesisHonorarium />}
+                        fileName="thesis-honorarium.pdf"
+                        buttonLabel="Export Honorarium"
+                    />
                 )}
+                
             </div>
 
             <div className='py-4 space-y-3'>

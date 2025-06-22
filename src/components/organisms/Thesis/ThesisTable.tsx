@@ -16,7 +16,6 @@ interface Subject {
 
 const ThesisTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
     const [selectedThesis, setSelectedThesis] = useState<Thesis | null>(null);
-    const [adviserData, setAdviserData] = useState<Adviser[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [statusFilter, setStatusFilter] = useState<string>("All");
     const [searchQuery, setSearchQuery] = useState<string>("");
