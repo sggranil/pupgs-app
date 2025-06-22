@@ -1,3 +1,5 @@
+"use client";
+
 import { EnrolledSubject } from "@/interface/thesis.interface";
 import { useState } from "react";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
@@ -46,14 +48,28 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
         <div className="w-full overflow-x-auto">
             {/* Filters */}
             <div className="mb-4 flex justify-end space-x-2">
-                <select className="p-2 border rounded-md" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
+                <select
+                    className="p-2 border rounded-md"
+                    value={subjectFilter}
+                    onChange={(e) => {
+                        setSubjectFilter(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                >
                     <option value="All">All</option>
                     <option value="Thesis Proposal">Thesis Proposal</option>
                     <option value="Pre-Oral Defense">Pre-Oral Defense</option>
                     <option value="Final Defense">Final Defense</option>
                 </select>
 
-                <select className="p-2 border rounded-md" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <select
+                    className="p-2 border rounded-md"
+                    value={statusFilter}
+                    onChange={(e) => {
+                        setStatusFilter(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                >
                     <option value="All">All</option>
                     <option value="true">Confirmed</option>
                     <option value="false">Pending Review/Denied</option>
@@ -64,7 +80,10 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                     className="p-2 border rounded-md"
                     placeholder="Search by student name"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                    }}
                 />
             </div>
 
@@ -83,16 +102,29 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                 <tbody>
                     {paginatedData.map((subject, index) => (
                         <tr key={index} className="border-b">
-                            <td className="p-3 text-sm text-gray-900">{subject.student?.user?.first_name} {subject.student?.user?.last_name}</td>
+                            <td className="p-3 text-sm text-gray-900">
+                                {subject.student?.user?.first_name} {subject.student?.user?.last_name}
+                            </td>
                             <td className="p-3 text-sm text-gray-900">{subject.subject_name}</td>
                             <td className="p-3 text-sm text-gray-900">{subject.or_number}</td>
                             <td className="p-3 text-sm text-gray-900">
-                                <a className="text-blue-500 underline" href={subject.attachment} target="_blank">View File</a>
+                                <a
+                                    className="text-blue-500 underline"
+                                    href={subject.attachment}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    View File
+                                </a>
                             </td>
                             <td className="p-3 text-sm text-gray-500">
-                                {!subject.is_confirmed ? !subject.message ? "Pending Review" : "Denied" : "Confirmed"}
+                                {subject.is_confirmed
+                                    ? "Confirmed"
+                                    : subject.message
+                                    ? "Denied"
+                                    : "Pending Review"}
                             </td>
-                            {userInfo?.role != "adviser" ? (
+                            {userInfo?.role !== "adviser" ? (
                                 <td className="p-3 text-sm text-gray-500">
                                     <button
                                         className="bg-bgPrimary text-sm font-medium p-2 text-white rounded-md"
@@ -114,28 +146,21 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                 </tbody>
             </table>
 
-            {/* Pagination Controls */}
-            <div className="mt-4 flex justify-center items-center space-x-2">
+            <div className="flex justify-between items-center mt-4">
                 <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                 >
-                    Prev
+                    Previous
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => goToPage(i + 1)}
-                        className={`px-3 py-1 border rounded ${currentPage === i + 1 ? "bg-blue-500 text-white" : ""}`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
+                <span className="text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                </span>
                 <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                 >
                     Next
                 </button>
@@ -145,7 +170,8 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
             <Modal
                 title="Update Status"
                 isModalOpen={enrolledSubjectModal}
-                setModalOpen={setEnrolledSubjectModal}>
+                setModalOpen={setEnrolledSubjectModal}
+            >
                 <SubjectConfirmationModal
                     setIsUpdated={setIsUpdated}
                     setIsModalOpen={setEnrolledSubjectModal}
