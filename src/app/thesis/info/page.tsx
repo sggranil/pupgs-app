@@ -10,6 +10,10 @@ import FormDownloadableCard from '@/components/molecules/Thesis/FormDownloadable
 import ProposalCardList from '@/components/organisms/Proposal/ProposalCardList';
 import { Thesis } from '@/interface/thesis.interface';
 import ThesisInfoCard from '@/components/organisms/Thesis/ThesisInfoCard';
+import FormOne from '@/components/forms/1. FormOne';
+import FormTwo from '@/components/forms/2. FormTwo';
+import FormThree from '@/components/forms/3. FormThree';
+import FormFour from '@/components/forms/4. FormFour';
 
 export default function ThesisPage() {
     const [thesisData, setThesisData] = useState<Thesis | null>(null);
@@ -36,7 +40,7 @@ export default function ThesisPage() {
             fetchThesisData();
             setIsUpdated(false);
         }
-    }, [thesisId, isUpdated]); 
+    }, [thesisId, isUpdated]);
 
     return (
         <div className='w-full py-4'>
@@ -69,13 +73,28 @@ export default function ThesisPage() {
                         <div className="col-span-12 md:col-span-5">
                             <ThesisInfoCard setIsUpdated={setIsUpdated} thesisData={thesisData} />
                             {userData?.role === "student" && (
-                                <div className='bg-gray-100 rounded-md p-2 px-4'>
-                                    <h1 className='border-b border-gray-300 py-2 font-semibold'>Downloadables</h1>
-                                    <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">
-                                        <FormDownloadableCard itemNo={1} title="Concept Paper Adviser Endorsement Form" link="#" />
-                                        <FormDownloadableCard itemNo={2} title="Thesis Dissertation Advising Contract" link="#" />
-                                        <FormDownloadableCard itemNo={3} title="Thesis Dissertation Consultation and Monitoring Form" link="#" />
-                                        <FormDownloadableCard itemNo={4} title="Thesis Dissertation Adviser Appointment and Acknowledgement Form" link="#" />
+                                <div className='border border-gray-200 rounded-md p-2 px-4'>
+                                    <h1 className='border-b border-gray-300 py-2 font-bold'>Thesis Files</h1>
+                                    <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col"><FormDownloadableCard
+                                        itemNo={1}
+                                        title="Concept Paper Adviser Endorsement Form"
+                                        document={<FormOne />}
+                                    />
+                                    <FormDownloadableCard 
+                                        itemNo={2} 
+                                        title="Thesis Dissertation Advising Contract" 
+                                        document={<FormTwo />} 
+                                    />
+                                    <FormDownloadableCard 
+                                        itemNo={3} 
+                                        title="Thesis Dissertation Consultation and Monitoring Form" 
+                                        document={<FormThree />} 
+                                    />
+                                    <FormDownloadableCard 
+                                        itemNo={4} 
+                                        title="Thesis Dissertation Adviser Appointment and Acknowledgement Form" 
+                                        document={<FormFour />} 
+                                    />
                                     </div>
                                 </div>
                             )}
