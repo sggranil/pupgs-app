@@ -29,12 +29,15 @@ export default function ThesisPage() {
             setThesisData(response.data);
         }
         setLoading(false);
-    }
+    };
 
     useEffect(() => {
-        if (thesisId) fetchThesisData();
-    }, [isUpdated]);
-    
+        if (thesisId) {
+            fetchThesisData();
+            setIsUpdated(false);
+        }
+    }, [thesisId, isUpdated]); 
+
     return (
         <div className='w-full py-4'>
             {loading ? (
@@ -44,13 +47,19 @@ export default function ThesisPage() {
             ) : (
                 <>
                     <div className='p-4 border-b-2 border-gray-200'>
-                        <h1 className='text-textPrimary text-xl md:text-2xl font-bold'>"{thesisData?.thesis_title}"</h1>
-                        {userData?.role === "adviser" && (
-                            <>
-                                <span className='uppercase text-lg font-bold'>{thesisData?.student?.user?.first_name} {thesisData?.student?.user?.last_name}</span> | 
-                                <span className='uppercase text-lg font-bold'> {thesisData?.student?.user?.program}</span>
-                            </>
-                        )}
+                        <h1 className='text-textPrimary text-xl md:text-2xl font-bold'>
+                            "{thesisData?.thesis_title}"
+                        </h1>
+                        <>
+                            <span className='uppercase text-lg font-bold'>
+                                {thesisData?.student?.user_id}
+                                {thesisData?.student?.user?.first_name} {thesisData?.student?.user?.last_name}
+                            </span>{" "}
+                            |{" "}
+                            <span className='uppercase text-lg font-bold'>
+                                {thesisData?.student?.user?.program ?? "Sta. Mesa Campus"}
+                            </span>
+                        </>
                     </div>
 
                     <div className="grid grid-cols-12 gap-2 py-2">
