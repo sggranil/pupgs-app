@@ -5,25 +5,45 @@ import { useEffect, useState } from 'react';
 
 import { getUserInfoFromCookies } from '@/utilities/AuthUtilities';
 
-import useThesisRequest from '@/hooks/thesis';
 import FormDownloadableCard from '@/components/molecules/Thesis/FormDownloadableCard';
 import ProposalCardList from '@/components/organisms/Proposal/ProposalCardList';
-import { Thesis } from '@/interface/thesis.interface';
 import ThesisInfoCard from '@/components/organisms/Thesis/ThesisInfoCard';
+
+import PDFDownloadWrapper from "@/components/wrapper/PDFExportWrapper";
+import ThesisHonorarium from "@/components/forms/ThesisHonorarium";
+import PageHeader from "@/components/forms/component/PageHeader";
+import PageFooter from "@/components/forms/component/PageFooter";
 import FormOne from '@/components/forms/1. FormOne';
 import FormTwo from '@/components/forms/2. FormTwo';
 import FormThree from '@/components/forms/3. FormThree';
 import FormFour from '@/components/forms/4. FormFour';
 
+import useAdviserRequest from '@/hooks/adviser';
+import useRoomRequest from '@/hooks/room';
+import useSubjectRequest from '@/hooks/subject';
+import useThesisRequest from '@/hooks/thesis';
+
+import { Adviser } from '@/interface/user.interface';
+import { EnrolledSubject, Room, Thesis } from '@/interface/thesis.interface';
+
 export default function ThesisPage() {
     const [thesisData, setThesisData] = useState<Thesis | null>(null);
+    const [adviserData, setAdviserData] = useState<Adviser[]>([]);
+    const [roomData, setRoomData] = useState<Room[]>([]);
+    const [subjectData, setSubjectData] = useState<EnrolledSubject | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [isUpdated, setIsUpdated] = useState<boolean>(false);
+    const [isSubjectLoaded, setIsSubjectLoaded] = useState<boolean>(false);
 
     const searchParams = useSearchParams();
     const thesisId = searchParams.get('id');
+    const index = parseInt(searchParams.get("index") || "0");
 
     const { fetchThesis } = useThesisRequest();
+    const { getAllAdviser } = useAdviserRequest();
+    const { getAllRooms } = useRoomRequest();
+    const { getAllSubject } = useSubjectRequest();
+
     const userData = getUserInfoFromCookies();
 
     const fetchThesisData = async () => {
@@ -35,12 +55,71 @@ export default function ThesisPage() {
         setLoading(false);
     };
 
+    const fetchRooms = async () => {
+        try {
+            const response = await getAllRooms();
+            setRoomData(response?.data || []);
+        } catch (error) {
+            console.error("Error fetching rooms:", error);
+            setRoomData([]);
+        }
+    };
+
+    const fetchAdvisers = async () => {
+        try {
+            const response = await getAllAdviser();
+            setAdviserData(response?.data || []);
+        } catch (error) {
+            console.error("Error fetching advisers:", error);
+            setAdviserData([]);
+        }
+    };
+
+    const fetchSubject = async () => {
+        setIsSubjectLoaded(true);
+        try {
+            const response = await getAllSubject();
+            const allSubjects = response?.data.filter(
+                (sub: EnrolledSubject) => sub.is_confirmed == true && sub?.student?.user_id === thesisData?.user_id
+            ) || [];
+
+            const types = ["Thesis Proposal", "Pre-Oral Defense", "Final Defense"];
+
+            const selectedSubjects = types.map(type => {
+                const subjectsOfType = allSubjects
+                    .filter((subject: EnrolledSubject) => subject.subject_name === type)
+                    .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+                return subjectsOfType[index];
+            });
+
+            const latestSubject = [...selectedSubjects]
+                .reverse()
+                .find(subject => subject?.is_confirmed === true);
+
+            setSubjectData(latestSubject || null);
+        } catch (error) {
+            console.error("Error fetching subjects:", error);
+            setSubjectData(null);
+        }
+        setIsSubjectLoaded(false);
+    };
+
     useEffect(() => {
         if (thesisId) {
             fetchThesisData();
             setIsUpdated(false);
         }
-    }, [thesisId, isUpdated]);
+    }, [thesisId]);
+
+    useEffect(() => {
+        if (thesisData) {
+            fetchAdvisers();
+            fetchRooms();
+            fetchSubject();
+        }
+    }, [thesisData, isUpdated]);
+
 
     return (
         <div className='w-full py-4'>
@@ -71,7 +150,34 @@ export default function ThesisPage() {
                             <ProposalCardList thesisId={thesisId ?? ""} />
                         </div>
                         <div className="col-span-12 md:col-span-5">
-                            <ThesisInfoCard setIsUpdated={setIsUpdated} thesisData={thesisData} />
+                            <div className='border border-gray-200 rounded-md p-2 px-4 mb-4'>
+                                <div className='flex items-center justify-between border-b border-gray-300 py-2'>
+                                    <h4 className='font-bold text-lg'>Phase Status</h4>
+                                    <PDFDownloadWrapper
+                                        header={<PageHeader />}
+                                        footer={<PageFooter />}
+                                        content={<ThesisHonorarium thesisData={thesisData} enrolledSubject={subjectData} />}
+                                        fileName="thesis-honorarium.pdf"
+                                        buttonLabel="Export Honorarium"
+                                    />
+                                </div>
+                                <div className='py-4 space-y-3'>
+                                    {/* Adviser */}
+                                    <div>
+                                        <span className="font-semibold text-sm text-gray-600">OR Number</span>
+                                        <p className="ml-4 text-lg font-semibold text-textPrimary">
+                                            {isSubjectLoaded ? (<span>Loading...</span>) : (<span>#{subjectData?.or_number}</span>)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold text-sm text-gray-600">Current Phase</span>
+                                        <p className="ml-4 text-lg font-semibold text-textPrimary">
+                                            {isSubjectLoaded ? (<span>Loading...</span>) : (<span>{subjectData?.subject_name}</span>)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <ThesisInfoCard setIsUpdated={setIsUpdated} adviserData={adviserData} roomData={roomData} thesisData={thesisData} subjectData={subjectData} />
                             {userData?.role === "student" && (
                                 <div className='border border-gray-200 rounded-md p-2 px-4'>
                                     <h1 className='border-b border-gray-300 py-2 font-bold'>Thesis Files</h1>
@@ -80,21 +186,21 @@ export default function ThesisPage() {
                                         title="Concept Paper Adviser Endorsement Form"
                                         document={<FormOne />}
                                     />
-                                    <FormDownloadableCard 
-                                        itemNo={2} 
-                                        title="Thesis Dissertation Advising Contract" 
-                                        document={<FormTwo />} 
-                                    />
-                                    <FormDownloadableCard 
-                                        itemNo={3} 
-                                        title="Thesis Dissertation Consultation and Monitoring Form" 
-                                        document={<FormThree />} 
-                                    />
-                                    <FormDownloadableCard 
-                                        itemNo={4} 
-                                        title="Thesis Dissertation Adviser Appointment and Acknowledgement Form" 
-                                        document={<FormFour />} 
-                                    />
+                                        <FormDownloadableCard
+                                            itemNo={2}
+                                            title="Thesis Dissertation Advising Contract"
+                                            document={<FormTwo />}
+                                        />
+                                        <FormDownloadableCard
+                                            itemNo={3}
+                                            title="Thesis Dissertation Consultation and Monitoring Form"
+                                            document={<FormThree />}
+                                        />
+                                        <FormDownloadableCard
+                                            itemNo={4}
+                                            title="Thesis Dissertation Adviser Appointment and Acknowledgement Form"
+                                            document={<FormFour />}
+                                        />
                                     </div>
                                 </div>
                             )}
