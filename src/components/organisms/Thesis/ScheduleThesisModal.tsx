@@ -1,83 +1,135 @@
 "use client";
 
 import { Adviser } from "@/interface/user.interface";
-import { useEffect, useState } from "react";
-import { Thesis } from "@/interface/thesis.interface";
+import { Thesis, Room } from "@/interface/thesis.interface";
 import useThesisRequest from "@/hooks/thesis";
+import useRoomRequest from "@/hooks/room";
+import { useEffect, useState } from "react";
 import { showToast } from "../Toast";
+
+const TIME_OPTIONS = [
+    "08:00", "09:00", "10:00", "11:00",
+    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"
+];
+
+const format12Hour = (time: string) => {
+    const [hour, minute] = time.split(":").map(Number);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const formattedHour = ((hour + 11) % 12 + 1);
+    return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+};
 
 interface Props {
     thesisData: Thesis | null;
     adviserData: Adviser[];
-    setIsModalOpen: (modalOpen: boolean) => void;
-    setIsUpdated: (isUpdated: boolean) => void;
+    roomData: Room[];
+    setIsModalOpen: (open: boolean) => void;
+    setIsUpdated: (updated: boolean) => void;
 }
 
-const formatDate = (dateString: string | null | undefined): string => {
-    if (!dateString) return "";
-    return new Date(dateString).toISOString().split("T")[0];
-};
-
-const formatTime = (timeString: string | null | undefined): string => {
-    if (!timeString) return "";
-    const date = new Date(timeString);
-    return date.toTimeString().slice(0, 5);
-};
-
-const ScheduleThesisModal: React.FC<Props> = ({ thesisData, adviserData, setIsModalOpen, setIsUpdated }) => {
-    const [loading, setLoading] = useState<boolean>(false);
-    const [date, setDate] = useState<string>(formatDate(thesisData?.defense_date));
-    const [time, setTime] = useState<string>(formatTime(thesisData?.defense_time));
-    const [selectedAdvisers, setSelectedAdvisers] = useState<number[]>(
-        thesisData?.panelists?.map(panelist => panelist.id) || []
-    );
+const ScheduleThesisModal: React.FC<Props> = ({
+    thesisData,
+    adviserData,
+    roomData,
+    setIsModalOpen,
+    setIsUpdated,
+}) => {
+    const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
+    const [selectedRoomId, setSelectedRoomId] = useState(0);
+    const [selectedAdvisers, setSelectedAdvisers] = useState<number[]>([]);
+    const [selectedSecretaryId, setSelectedSecretaryId] = useState(0);
+    const [unavailableTimes, setUnavailableTimes] = useState<string[]>([]);
 
     const { scheduleThesis } = useThesisRequest();
+    const { getAvailableRoom } = useRoomRequest();
+
+    const fetchAvailability = async () => {
+        if (!selectedRoomId || !date) return;
+        try {
+            const response = await getAvailableRoom(selectedRoomId, date);
+            if (Array.isArray(response?.data)) {
+                setUnavailableTimes(response.data);
+            } else {
+                setUnavailableTimes([]);
+                console.warn("Expected array of unavailable times, got:", response);
+            }
+        } catch (err) {
+            console.error("Error fetching availability", err);
+            setUnavailableTimes([]);
+        }
+    };
 
     useEffect(() => {
-        setDate(formatDate(thesisData?.defense_date));
-        setTime(formatTime(thesisData?.defense_time));
-        setSelectedAdvisers(thesisData?.panelists?.map(panelist => panelist.id) || []);
+        if (thesisData?.defense_date) {
+            const dateObj = new Date(thesisData.defense_date);
+            const formattedDate = new Intl.DateTimeFormat("en-CA", {
+                timeZone: "Asia/Manila",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            }).format(dateObj);
+            setDate(formattedDate);
+        } else {
+            setDate("");
+        }
+
+        if (thesisData?.defense_time) {
+            const timeObj = new Date(thesisData.defense_time);
+            const formattedTime = timeObj.toLocaleTimeString("en-PH", {
+                timeZone: "Asia/Manila",
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+            setTime(formattedTime);
+        } else {
+            setTime("");
+        }
+
+        setSelectedRoomId(thesisData?.room?.id || 0);
+        setSelectedSecretaryId(thesisData?.secretary?.id || 0);
+        setSelectedAdvisers(thesisData?.panelists?.map((p) => p.id) || []);
     }, [thesisData]);
 
-    const handleAdviserSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedValues = Array.from(event.target.selectedOptions, (option) => Number(option.value));
-        setSelectedAdvisers(selectedValues);
-    };
+    useEffect(() => {
+        fetchAvailability();
+    }, [selectedRoomId, date]);
 
-    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setDate(event.target.value);
-    };
-
-    const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTime(event.target.value);
+    const handleAdviserSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selected = Array.from(e.target.selectedOptions, (o) => Number(o.value));
+        if (selected.length <= 3) setSelectedAdvisers(selected);
     };
 
     const handleSubmit = async () => {
-        if (!date || !time || selectedAdvisers.length === 0) return;
+        if (!date || !time || !selectedRoomId || selectedAdvisers.length === 0 || !selectedSecretaryId) {
+            showToast("Please fill out all required fields.", "error");
+            return;
+        }
 
         const data = {
             id: thesisData?.id,
-            defense_date: date,
-            defense_time: time,
+            defense_date: new Date(`${date}T00:00:00+08:00`),
+            defense_time: new Date(`${date}T${time}:00+08:00`),
+            room_id: selectedRoomId,
             panelists: selectedAdvisers,
-        }
+            thesis_secretary_id: selectedSecretaryId,
+        };
 
         setLoading(true);
-
         try {
-            const response = await scheduleThesis(data)
-
-            if (response) {
-                showToast("Thesis scheduled updated successfully.", "success")
+            const res = await scheduleThesis(data);
+            if (res) {
+                showToast("Thesis schedule updated successfully.", "success");
+                setIsUpdated(true);
+                setIsModalOpen(false);
             } else {
-                showToast(response.message || "Thesis scheduled updated failed.", "error")
+                showToast("Failed to update thesis.", "error");
             }
-
-            setIsUpdated(true);
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error("Error updating thesis:", error);
+        } catch (err) {
+            console.error(err);
+            showToast("Something went wrong.", "error");
         } finally {
             setLoading(false);
         }
@@ -86,60 +138,99 @@ const ScheduleThesisModal: React.FC<Props> = ({ thesisData, adviserData, setIsMo
     return (
         <div className="flex flex-col gap-4 p-4">
             <label className="font-medium">
+                Select Room:
+                <select
+                    value={selectedRoomId}
+                    onChange={(e) => setSelectedRoomId(Number(e.target.value))}
+                    className="block w-full p-2 mt-1 border rounded-lg"
+                >
+                    <option value={0}>-- Select Room --</option>
+                    {roomData.map((room) => (
+                        <option key={room.id} value={room.id}>
+                            {room.name} ({room.location || "No location"})
+                        </option>
+                    ))}
+                </select>
+            </label>
+
+            <label className="font-medium">
                 Select Date:
                 <input
                     type="date"
                     value={date}
-                    onChange={handleDateChange}
+                    onChange={(e) => setDate(e.target.value)}
                     className="block w-full p-2 mt-1 border rounded-lg"
                 />
             </label>
 
             <label className="font-medium">
                 Select Time:
-                <input
-                    type="time"
+                <select
                     value={time}
-                    onChange={handleTimeChange}
+                    onChange={(e) => setTime(e.target.value)}
                     className="block w-full p-2 mt-1 border rounded-lg"
-                />
+                >
+                    <option value="">-- Select Time --</option>
+                    {TIME_OPTIONS.map((t) => (
+                        <option
+                            key={t}
+                            value={t}
+                            disabled={unavailableTimes.includes(t) && t !== time}
+                        >
+                            {format12Hour(t)} {unavailableTimes.includes(t) && t !== time ? "(Occupied)" : ""}
+                        </option>
+                    ))}
+                </select>
             </label>
 
-            <div className="mb-4">
-                <label className="block text-textPrimary font-semibold mb-1">
-                    Select Thesis Advisers *
-                </label>
+            <label className="font-medium">
+                Select Thesis Secretary:
                 <select
-                    className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                    value={selectedSecretaryId}
+                    onChange={(e) => setSelectedSecretaryId(Number(e.target.value))}
+                    className="block w-full p-2 mt-1 border rounded-lg"
+                >
+                    <option value={0}>-- Select Secretary --</option>
+                    {adviserData.map((sec) => (
+                        <option key={sec.id} value={sec.id}>
+                            {sec.user.first_name} {sec.user.last_name}
+                        </option>
+                    ))}
+                </select>
+            </label>
+
+            <div>
+                <label className="block font-semibold mb-1">Select Panelists (Max 3)</label>
+                <select
                     multiple
                     value={selectedAdvisers.map(String)}
                     onChange={handleAdviserSelection}
+                    className="w-full p-2 border rounded-md bg-white"
                 >
-                    {adviserData.length > 0 ? (
-                        adviserData.map((adviser) => (
-                            <option key={adviser.id} value={adviser.id}>
-                                {adviser.user?.first_name} {adviser.user?.last_name}
-                            </option>
-                        ))
-                    ) : (
-                        <option value="" disabled>No advisers found</option>
-                    )}
+                    {adviserData.map((adviser) => (
+                        <option
+                            key={adviser.id}
+                            value={adviser.id}
+                            disabled={selectedAdvisers.length >= 3 && !selectedAdvisers.includes(adviser.id)}
+                        >
+                            {adviser.user.first_name} {adviser.user.last_name}
+                        </option>
+                    ))}
                 </select>
-                <p className="text-sm text-gray-500 mt-1">
-                    Hold `Ctrl` (Windows) or `Cmd` (Mac) to select multiple advisers.
-                </p>
+                <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple advisers</p>
             </div>
 
-            <div className="flex flex-row gap-2">
-                <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={!date || !time || selectedAdvisers.length === 0 || loading}
-                    className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
-                >
-                    {loading ? "Updating..." : "Update"}
-                </button>
-            </div>
+            <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={
+                    loading || !date || !time || !selectedRoomId ||
+                    !selectedSecretaryId || selectedAdvisers.length === 0
+                }
+                className="w-full mt-4 py-2 bg-bgPrimary text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
+            >
+                {loading ? "Updating..." : "Update"}
+            </button>
         </div>
     );
 };

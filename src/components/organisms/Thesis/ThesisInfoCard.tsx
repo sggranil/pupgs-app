@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import Modal from "@/components/organisms/Modal";
-import { Thesis } from "@/interface/thesis.interface";
+import { Room, Thesis } from "@/interface/thesis.interface";
 import { Adviser } from "@/interface/user.interface";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+
+import Modal from "@/components/organisms/Modal";
 import ScheduleThesisModal from "@/components/organisms/Thesis/ScheduleThesisModal";
 import useAdviserRequest from "@/hooks/adviser";
+import useRoomRequest from "@/hooks/room";
 
 interface ThesisInfoCardProp {
     thesisData: Thesis | null;
@@ -14,18 +16,26 @@ interface ThesisInfoCardProp {
 const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated }) => {
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
     const [adviserData, setAdviserData] = useState<Adviser[]>([]);
+    const [roomData, setRoomData] = useState<Room[]>([]);
     const userData = getUserInfoFromCookies();
 
     const { getAllAdviser } = useAdviserRequest();
+    const { getAllRooms, getAvailableRoom } = useRoomRequest();
+
+    const fetchRooms = async () => {
+        try {
+            const response = await getAllRooms();
+            setRoomData(response?.data || []);
+        } catch (error) {
+            console.error("Error fetching rooms:", error);
+            setRoomData([]);
+        }
+    };
 
     const fetchAdvisers = async () => {
         try {
             const response = await getAllAdviser();
-            if (response?.data) {
-                setAdviserData(response.data);
-            } else {
-                setAdviserData([]);
-            }
+            setAdviserData(response?.data || []);
         } catch (error) {
             console.error("Error fetching advisers:", error);
             setAdviserData([]);
@@ -34,13 +44,14 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
 
     useEffect(() => {
         fetchAdvisers();
+        fetchRooms();
     }, [setIsUpdated]);
 
     return (
         <div className='border border-gray-200 rounded-md p-2 px-4 mb-4'>
-            <div className='flex align-center justify-between border-b border-gray-300 py-2'>
+            <div className='flex items-center justify-between border-b border-gray-300 py-2'>
                 <h4 className='font-bold text-lg'>Information</h4>
-                {userData?.role === "adviser" && (
+                {userData?.role === "admin" && (
                     <button
                         onClick={() => setModalOpen(true)}
                         className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white"
@@ -49,58 +60,88 @@ const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, setIsUpdated
                     </button>
                 )}
             </div>
-            <div className='py-4'>
-                <p className='pb-1'>
+
+            <div className='py-4 space-y-3'>
+                {/* Adviser */}
+                <div>
                     <span className="font-semibold text-sm text-gray-600">Thesis Adviser</span>
-                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
-                        {thesisData?.adviser?.user?.first_name ? `${thesisData.adviser.user?.first_name} ${thesisData.adviser.user?.last_name} (${thesisData.adviser.user?.position} - ${thesisData.adviser.user?.program ?? "Main" })` : "No Adviser Assigned"}
-                    </span>
-                </p>
-                <p className='py-1'>
-                    <span className="font-semibold text-sm text-gray-600">Defense Date</span> 
-                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
-                        {thesisData?.defense_date ? new Date(thesisData.defense_date).toDateString() : "To be Announced"}
-                    </span>
-                </p>
-                <p className='py-1'>
-                    <span className="font-semibold text-sm text-gray-600">Defense Time</span> 
-                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
-                        {thesisData?.defense_time ? `${new Date(thesisData.defense_time).toLocaleTimeString()} - ${new Date(new Date(thesisData.defense_time).getTime() + 60 * 60 * 1000).toLocaleTimeString()}` : "To be Announced"}
-                    </span>
-                </p>
-                <p className='py-1'>
-                    <span className="font-semibold text-sm text-gray-600">Assigned Room</span> 
-                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
-                        {thesisData?.room?.name ? thesisData?.room?.name : "To be Announced"}
-                    </span>
-                </p>
-                <p className="py-1">
-                    <span className="font-semibold text-sm text-gray-600">Panelists</span>{" "}
-                    {!thesisData?.panelists || thesisData.panelists.length === 0 ? (
-                        <span className="block ml-4 text-lg font-semibold text-textPrimary">No Panelist Assigned</span>
-                    ) : (
-                        thesisData.panelists.map((panelist, index) => (
-                            <span key={index} className="block ml-4 text-lg font-semibold text-textPrimary">{panelist.user?.first_name} {panelist.user?.last_name}</span>
+                    <p className="ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.adviser?.user
+                            ? `${thesisData.adviser.user.first_name} ${thesisData.adviser.user.last_name} (${thesisData.adviser.user.position ?? "N/A"} - ${thesisData.adviser.user.program ?? "Main"})`
+                            : "No Adviser Assigned"}
+                    </p>
+                </div>
+
+                {/* Date */}
+                <div>
+                    <span className="font-semibold text-sm text-gray-600">Defense Date</span>
+                    <p className="ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.defense_date
+                            ? new Date(new Date(thesisData.defense_date).toLocaleString("en-US", { timeZone: "Asia/Manila" })).toDateString()
+                            : "To be Announced"}
+                    </p>
+                </div>
+
+                {/* Time */}
+                <div>
+                    <span className="font-semibold text-sm text-gray-600">Defense Time</span>
+                    <p className="ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.defense_time
+                            ? (() => {
+                                const start = new Date(new Date(thesisData.defense_time).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+                                const end = new Date(start.getTime() + 60 * 60 * 1000);
+                                return `${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            })()
+                            : "To be Announced"}
+                    </p>
+                </div>
+
+                {/* Room */}
+                <div>
+                    <span className="font-semibold text-sm text-gray-600">Assigned Room</span>
+                    <p className="ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.room
+                            ? `${thesisData.room.name}${thesisData.room.location ? ` (${thesisData.room.location})` : ""}`
+                            : "To be Announced"}
+                    </p>
+                </div>
+
+                {/* Panelists */}
+                <div>
+                    <span className="font-semibold text-sm text-gray-600">Panelists</span>
+                    {thesisData?.panelists && thesisData.panelists.length > 0 ? (
+                        thesisData.panelists.map((panelist, idx) => (
+                            <p key={idx} className="ml-4 text-lg font-semibold text-textPrimary">
+                                {panelist.user?.first_name} {panelist.user?.last_name}
+                            </p>
                         ))
+                    ) : (
+                        <p className="ml-4 text-lg font-semibold text-textPrimary">No Panelist Assigned</p>
                     )}
-                </p>
-                <p className='py-1'>
-                    <span className="font-semibold text-sm text-gray-600">Secretary</span> 
-                    <span className="block ml-4 text-lg font-semibold text-textPrimary">
-                        {thesisData?.thesisSecretary?.user?.first_name ? ` ${thesisData?.thesisSecretary?.user?.first_name} ${thesisData?.thesisSecretary?.user?.last_name}` : " No Adviser Assigned"}
-                    </span>
-                </p>
+                </div>
+
+                {/* Secretary */}
+                <div>
+                    <span className="font-semibold text-sm text-gray-600">Secretary</span>
+                    <p className="ml-4 text-lg font-semibold text-textPrimary">
+                        {thesisData?.secretary?.user
+                            ? `${thesisData.secretary.user.first_name} ${thesisData.secretary.user.last_name}`
+                            : "No Secretary Assigned"}
+                    </p>
+                </div>
             </div>
+
             <Modal title="Update Information" isModalOpen={isModalOpen} setModalOpen={setModalOpen}>
-                <ScheduleThesisModal 
-                    thesisData={thesisData} 
-                    adviserData={adviserData} 
-                    setIsModalOpen={setModalOpen} 
-                    setIsUpdated={setIsUpdated} 
+                <ScheduleThesisModal
+                    thesisData={thesisData}
+                    adviserData={adviserData}
+                    roomData={roomData}
+                    setIsModalOpen={setModalOpen}
+                    setIsUpdated={setIsUpdated}
                 />
             </Modal>
         </div>
     );
-}
+};
 
 export default ThesisInfoCard;
