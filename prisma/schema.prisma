@@ -44,7 +44,6 @@ model Adviser {
   thesis      Thesis[]
   panelists   Thesis[]    @relation("ThesisPanelists")
   secretary   Thesis[]    @relation("ThesisSecretary")
-  thesisSecretary ThesisSecretary[] @relation("AdviserThesisSecretary")
 }
 
 model Room {
@@ -68,23 +67,14 @@ model Thesis {
   user            User?       @relation(fields: [user_id], references: [id])
   user_id         Int?
   proposals       Proposal[]
-  panelists       Adviser[]   @relation("ThesisPanelists")
-  secretary       Adviser[]   @relation("ThesisSecretary")
+  panelists       Adviser[]   @relation("ThesisPanelists")  
+  secretary       Adviser?   @relation("ThesisSecretary", fields: [secretary_id], references: [id])
+  secretary_id    Int?
   defense_date    DateTime?
   defense_time    DateTime?
   room            Room?       @relation(fields: [room_id], references: [id])
   room_id         Int?
-  thesisSecretary ThesisSecretary[]
   created_at      DateTime    @default(now())
-}
-
-model ThesisSecretary {
-  thesis        Thesis  @relation(fields: [thesis_id], references: [id])
-  thesis_id     Int
-  adviser       Adviser @relation(fields: [adviser_id], references: [id], name: "AdviserThesisSecretary")
-  adviser_id    Int
-  assigned_at   DateTime @default(now())
-  @@id([thesis_id, adviser_id])
 }
 
 model Proposal {
