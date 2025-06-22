@@ -17,8 +17,6 @@ interface ThesisCardListProps {
 }
 
 const ThesisCardList: React.FC<ThesisCardListProps> = ({ isUpdated, setIsUpdated }) => {
-    const [ thesisModal, setThesisModal ] = useState<boolean>(false);
-    const [ selectedThesis, setSelectedThesis ] = useState<Thesis | null>(null);
     const [ userThesis, setUserThesis ] = useState<Thesis[] | null>([]);
     const [ loading, setLoading ] = useState<boolean>(false);
     const { getAllThesis } = useThesisRequest();
