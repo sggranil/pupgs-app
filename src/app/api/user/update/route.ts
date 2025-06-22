@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
         const userId = await getUserId();
         const data = await request.json();
 
-        if (!userId || isNaN(Number(userId))) {
+        if (!userId || !data.id || isNaN(Number(userId))) {
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
         }
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         }
 
         const existingUser = await prisma.user.findUnique({
-            where: { id: Number(userId) },
+            where: { id: data.id ?? Number(userId) },
         });
 
         if (!existingUser) {
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: Number(userId) },
+            where: { id: data.id ?? Number(userId) },
             data: otherUpdates,
         });
 
