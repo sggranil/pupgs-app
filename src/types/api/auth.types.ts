@@ -29,6 +29,8 @@ export const updateUserSchema = z
     ext_name: z.string().optional(),
     standing: z.string().optional(),
     position: z.string().optional(),
+    role: z.string().optional(),
+    is_deleted: z.string().optional(),
     program: z.string().optional(),
     tel_number: z.string().optional(),
     old_password: z.string().optional(),
