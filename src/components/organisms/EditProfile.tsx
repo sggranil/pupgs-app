@@ -11,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useRouter } from "next/navigation";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import { DEPARTMENTS } from "@/constants/departments";
+import { COURSES } from "@/constants/course";
 
 interface EditProfileProps {
     userData: User | null;
@@ -107,6 +109,7 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                     </div>
                     <div>
                         <label className="block text-textPrimary font-semibold mb-1">Last Name *</label>
+                        
                         <input
                             type="text"
                             className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
@@ -153,14 +156,36 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                     }
 
                     <div>
-                        <label className="block text-textPrimary font-semibold mb-1">Program</label>
-                        <input
-                            type="text"
-                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                            placeholder="Program"
+                        <label htmlFor="program" className="block text-textPrimary font-semibold mb-1">Program</label>
+                        <select
+                            id="program"
+                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
                             {...register("program")}
-                            defaultValue={userData?.program}
-                        />
+                            defaultValue={userData?.program || ""}
+                        >
+                            <option value="" disabled>Select a Program</option>
+                            {COURSES.map((course) => (
+                                <option key={course.id} value={course.id}>
+                                    {course.name} ({course.level})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="department" className="block text-textPrimary font-semibold mb-1">Department</label>
+                        <select
+                            id="department"
+                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+                            {...register("department")}
+                            defaultValue={userData?.department || ""}
+                        >
+                            <option value="" disabled>Select a Department</option>
+                            {DEPARTMENTS.map((department, index) => (
+                                <option key={index} value={department}>
+                                    {department}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     {userData?.position &&
                         <div>

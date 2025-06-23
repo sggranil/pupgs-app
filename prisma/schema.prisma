@@ -18,10 +18,12 @@ model User {
   middle_name String?
   last_name   String
   ext_name    String?
+  prefix    String?
   role        String
   tel_number  String?
   standing    String?
   program     String?
+  department     String?
   position    String?
   thesis      Thesis[]
   adviser     Adviser? @relation
@@ -54,28 +56,39 @@ model Room {
   thesis      Thesis[]
 }
 
-model Thesis {
-  id              Int        @id @default(autoincrement())
-  thesis_title    String
-  student         Student?    @relation(fields: [student_id], references: [id])
-  student_id      Int?
-  adviser         Adviser?    @relation(fields: [adviser_id], references: [id])
-  adviser_id      Int?
-  defense_phase   String?
-  is_confirmed    Boolean?
-  message         String?
-  user            User?       @relation(fields: [user_id], references: [id])
-  user_id         Int?
-  proposals       Proposal[]
-  panelists       Adviser[]   @relation("ThesisPanelists")  
-  secretary       Adviser?   @relation("ThesisSecretary", fields: [secretary_id], references: [id])
-  secretary_id    Int?
-  defense_date    DateTime?
-  defense_time    DateTime?
-  room            Room?       @relation(fields: [room_id], references: [id])
-  room_id         Int?
-  created_at      DateTime    @default(now())
+model Consultation {
+  id             Int      @id @default(autoincrement())
+  date_time      DateTime @default(now())
+  location       String?
+  recommendation Int?
+  thesis         Thesis   @relation(fields: [thesis_id], references: [id])
+  thesis_id      Int
 }
+
+model Thesis {
+  id             Int             @id @default(autoincrement())
+  thesis_title   String
+  student        Student?        @relation(fields: [student_id], references: [id])
+  student_id     Int?
+  adviser        Adviser?        @relation(fields: [adviser_id], references: [id])
+  adviser_id     Int?
+  defense_phase  String?
+  is_confirmed   Boolean?
+  message        String?
+  user           User?           @relation(fields: [user_id], references: [id])
+  user_id        Int?
+  proposals      Proposal[]
+  panelists      Adviser[]       @relation("ThesisPanelists")  
+  secretary      Adviser?        @relation("ThesisSecretary", fields: [secretary_id], references: [id])
+  secretary_id   Int?
+  defense_date   DateTime?
+  defense_time   DateTime?
+  room           Room?           @relation(fields: [room_id], references: [id])
+  room_id        Int?
+  created_at     DateTime        @default(now())
+  consultations  Consultation[]  
+}
+
 
 model Proposal {
   id          Int         @id @default(autoincrement())
