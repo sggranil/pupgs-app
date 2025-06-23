@@ -13,6 +13,7 @@ export interface User {
     standing?: string;
     position?: string;
     program?: string;
+    department?: string;
     thesis: Thesis[];
     adviser?: Adviser;
     student?: Student;

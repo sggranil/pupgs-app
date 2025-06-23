@@ -32,6 +32,7 @@ export const updateUserSchema = z
     role: z.string().optional(),
     is_deleted: z.string().optional(),
     program: z.string().optional(),
+    department: z.string().optional(),
     tel_number: z.string().optional(),
     old_password: z.string().optional(),
     password: z.string().optional(),
