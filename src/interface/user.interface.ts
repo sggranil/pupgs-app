@@ -8,9 +8,12 @@ export interface User {
     middle_name?: string;
     last_name: string;
     ext_name?: string;
+    prefix?: string;
     role: string;
     tel_number?: string;
     standing?: string;
+    start_date?: string;
+    pass_date?: string;
     position?: string;
     program?: string;
     department?: string;
