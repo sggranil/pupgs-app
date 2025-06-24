@@ -112,6 +112,7 @@ export default function LoginPage() {
                     >
                         {loading ? "Loggin in..." : "Log in"}
                     </button>
+                    <p className="text-center mt-4">Doesn't have an account? <a className="text-textPrimary underline" href="/register/student">Register</a></p>
                 </form>
             </div>
         </Layout>

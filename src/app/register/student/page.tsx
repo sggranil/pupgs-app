@@ -197,6 +197,8 @@ export default function RegistrationPage() {
                     >
                         {loading ? "Registering..." : "Register"}
                     </button>
+                    
+                    <p className="text-center mt-4">Already have an account? <a className="text-textPrimary underline" href="/login">Login</a></p>
                 </form>
             </div>
         </Layout>
