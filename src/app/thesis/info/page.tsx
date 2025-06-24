@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { SquarePen, X } from "lucide-react"
 
 import { getUserInfoFromCookies } from '@/utilities/AuthUtilities';
 
@@ -37,6 +38,7 @@ import { Adviser } from '@/interface/user.interface';
 import { EnrolledSubject, Room, Thesis } from '@/interface/thesis.interface';
 
 import { OFFICIALS } from '@/constants/officials';
+import { showToast } from '@/components/organisms/Toast';
 
 export default function ThesisPage() {
     const [thesisData, setThesisData] = useState<Thesis | null>(null);
@@ -46,13 +48,15 @@ export default function ThesisPage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isUpdated, setIsUpdated] = useState<boolean>(false);
     const [isSubjectLoaded, setIsSubjectLoaded] = useState<boolean>(false);
+    const [isEditTitle, setIsEditTitle] = useState<boolean>(false);
     const [programChair, setProgramChair] = useState<string>("");
+    const [editedTitle, setEditedTitle] = useState<string>("");
 
     const searchParams = useSearchParams();
     const thesisId = searchParams.get('id');
     const index = parseInt(searchParams.get("index") || "0");
 
-    const { fetchThesis } = useThesisRequest();
+    const { fetchThesis, updateThesisInfo } = useThesisRequest();
     const { getAllAdviser } = useAdviserRequest();
     const { getAllRooms } = useRoomRequest();
     const { getAllSubject } = useSubjectRequest();
@@ -130,13 +134,40 @@ export default function ThesisPage() {
         }
     };
 
+    const handleUpdateTitle = async () => {
+        if (!editedTitle.trim()) {
+            showToast("Title cannot be empty.", "error");
+            return;
+        }
+
+        const data = {
+            id: thesisData?.id,
+            thesis_title: editedTitle, 
+        };
+
+        setLoading(true);
+        try {
+            const res = await updateThesisInfo(data);
+            if (res) {
+                showToast("Title updated successfully.", "success");
+                setIsUpdated(true);
+                setIsEditTitle(false);
+            } else {
+                showToast("Failed to update title.", "error");
+            }
+        } catch (err) {
+            showToast("Something went wrong.", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (thesisId) {
             fetchThesisData();
             setIsUpdated(false);
         }
-    }, [thesisId]);
+    }, [thesisId, isUpdated]);
 
     useEffect(() => {
         if (thesisData) {
@@ -157,9 +188,42 @@ export default function ThesisPage() {
             ) : (
                 <>
                     <div className='p-4 border-b-2 border-gray-200'>
-                        <h1 className='text-textPrimary text-xl md:text-2xl font-bold'>
-                            "{thesisData?.thesis_title}"
-                        </h1>
+                        <div className="">
+                                
+                            {isEditTitle ? (
+                                <div className='flex align-center'>
+                                    <input
+                                        type="text"
+                                        defaultValue={thesisData?.thesis_title  }
+                                        onChange={(e) => setEditedTitle(e.target.value)}
+                                        className='text-textPrimary text-xl md:text-2xl font-bold border-b border-gray-400 focus:outline-none'
+                                    />
+                                    <button
+                                        onClick={() => setIsEditTitle(false)}
+                                    >
+                                        <X className='text-textPrimary mt-1 ml-2' size={24} />
+                                    </button>
+                                    <button
+                                        className='bg-bgPrimary text-white text-sm rounded-md px-2 mt-1 ml-2'
+                                        onClick={handleUpdateTitle}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                                
+                            ) : (
+                                <div className='flex align-center'>
+                                    <h1 className='text-textPrimary text-xl md:text-2xl font-bold'>
+                                        "{thesisData?.thesis_title}"
+                                    </h1>
+                                    <button
+                                        onClick={() => setIsEditTitle(true)}
+                                    >
+                                        <SquarePen className='text-textPrimary mt-1 ml-2' size={24} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                         <>
                             <span className='uppercase text-lg font-bold'>
                                 {thesisData?.student?.user_id}
