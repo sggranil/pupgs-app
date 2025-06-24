@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const thesis = await prisma.thesis.findFirst({
-            where: { student_id: parseInt(params.id) },
+            where: { id: parseInt(params.id) },
             include: {
                 proposals: true,
                 room: true,
@@ -33,6 +33,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
                     last_name: thesis.student.user.last_name,
                     standing: thesis.student.user.standing,
                     program: thesis.student.user.program,
+                    department: thesis.student.user.department,
+                    tel_number: thesis.student.user.tel_number,
+                    email: thesis.student.user.email,
+                    start_date: thesis.student.user.start_date,
+                    pass_date: thesis.student.user.pass_date,
                 },
             } : null,
             adviser: thesis.adviser ? {
@@ -42,6 +47,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
                     last_name: thesis.adviser.user.last_name,
                     position: thesis.adviser.user.position,
                     program: thesis.adviser.user.program,
+                    tel_number: thesis.adviser.user.tel_number,
+                    email: thesis.adviser.user.email,
                 },
             } : null,
             secretary: thesis.secretary ? {
