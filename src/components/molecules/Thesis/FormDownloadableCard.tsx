@@ -5,12 +5,13 @@ import PDFDownloadWrapper from "@/components/wrapper/PDFExportWrapper";
 interface FormCardProps {
     itemNo: number;
     title: string;
+    isLandscape?: boolean;
     document: React.ReactNode;
     header?: React.ReactNode;
     footer?: React.ReactNode;
 }
 
-const FormDownloadableCard: React.FC<FormCardProps> = ({ itemNo, title, document, header, footer }) => {
+const FormDownloadableCard: React.FC<FormCardProps> = ({ itemNo, title, document, header, footer, isLandscape }) => {
     return (
         <div className="w-[300] md:w-full flex-shrink-0 m-1">
             <div className="h-[110] md:h-full flex items-center justify-between py-3 bg-white rounded-md">
@@ -22,6 +23,7 @@ const FormDownloadableCard: React.FC<FormCardProps> = ({ itemNo, title, document
                         footer={footer}
                         fileName={`${title}`}
                         buttonLabel={`Download Form #${itemNo}`}
+                        isLandscape={isLandscape}
                     />
                 </div>
             </div>

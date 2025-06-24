@@ -30,13 +30,15 @@ const FormOne: React.FC<FormOneProps> = ({ thesisData }) => {
                 <p className="py-4">Thank you very much for your cooperation.</p>
                 <div className="mr-0 mt-8">
                     <div className="text-right">
-                        <div className="inline-block  m-0 p-0 w-64 border-b border-black mb-1"></div>
+                        <div className="inline-block m-0 p-0 w-64 border-b border-black mb-1">
+                            <span className="text-center mr-8">Dr. Carmencita L. Castolo</span>
+                        </div>
                         <p className="text-sm m-0 p-0 mb-1 mr-[84px]">Dean/Director</p>
                     </div>
                 </div>
                 <p className="py-4 pt-8">This confirms my acceptance to supervise the development of a concept paper:</p>
                 <div className="px-0 py-4">
-                    <p className="py-2">Faculty: <span className="font-bold pl-[200px]">{thesisData?.adviser?.user.first_name} {thesisData?.adviser?.user.last_name}</span></p>
+                    <p className="py-2">Faculty: <span className="font-bold pl-[200px]">{thesisData?.adviser?.user.prefix || ''} {thesisData?.adviser?.user.first_name} {thesisData?.adviser?.user.last_name} {thesisData?.adviser?.user.ext_name || ''}</span></p>
                     <p className="py-2">Signature: <span className="inline-block m-0 p-0 w-[350px] border-b border-black mb-1 ml-[180px]" /></p>
                     <p className="py-2">Date: <span className="font-bold pl-[220px]">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
                 </div>

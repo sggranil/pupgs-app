@@ -220,10 +220,7 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({ thesisData, enrolle
 
                     </table>
                 </div>
-
-
             </div>
-
         </div>
     );
 };

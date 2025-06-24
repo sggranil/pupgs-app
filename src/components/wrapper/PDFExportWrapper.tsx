@@ -9,9 +9,10 @@ interface PDFExportWrapperProps {
   content: React.ReactNode;
   header?: React.ReactNode;
   footer?: React.ReactNode;
+  isLandscape?: boolean;
 }
 
-const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLabel, content, header, footer }) => {
+const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLabel, content, header, footer, isLandscape }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -45,12 +46,12 @@ const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLab
     const imgWidth = mainCanvas.width;
     const imgHeight = mainCanvas.height;
 
-    const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "legal" });
+    const pdf = new jsPDF({ orientation: isLandscape ? "landscape" : "portrait", unit: "px", format: "legal" });
 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const headerHeight = headerImg ? 80 : 0;
+    const headerHeight = headerImg ? isLandscape ? 85 : 80 : 0;
     const footerHeight = footerImg ? 85 : 20;
     const usableHeight = pageHeight - headerHeight - footerHeight;
 
@@ -86,15 +87,15 @@ const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLab
       }
     }
 
-    pdf.save(`${fileName}.pdf`);
+    pdf.save(`${fileName}`);
   };
 
 
 
   return (
-    <div>
-      <Modal title="Export Document" isModalOpen={isModalOpen} setModalOpen={setModalOpen}>
-        <div className="h-[400px] overflow-y-auto border border-gray-200 rounded-md bg-white">
+    <div className="">
+      <Modal title="Export Document" ifLandscape={isLandscape} isModalOpen={isModalOpen} setModalOpen={setModalOpen}>
+        <div className="w-full h-[400px] overflow-y-auto border border-gray-200 rounded-md bg-white">
           {header && <div ref={headerRef}>{header}</div>}
           <div ref={printRef}>{content}</div>
           {footer && <div ref={footerRef}>{footer}</div>}

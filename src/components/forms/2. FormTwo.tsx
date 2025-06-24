@@ -2,36 +2,54 @@ import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
 
 interface FormTwoProps {
     thesisData: Thesis | null
+    programChair: string | null;
 }
 
-const FormTwo: React.FC<FormTwoProps> = ({ thesisData }) => {
+const FormTwo: React.FC<FormTwoProps> = ({ thesisData, programChair }) => {
+    const currentDate = new Date();
+    const day = currentDate.toLocaleDateString('en-US', { day: 'numeric' });
+    const month = currentDate.toLocaleDateString('en-US', { month: 'long' });
+    const year = currentDate.toLocaleDateString('en-US', { year: 'numeric' });
+
     return (
-        <div className="w-full">
-            <h1 className="text-md font-bold mb-4 text-center">
+        <div className="w-full p-8 font-inter bg-white shadow-lg rounded-lg">
+            <h1 className="text-xl font-extrabold mb-6 text-center text-gray-800">
                 THESIS/DISSERTATION ADVISING CONTRACT
             </h1>
 
-            <div className="block mb-8 px-24" >
-                <p className="mt-12 font-bold pb-8">KNOW ALL MEN BY THESE PRESENTS:</p>
-                <p className="indent-24">This agreement is made and entered into this {new Date().toLocaleDateString('en-US', { day: 'numeric' })} day of, {new Date().toLocaleDateString('en-US', { month: 'long' })} {new Date().toLocaleDateString('en-US', { year: 'numeric' })} , in Manila, Philippines by and between:</p>
+            <div className="mb-8 px-8">
+                <p className="mt-8 font-bold pb-4 text-gray-700">KNOW ALL MEN BY THESE PRESENTS:</p>
+                <p className="indent-12 text-gray-700 leading-relaxed">
+                    This agreement is made and entered into this <span className="font-semibold">{day}</span> day of, <span className="font-semibold">{month}</span> <span className="font-semibold">{year}</span>, in Manila, Philippines by and between:
+                </p>
             </div>
 
-            <div className="block mb-8 px-24" >
-                <p className="indent-24"><span className="font-bold">{thesisData?.adviser?.user.first_name} {thesisData?.adviser?.user.last_name}</span>, from the <span className="font-bold">{thesisData?.adviser?.user.program}</span>, hereinafter referred to as <strong>“Adviser”</strong></p>
-                <p className="text-center py-4">- and -</p>
-                <p className="indent-24"><span className="font-bold">{thesisData?.student?.user.first_name} {thesisData?.student?.user.last_name}</span>, a bonafide student of the <span className="font-bold">{thesisData?.student?.user.program}</span> of the <span className="font-bold">{thesisData?.student?.user.program}</span> hereinafter referred to as <strong>“Advisee”</strong></p>
+            <div className="mb-8 px-8">
+                <p className="indent-12 text-gray-700 leading-relaxed">
+                    <span className="font-bold text-gray-900">{thesisData?.adviser?.user.prefix || ''} {thesisData?.adviser?.user.first_name || '[Adviser First Name]'} {thesisData?.adviser?.user.last_name || '[Adviser Last Name]'} {thesisData?.adviser?.user.ext_name || ''}</span>, from the <span className="font-bold text-gray-900">{thesisData?.adviser?.user.program || '[Adviser Program]'}</span>, hereinafter referred to as <strong className="text-gray-900">“Adviser”</strong>
+                </p>
+                <p className="text-center py-4 font-bold text-gray-800">- and -</p>
+                <p className="indent-12 text-gray-700 leading-relaxed">
+                    <span className="font-bold text-gray-900">{thesisData?.student?.user.first_name || '[Student First Name]'} {thesisData?.student?.user.last_name || '[Student Last Name]'}</span>, a bonafide student of the <span className="font-bold text-gray-900">{thesisData?.student?.user.program || '[Student Program]'}</span> of the <span className="font-bold text-gray-900">{thesisData?.student?.user.department || '[Student Department]'}</span> hereinafter referred to as <strong className="text-gray-900">“Advisee”</strong>
+                </p>
             </div>
 
-            <div className="block mb-8 px-24" >
-                <p className="text-center py-4 font-bold">WITNESSETH:</p>
-                <p className="indent-24 py-3"><strong>WHEREAS</strong>, the Adviser is preferably a faculty/employee of the Polytechnic University of the Philippines, with a masters/doctorate degree in the field relevant to the topic or program specialization of the thesis/dissertation, with research experience (evidenced by research publications), and an expert in the field of study conducted by her/his Advisee;</p>
-                <p className="indent-24 py-3"><strong>WHEREAS</strong>, the Advisee is a bonafide student in the University who is writing his/her thesis/dissertation in partial fulfillment of the degree he/she is enrolled in;;</p>
-                <p className="indent-24 py-3"><strong>NOW, THEREFORE,</strong>, the two parties hereby agree to enter into this Agreement under the following terms and conditions;</p>
+            <div className="mb-8 px-8">
+                <p className="text-center py-4 font-bold text-gray-800">WITNESSETH:</p>
+                <p className="indent-12 py-3 text-gray-700 leading-relaxed">
+                    <strong className="text-gray-900">WHEREAS</strong>, the Adviser is preferably a faculty/employee of the Polytechnic University of the Philippines, with a masters/doctorate degree in the field relevant to the topic or program specialization of the thesis/dissertation, with research experience (evidenced by research publications), and an expert in the field of study conducted by her/his Advisee;
+                </p>
+                <p className="indent-12 py-3 text-gray-700 leading-relaxed">
+                    <strong className="text-gray-900">WHEREAS</strong>, the Advisee is a bonafide student in the University who is writing his/her thesis/dissertation in partial fulfillment of the degree he/she is enrolled in;
+                </p>
+                <p className="indent-12 py-3 text-gray-700 leading-relaxed">
+                    <strong className="text-gray-900">NOW, THEREFORE,</strong> the two parties hereby agree to enter into this Agreement under the following terms and conditions;
+                </p>
             </div>
 
-            <div className="text-justify space-y-4 leading-relaxed px-24">
-                <p className="font-semibold">Adviser shall:</p>
-                <ol className="list-decimal list-inside space-y-1 ml-4">
+            <div className="text-justify space-y-6 leading-relaxed px-8 text-gray-700">
+                <p className="font-semibold text-gray-800">Adviser shall:</p>
+                <ol className="list-decimal list-inside space-y-2 ml-4">
                     <li>
                         Help the student in the proper conduct (through regular and close monitoring) of research
                         work according to the set timetable to ensure integrity and high-quality output.
@@ -52,8 +70,8 @@ const FormTwo: React.FC<FormTwoProps> = ({ thesisData }) => {
                     <li>Provide expert support during the defense of his/her Advisee.</li>
                 </ol>
 
-                <p className="font-semibold">Advisee shall:</p>
-                <ol className="list-decimal list-inside space-y-1 ml-4">
+                <p className="font-semibold text-gray-800">Advisee shall:</p>
+                <ol className="list-decimal list-inside space-y-2 ml-4">
                     <li>
                         Fulfill the requirements of the thesis/dissertation writing under the supervision of his/her
                         Adviser;
@@ -76,7 +94,7 @@ const FormTwo: React.FC<FormTwoProps> = ({ thesisData }) => {
                     </li>
                 </ol>
 
-                <p className="indent-12">
+                <p className="indent-12 pt-4">
                     The Advisee and Adviser shall agree to discuss in advance issues of authorship and intellectual
                     property related to the thesis/dissertation of the Advisee being supervised by the Adviser, in
                     accordance with the University Policy on Co-authorship in Paper Presentation and Publication,
@@ -98,36 +116,41 @@ const FormTwo: React.FC<FormTwoProps> = ({ thesisData }) => {
                     another Adviser.
                 </p>
 
-                <p>
+                <p className="mt-8 text-gray-800">
                     <span className="italic font-bold">In WITNESS WHEREOF</span>, the parties have hereunto set their hands on the date and place above-written.
                 </p>
 
-                {/* Signature section */}
-                <div className="grid grid-cols-2 gap-8 mt-6">
+                <div className="grid grid-cols-2 gap-12 mt-10">
                     <div className="space-y-1 text-center">
-                        <div className="border-b border-black w-full h-6"></div>
-                        <p className="text-sm">Advisee</p>
+                        <div className="border-b-2 border-gray-400 w-full h-8 mb-2">
+                            {thesisData?.student?.user.first_name || ''} {thesisData?.student?.user.middle_name || ''} {thesisData?.student?.user.last_name || ''}
+                        </div>
+                        <p className="text-sm text-gray-600">Advisee</p>
                     </div>
                     <div className="space-y-1 text-center">
-                        <div className="border-b border-black w-full h-6"></div>
-                        <p className="text-sm">Adviser</p>
+                        <div className="border-b-2 border-gray-400 w-full h-8 mb-2">
+                            {thesisData?.adviser?.user.prefix || ''} {thesisData?.adviser?.user.first_name || '' } {thesisData?.adviser?.user.last_name || '' } {thesisData?.adviser?.user.ext_name || ''}
+                        </div>
+                        <p className="text-sm text-gray-600">Adviser</p>
                     </div>
                 </div>
 
-                <p className="mt-6 font-semibold text-center">Witnesses:</p>
-                <div className="grid grid-cols-2 gap-8 mt-2">
+                <p className="mt-8 font-semibold text-center text-gray-800">Witnesses:</p>
+                <div className="grid grid-cols-2 gap-12 mt-4 pb-8">
                     <div className="space-y-1 text-center">
-                        <div className="border-b border-black w-full h-6"></div>
-                        <p className="text-sm">Program Chair</p>
+                        <div className="border-b-2 border-gray-400 w-full h-8 mb-2">
+                            {programChair}
+                        </div>
+                        <p className="text-sm text-gray-600">Program Chair</p>
                     </div>
                     <div className="space-y-1 text-center">
-                        <div className="border-b border-black w-full h-6"></div>
-                        <p className="text-sm">Graduate School Secretary</p>
+                        <div className="border-b-2 border-gray-400 w-full h-8 mb-2"></div>
+                        <p className="text-sm text-gray-600">Graduate School Secretary</p>
                     </div>
                 </div>
             </div>
         </div>
-    );
+    )
 };
 
 export default FormTwo;
