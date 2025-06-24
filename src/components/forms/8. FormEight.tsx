@@ -7,7 +7,7 @@ interface FormEightProps {
 
 const FormEight: React.FC<FormEightProps> = ({ thesisData }) => {
     const defenseSchedule = thesisData?.defense_date && thesisData?.defense_time
-        ? `${new Date(thesisData.defense_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} | ${new Date(`2000/01/01 ${thesisData.defense_time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+        ? `${new Date(thesisData.defense_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} | ${new Date(`${thesisData.defense_time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
         : '_____________________________';
 
     const getFullAdviserName = (adviser: Adviser | undefined) => {
@@ -24,44 +24,44 @@ const FormEight: React.FC<FormEightProps> = ({ thesisData }) => {
                 <div className="grid grid-cols-2 gap-x-4">
                     <div className="flex items-center mb-2">
                         <p className="font-semibold w-1/3">Name of Candidate:</p>
-                        <span className="border-b border-black flex-grow px-2 pb-0.5">
+                        <span className="pb-4 border-b border-black flex-grow px-2 pb-0.5">
                             {thesisData?.student?.user.first_name || ''} {thesisData?.student?.user.middle_name ? thesisData.student.user.middle_name + ' ' : ''} {thesisData?.student?.user.last_name || ''}
                         </span>
                     </div>
                     <div className="flex items-center mb-2">
                         <p className="font-semibold w-1/3">Program:</p>
-                        <span className="border-b border-black flex-grow px-2 pb-0.5">
+                        <span className="pb-4 border-b border-black flex-grow px-2 pb-0.5">
                             {thesisData?.student?.user.program || ''}
                         </span>
                     </div>
                     <div className="flex items-center mb-2 col-span-2">
                         <p className="font-semibold w-1/6">Schedule of Defense:</p>
-                        <span className="border-b border-black flex-grow px-2 pb-0.5">
+                        <span className="pb-4 border-b border-black flex-grow px-2 pb-0.5">
                             {defenseSchedule}
                         </span>
                     </div>
                 </div>
                 <div className="mb-2">
                     <p className="font-semibold">Thesis/Dissertation Title:</p>
-                    <span className="border-b border-black w-full inline-block px-2 pb-0.5 mt-1">
+                    <span className="pb-4 border-b border-black w-full inline-block px-2 pb-0.5 mt-1">
                         {thesisData?.thesis_title || ''}
                     </span>
                 </div>
                 <div className="flex items-center mb-2">
                     <p className="font-semibold w-1/6">Adviser:</p>
-                    <span className="border-b border-black flex-grow px-2 pb-0.5">
+                    <span className="pb-4 border-b border-black flex-grow px-2 pb-0.5">
                         {getFullAdviserName(thesisData?.adviser)}
                     </span>
                 </div>
                 <div className="mb-2">
                     <p className="font-semibold">Final Defense Panel:</p>
                     <div className="ml-4">
-                        <p className="mb-1">Adviser: <span className="border-b border-black px-2 pb-0.5 min-w-[100px] inline-block">{getFullAdviserName(thesisData?.adviser)}</span></p>
+                        <p className="mb-1">Adviser: <span className="pb-4 border-b border-black px-2 pb-0.5 min-w-[100px] inline-block">{getFullAdviserName(thesisData?.adviser)}</span></p>
                         <p className="mb-1">Evaluators:
                             {thesisData?.panelists?.map((panelist, index) => (
-                                <span key={panelist.id || index} className="border-b border-black px-2 pb-0.5 min-w-[100px] inline-block ml-2">{getFullAdviserName(panelist)}</span>
+                                <span key={panelist.id || index} className="pb-4 border-b border-black px-2 pb-0.5 min-w-[100px] inline-block ml-2">{getFullAdviserName(panelist)}</span>
                             ))}
-                            {thesisData?.panelists?.length === 0 && <span className="border-b border-black px-2 pb-0.5 min-w-[100px] inline-block ml-2">&nbsp;</span>}
+                            {thesisData?.panelists?.length === 0 && <span className="pb-4 border-b border-black px-2 pb-0.5 min-w-[100px] inline-block ml-2">&nbsp;</span>}
                         </p>
                     </div>
                 </div>
@@ -160,15 +160,15 @@ const FormEight: React.FC<FormEightProps> = ({ thesisData }) => {
                 <div className="flex items-center space-x-6">
                     <label className="flex items-center cursor-pointer">
                         <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
-                        <span className="ml-2">Approved</span>
+                        <span className="ml-2 mb-4">Approved</span>
                     </label>
                     <label className="flex items-center cursor-pointer">
                         <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
-                        <span className="ml-2">Approved with Revisions</span>
+                        <span className="ml-2 mb-4">Approved with Revisions</span>
                     </label>
                     <label className="flex items-center cursor-pointer">
                         <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
-                        <span className="ml-2">Disapproved</span>
+                        <span className="ml-2 mb-4">Disapproved</span>
                     </label>
                 </div>
             </div>

@@ -19,19 +19,19 @@ const FormSeven: React.FC<FormSevenProps> = ({ thesisData, programChair }) => {
             <div className="mb-4">
                 <div className="flex items-center mb-2">
                     <p className="font-semibold w-1/3">Name of Student/Candidate:</p>
-                    <span className="border-b border-black flex-grow px-2 pb-0.5">
+                    <span className="border-b border-black flex-grow px-2 pb-3">
                         {thesisData?.student?.user.first_name || ''} {thesisData?.student?.user.middle_name ? thesisData.student.user.middle_name + ' ' : ''} {thesisData?.student?.user.last_name || ''}
                     </span>
                 </div>
                 <div className="flex items-center mb-2">
                     <p className="font-semibold w-1/3">Program:</p>
-                    <span className="border-b border-black flex-grow px-2 pb-0.5">
+                    <span className="border-b border-black flex-grow px-2 pb-3">
                         {thesisData?.student?.user.program || ''}
                     </span>
                 </div>
                 <div className="mb-2">
                     <p className="font-semibold">Thesis/Dissertation Title:</p>
-                    <span className="border-b border-black w-full inline-block px-2 pb-0.5 mt-1">
+                    <span className="border-b border-black w-full inline-block px-2 pb-3 mt-1">
                         {thesisData?.thesis_title || ''}
                     </span>
                     <span className="border-b border-black w-full inline-block px-2 pb-0.5 mt-1">&nbsp;</span>
@@ -46,7 +46,7 @@ const FormSeven: React.FC<FormSevenProps> = ({ thesisData, programChair }) => {
 
             <div className="flex items-center mb-8">
                 <p className="font-semibold w-1/3">Schedule of Defense:</p>
-                <span className="border-b border-black flex-grow px-2 pb-0.5">
+                <span className="border-b border-black flex-grow px-2 pb-3">
                     {defenseSchedule}
                 </span>
             </div>
@@ -103,15 +103,15 @@ const FormSeven: React.FC<FormSevenProps> = ({ thesisData, programChair }) => {
 
             <div className="mt-8 grid grid-cols-2 gap-x-16">
                 <div>
-                    <p className="font-bold mb-1">Noted:</p>
-                    <div className="text-center pb-4 border-b border-black w-full h-6 mb-1">
+                    <p className="font-bold mb-4">Noted:</p>
+                    <div className="text-center pb-4 w-full h-6 mb-1">
                         {programChair} ({new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })})
                     </div>
                     <p className="text-center text-xs mt-1">(Program Chairperson/Date of Signing)</p>
                 </div>
                 <div>
-                    <p className="font-bold mb-1">Approved:</p>
-                    <div className="text-center border-b border-black w-full h-6 mb-1">
+                    <p className="font-bold mb-4">Approved:</p>
+                    <div className="text-center w-full h-6 mb-1">
                         Dr. Carmencita L. Castolo ({new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })})
                     </div>
                     <p className="text-center text-xs mt-1">(Dean/Director & Date of Signing)</p>
