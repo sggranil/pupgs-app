@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
   
   useEffect(() => {      
-    router.push(`/login?type=student`)
+    router.push(`/login`)
   }, []);
 
   return (

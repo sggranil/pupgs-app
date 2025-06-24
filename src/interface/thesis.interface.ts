@@ -46,7 +46,7 @@ export interface EnrolledSubject {
   subject_name: string;
   or_number: string;
   attachment: string;
-  is_confirmed?: boolean | null;
-  message?: string;
-  enrolled_at: string;
+  is_confirmed: boolean | null;
+  message: string | null;
+  enrolled_at: Date;
 }

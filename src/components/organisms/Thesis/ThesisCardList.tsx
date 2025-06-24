@@ -57,12 +57,12 @@ const ThesisCardList: React.FC<ThesisCardListProps> = ({ isUpdated, setIsUpdated
                     </div>
                 ) : userThesis && userThesis.length > 0 ? (
                     userData?.role === "student" || userData?.role === "adviser" ? (
-                        userThesis.map((thesis) => (
+                        userThesis.map((thesis, idx) => (
                             <div
                                 className="cursor-pointer"
                                 key={thesis.id}
                                 onClick={() => {
-                                    router.push(`/thesis/info/?id=${thesis.id}`)
+                                    router.push(`/thesis/info/?id=${thesis.id}&index=${idx}`)
                                 }}
                             >
                                 <ThesisCard thesisData={thesis} />

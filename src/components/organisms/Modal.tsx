@@ -4,11 +4,13 @@ import { ImCross } from "react-icons/im";
 interface ModalProps {
     title: string;
     isModalOpen: boolean;
+    ifLandscape?: boolean;
     setModalOpen: (modalOpen: boolean) => void;
     children: React.ReactNode;
 }
 
-const Modal = ({ title, isModalOpen, setModalOpen, children }: ModalProps) => {
+const Modal = ({ title, isModalOpen, setModalOpen, children, ifLandscape }: ModalProps) => {
+    const width = ifLandscape ? 1544 : 930;
 
     return (
         <div className="flex flex-col items-center justify-center">
@@ -18,7 +20,7 @@ const Modal = ({ title, isModalOpen, setModalOpen, children }: ModalProps) => {
                     onClick={() => setModalOpen(false)}
                 >
                     <div
-                        className="bg-white p-6 rounded-lg shadow-lg w-full md:w-1/2"
+                        className={`bg-white p-6 rounded-lg shadow-lg w-[${width}px]`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between border-b border-gray-200 py-2">

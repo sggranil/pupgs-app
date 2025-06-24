@@ -9,24 +9,28 @@ export async function GET(request: NextRequest) {
             include: {
                 student: {
                     include: {
-                        user: true,
+                        user: {
+                            select: {
+                                id: true,
+                                first_name: true,
+                                middle_name: true,
+                                last_name: true,
+                                ext_name: true,
+                                role: true,
+                            }
+                        }
                     }
-                },
+                }
             }
         });
 
-        if (!subject) {
-            return NextResponse.json(
-                { message: "Subject not found." },
-                { status: 401 }
-            );
-        }
-
-        return NextResponse.json({ 
+        return NextResponse.json({
             data: subject,
-            status: 200 
+            status: 200
         });
+
     } catch (err) {
+        console.error("Error fetching enrolled subjects:", err);
         return NextResponse.json(
             { message: "An error occurred during fetching" },
             { status: 500 }

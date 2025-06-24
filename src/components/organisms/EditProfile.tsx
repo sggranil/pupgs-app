@@ -11,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useRouter } from "next/navigation";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import { DEPARTMENTS } from "@/constants/departments";
+import { COURSES } from "@/constants/course";
 
 interface EditProfileProps {
     userData: User | null;
@@ -36,7 +38,7 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
         resolver: zodResolver(updateUserSchema),
     })
 
-    async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+   async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         removeToasts();
         isUpdated(false);
@@ -57,6 +59,20 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                 ...formData,
                 id: targetUserId,
             };
+
+            if (payload.start_date === "") {
+                payload.start_date = null;
+            } else if (typeof payload.start_date === 'string') {
+                const parsedStartDate = new Date(payload.start_date);
+                payload.start_date = !isNaN(parsedStartDate.getTime()) ? parsedStartDate : null;
+            }
+
+            if (payload.pass_date === "") {
+                payload.pass_date = null;
+            } else if (typeof payload.pass_date === 'string') {
+                const parsedPassDate = new Date(payload.pass_date);
+                payload.pass_date = !isNaN(parsedPassDate.getTime()) ? parsedPassDate : null;
+            }
 
             if (!fromUserProfile && userInfo?.role === "admin") {
                 payload.role = formData.role ? "admin" : "adviser";
@@ -86,8 +102,6 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
             setLoading(false);
         }
     }
-
-
 
     return (
         <form
@@ -127,14 +141,52 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                             defaultValue={userData?.middle_name}
                         />
                     </div>
+                    <div className="flex justify-between align-center gap-2">
+                        <div>
+                            <label className="block text-textPrimary font-semibold mb-1">Prefix</label>
+                            <input
+                                type="text"
+                                className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                                placeholder="Dr., Asst. Prof., etc."
+                                {...register("prefix")}
+                                defaultValue={userData?.prefix}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-textPrimary font-semibold mb-1">Name Extension</label>
+                            <input
+                                type="text"
+                                className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                                placeholder="Jr., Sr., or such titles (MSIT, MSCS, MBA, etc.)"
+                                {...register("ext_name")}
+                                defaultValue={userData?.ext_name}
+                            />
+                        </div>
+                    </div>
                     <div>
-                        <label className="block text-textPrimary font-semibold mb-1">Name Extension</label>
+                        <label className="block text-textPrimary font-semibold mb-1">Date Started</label>
                         <input
-                            type="text"
+                            type="date"
+                            placeholder="YYYY-MM-DD"
                             className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                            placeholder="Name Extension"
-                            {...register("ext_name")}
-                            defaultValue={userData?.ext_name}
+                            {...register("start_date")}
+                            defaultValue={userData?.start_date
+                                ? new Date(userData.start_date).toISOString().split('T')[0]
+                                : ''
+                            }
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-textPrimary font-semibold mb-1">Comprehensive Exam Pass Date</label>
+                        <input
+                            type="date"
+                            placeholder="YYYY-MM-DD"
+                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                            {...register("pass_date")}
+                            defaultValue={userData?.pass_date
+                                ? new Date(userData.pass_date).toISOString().split('T')[0]
+                                : ''
+                            }
                         />
                     </div>
                 </div>
@@ -153,14 +205,36 @@ const EditProfle: React.FC<EditProfileProps> = ({ userData, isShowEdit, isUpdate
                     }
 
                     <div>
-                        <label className="block text-textPrimary font-semibold mb-1">Program</label>
-                        <input
-                            type="text"
-                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                            placeholder="Program"
+                        <label htmlFor="program" className="block text-textPrimary font-semibold mb-1">Program</label>
+                        <select
+                            id="program"
+                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
                             {...register("program")}
-                            defaultValue={userData?.program}
-                        />
+                            defaultValue={userData?.program || ""}
+                        >
+                            <option value="" disabled>Select a Program</option>
+                            {COURSES.map((course) => (
+                                <option key={course.id} value={course.name}>
+                                    {course.name} ({course.level})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="department" className="block text-textPrimary font-semibold mb-1">Department</label>
+                        <select
+                            id="department"
+                            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+                            {...register("department")}
+                            defaultValue={userData?.department || ""}
+                        >
+                            <option value="" disabled>Select a Department</option>
+                            {DEPARTMENTS.map((department, index) => (
+                                <option key={index} value={department}>
+                                    {department}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     {userData?.position &&
                         <div>

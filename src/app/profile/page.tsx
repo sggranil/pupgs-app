@@ -11,7 +11,6 @@ import useUserRequest from "@/hooks/user";
 import Modal from "@/components/organisms/Modal";
 import EnrolledSubjectModal from "@/components/organisms/Subject/EnrolledSubjectModal";
 import SubjectCardList from "@/components/organisms/Subject/SubjectCardList";
-import ThesisCardList from "@/components/organisms/Thesis/ThesisCardList";
 import EditProfile from "@/components/organisms/EditProfile";
 
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
@@ -95,18 +94,20 @@ export default function Profile() {
                             <h1 className="text-textPrimary text-1xl md:text-3xl font-bold">Loading...</h1>
                         ) : (
                             <h1 className="text-textPrimary text-2xl md:text-2xl font-bold">
-                                {userProfile?.first_name} {userProfile?.middle_name} {userProfile?.last_name} {userProfile?.ext_name}
+                                 {userProfile?.prefix || ''} {userProfile?.first_name} {userProfile?.middle_name || ''} {userProfile?.last_name}{` ${userProfile?.ext_name}` || ''}
                             </h1>
                         )}
                         <p className="text-textBlack text-md">
-                            {loading
-                                ? "Loading..."
-                                : userProfile?.standing
-                                || `${userProfile?.position || ""} - ${userProfile?.program || "Sta. Mesa Campus"}`
-                            }
+                        {loading
+                            ? "Loading..."
+                            : userProfile?.standing || userProfile?.position || "Admin"}
                         </p>
 
-
+                        <p>
+                        {userProfile?.program
+                            ? `${userProfile?.department} - ${userProfile?.program}`
+                            : userProfile?.department}
+                        </p>
                     </div>
                 </div>
             </div>
