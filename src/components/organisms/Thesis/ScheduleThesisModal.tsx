@@ -211,7 +211,7 @@ const ScheduleThesisModal: React.FC<Props> = ({
                         <option
                             key={adviser.id}
                             value={adviser.id}
-                            disabled={selectedAdvisers.length >= 3 && !selectedAdvisers.includes(adviser.id)}
+                            disabled={selectedAdvisers.length >= 4 && !selectedAdvisers.includes(adviser.id)}
                         >
                             {adviser.user.first_name} {adviser.user.last_name}
                         </option>
