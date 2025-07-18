@@ -5,7 +5,7 @@ import "./globals.css";
 
 const instrumentSans = Instrument_Sans({
   weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  style: ["normal"],
 });
 
 const sourceSerif4 = Source_Serif_4({
