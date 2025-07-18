@@ -86,7 +86,13 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
           )
         ) : (
           <div className="h-48 col-span-full flex flex-col justify-center items-center space-y-4">
-            <p>Upload your receipt to confirm payment.</p>
+            <p>
+              {userData?.role === "admin" ? (
+                "No receipt data available."
+              ) : (
+                "Upload your receipt to confirm payment"
+              )}
+            </p>
           </div>
         )}
       </div>

@@ -94,7 +94,7 @@ export default function Profile() {
                             <h1 className="text-textPrimary text-1xl md:text-3xl font-bold">Loading...</h1>
                         ) : (
                             <h1 className="text-textPrimary text-2xl md:text-2xl font-bold">
-                                 {userProfile?.prefix || ''} {userProfile?.first_name} {userProfile?.middle_name || ''} {userProfile?.last_name}{` ${userProfile?.ext_name}` || ''}
+                                 {userProfile?.prefix || ''} {userProfile?.first_name} {userProfile?.middle_name || ''} {userProfile?.last_name}{userProfile?.ext_name != null ? `, ${userProfile?.ext_name}` : ''}
                             </h1>
                         )}
                         <p className="text-textBlack text-md">
