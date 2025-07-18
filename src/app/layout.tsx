@@ -6,13 +6,16 @@ import "./globals.css";
 const instrumentSans = Instrument_Sans({
   weight: ["400", "500", "600", "700"],
   style: ["normal"],
+  subsets: ["latin"],
 });
 
 const sourceSerif4 = Source_Serif_4({
   weight: ["200", "300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
+  subsets: ["latin"],
   variable: "--font-source-serif-4",
 });
+
 
 export const metadata: Metadata = {
   title: "PUP Online Graduate Thesis Monitoring System",
