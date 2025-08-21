@@ -86,11 +86,61 @@ const SubjectConfirmationModal: React.FC<SubjectConfirmationProps> = ({ subjectD
                     <label className="block text-textPrimary font-semibold mb-1">
                         Message *
                     </label>
-                    <textarea
+                    <select
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        placeholder="Message"
-                        {...register("message")}
-                    />
+                        value={String(getValues("message"))}
+                        onChange={(e) => {
+                            setValue("message", e.target.value, {
+                                shouldValidate: true,
+                            });
+                        }}
+                        >
+                        <option value="" disabled>
+                            Choose a message
+                        </option>
+
+                        {/* ✅ Positive Confirmations */}
+                        <optgroup label="✅ Positive Confirmations">
+                            <option value="I confirm that I have received the receipt and all details are correct.">
+                            I confirm that I have received the receipt and all details are correct.
+                            </option>
+                            <option value="I acknowledge receipt of the document with no issues found.">
+                            I acknowledge receipt of the document with no issues found.
+                            </option>
+                            <option value="Receipt has been received and verified successfully.">
+                            Receipt has been received and verified successfully.
+                            </option>
+                            <option value="I confirm that the receipt is complete and accurate.">
+                            I confirm that the receipt is complete and accurate.
+                            </option>
+                            <option value="I have received and checked the receipt, and it matches the transaction.">
+                            I have received and checked the receipt, and it matches the transaction.
+                            </option>
+                            <option value="Receipt received, reviewed, and confirmed without discrepancies.">
+                            Receipt received, reviewed, and confirmed without discrepancies.
+                            </option>
+                        </optgroup>
+
+                        {/* ⚠️ Neutral / Needs Attention */}
+                        <optgroup label="⚠️ Neutral / Needs Attention">
+                            <option value="I have received the receipt, but some details are unclear.">
+                            I have received the receipt, but some details are unclear.
+                            </option>
+                            <option value="Receipt was received, but I need clarification on specific items.">
+                            Receipt was received, but I need clarification on specific items.
+                            </option>
+                        </optgroup>
+
+                        {/* ❌ Negative / Issues */}
+                        <optgroup label="❌ Negative / Issues">
+                            <option value="I have not received the receipt yet, please resend.">
+                            I have not received the receipt yet, please resend.
+                            </option>
+                            <option value="I received the receipt, but the details are incorrect.">
+                            I received the receipt, but the details are incorrect.
+                            </option>
+                        </optgroup>
+                    </select>
                 </div>
             </div>
             <div className="flex flex-row gap-2">

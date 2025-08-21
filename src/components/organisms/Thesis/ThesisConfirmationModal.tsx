@@ -149,12 +149,61 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-textPrimary font-semibold mb-1">Message *</label>
-                    <textarea
+                    <label className="block text-textPrimary font-semibold mb-1">Message *</label><select
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        placeholder="Message"
-                        {...register('message')}
-                    />
+                        value={String(watch('message'))}
+                        onChange={(e) =>
+                            setValue('message', e.target.value, {
+                                shouldValidate: true,
+                            })
+                        }
+                    >
+                        <option value="" disabled>
+                            Choose a message
+                        </option>
+
+                        {/* ✅ Positive Confirmations */}
+                        <optgroup label="✅ Positive Confirmations">
+                            <option value="I confirm that I have received the thesis in full and it is complete.">
+                            I confirm that I have received the thesis in full and it is complete.
+                            </option>
+                            <option value="The thesis has been received and reviewed without any issues.">
+                            The thesis has been received and reviewed without any issues.
+                            </option>
+                            <option value="I acknowledge receipt of the thesis and confirm it is properly formatted.">
+                            I acknowledge receipt of the thesis and confirm it is properly formatted.
+                            </option>
+                            <option value="Thesis document has been received and verified for completeness.">
+                            Thesis document has been received and verified for completeness.
+                            </option>
+                            <option value="I confirm successful submission of the thesis with all required sections included.">
+                            I confirm successful submission of the thesis with all required sections included.
+                            </option>
+                            <option value="I confirm that the thesis has been submitted on time and is accepted.">
+                            I confirm that the thesis has been submitted on time and is accepted.
+                            </option>
+                        </optgroup>
+
+                        {/* ⚠️ Neutral / Needs Attention */}
+                        <optgroup label="⚠️ Neutral / Needs Attention">
+                            <option value="Thesis has been received, but some sections are unclear.">
+                            Thesis has been received, but some sections are unclear.
+                            </option>
+                            <option value="I acknowledge receipt of the thesis, but formatting needs adjustments.">
+                            I acknowledge receipt of the thesis, but formatting needs adjustments.
+                            </option>
+                        </optgroup>
+
+                        {/* ❌ Negative / Issues */}
+                        <optgroup label="❌ Negative / Issues">
+                            <option value="The thesis file appears to be incomplete or corrupted.">
+                            The thesis file appears to be incomplete or corrupted.
+                            </option>
+                            <option value="I received the thesis, but the content does not match the submission guidelines.">
+                            I received the thesis, but the content does not match the submission guidelines.
+                            </option>
+                        </optgroup>
+                    </select>
                 </div>
 
                 {isConfirmed === true && (
