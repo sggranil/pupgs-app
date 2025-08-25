@@ -44,7 +44,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
         setSubjectData(studentSubjects);
       } else {
         setUserSubject(allSubjects);
-        setSubjectData(allSubjects)
+        setSubjectData(allSubjects);
       }
     }
 
@@ -55,6 +55,63 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
   useEffect(() => {
     fetchSubject();
   }, [isUpdated]);
+
+  const handleCardClick = (subject: EnrolledSubject) => {
+    setSelectedSubject(subject);
+    setEnrolledSubjectModal(true);
+  };
+
+  const renderModalContent = () => {
+    if (!selectedSubject) {
+      return null;
+    }
+
+    // Student view logic
+    if (userData?.role === "student") {
+      switch (selectedSubject.status) {
+        case "reupload_required":
+        case "invalid":
+        case "rejected":
+          // Show the form for students who need to re-upload
+          return (
+            <EnrolledSubjectModal
+              subjectData={selectedSubject}
+              setIsUpdated={setIsUpdated}
+              setIsModalOpen={setEnrolledSubjectModal}
+            />
+          );
+        case "confirmed":
+        case "acknowledged":
+        case "pending_review":
+          // Show a message for students whose receipt is being processed or is valid
+          return (
+            <div className="pt-6">
+              <p className="font-semibold text-lg">Receipt Status</p>
+              <p>Your receipt with Official Receipt <strong>#{selectedSubject.or_number}</strong> has been processed by our staff.</p>
+              <div className="py-4">
+                <p><strong>Status:</strong> {selectedSubject.status === "pending_review" ? "Pending Review" : "Confirmed"}</p>
+                {selectedSubject.message && <p><strong>Notes:</strong> {selectedSubject.message}</p>}
+              </div>
+            </div>
+          );
+        default:
+          return null;
+      }
+    }
+
+    // Admin/Adviser view logic
+    if (userData?.role === "admin" || userData?.role === "adviser") {
+      return (
+        <EnrolledSubjectModal
+          subjectData={selectedSubject}
+          setIsUpdated={setIsUpdated}
+          setIsModalOpen={setEnrolledSubjectModal}
+        />
+      );
+    }
+
+    return null;
+  };
 
   return (
     <div className="h-full">
@@ -69,10 +126,8 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
               <div
                 className="cursor-pointer"
                 key={subject.id}
-                onClick={() => {
-                  setSelectedSubject(subject);
-                  setEnrolledSubjectModal(true);
-                }}>
+                onClick={() => handleCardClick(subject)}
+              >
                 <SubjectCard userData={subject} />
               </div>
             ))
@@ -100,30 +155,9 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
       <Modal
         title="Receipt Information"
         isModalOpen={enrolledSubjectModal}
-        setModalOpen={setEnrolledSubjectModal}>
-        {!selectedSubject?.is_confirmed && !selectedSubject?.message ? (
-          <EnrolledSubjectModal
-            subjectData={selectedSubject}
-            setIsUpdated={setIsUpdated}
-            setIsModalOpen={setEnrolledSubjectModal}
-          />
-        ) : !selectedSubject?.is_confirmed && selectedSubject?.message ? (
-          <div className="pt-6">
-            Your receipt with Official Receipt <strong>#{selectedSubject?.or_number}</strong> has been flagged by our staff.
-            <div className="py-4">
-              <p><strong>Status:</strong> {selectedSubject?.is_confirmed ? "Confirmed" : "Denied"}</p>
-              <p><strong>Notes:</strong> {selectedSubject?.message}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="pt-6">
-            Your receipt with Official Receipt <strong>#{selectedSubject?.or_number}</strong> has been checked by our staff.
-            <div className="py-4">
-              <p><strong>Status:</strong> {selectedSubject?.message ? "Confirmed" : "Denied"}</p>
-              <p><strong>Notes:</strong> {selectedSubject?.message}</p>
-            </div>
-          </div>
-        )}
+        setModalOpen={setEnrolledSubjectModal}
+      >
+        {renderModalContent()}
       </Modal>
     </div>
   );
