@@ -8,7 +8,7 @@ export interface Thesis {
   adviser?: Adviser;
   adviser_id?: number;
   defense_phase?: string;
-  is_confirmed?: boolean;
+  status: string | null;
   message?: string;
   user?: User;
   user_id?: number;
@@ -46,7 +46,7 @@ export interface EnrolledSubject {
   subject_name: string;
   or_number: string;
   attachment: string;
-  is_confirmed: boolean | null;
+  status: string | null;
   message: string | null;
   enrolled_at: Date;
 }

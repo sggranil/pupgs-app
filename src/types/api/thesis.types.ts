@@ -6,7 +6,7 @@ export const enrolledSubjectSchema = z.object({
     subject_name: z.string(),
     or_number: z.string().min(6, "OR Number is required."),
     attachment: z.string().min(6, "OR Attachment is required."),
-    is_confirmed: z.boolean().optional(),
+    status: z.string().optional(),
     message: z.string().optional(),
 });
 
@@ -18,13 +18,25 @@ export const addThesisSchema = z.object({
         .regex(gDriveOrDocsDomainRegex, {
             message: "Please enter a valid Google Drive or Google Docs link.",
         }),
+    status: z.string().optional(),
 });
 
 export const updateThesisSchema = z.object({
-    is_confirmed: z.boolean().optional(),
-    message: z.string().optional(),
-    adviser_id: z.number().optional()
-})
+    status: z.string(),
+    message: z.string(),
+    adviser_id: z.number().optional(),
+}).refine(
+    (data) => {
+        if (data.status !== 'pending_review' && !data.adviser_id) {
+            return false;
+        }
+        return true;
+    },
+    {
+        message: 'Thesis adviser is required for confirmed or rejected statuses.',
+        path: ['adviser_id'],
+    }
+);
 
 export const addRoomSchema = z.object({
     name: z.string().min(1, "Room name is required"),
@@ -34,7 +46,16 @@ export const addRoomSchema = z.object({
         .optional(),
 });
 
+export const addProposalSchema = z.object({
+    file_url: z.string()
+        .url("Please enter a valid URL.")
+        .refine((val) => gDriveOrDocsDomainRegex.test(val), {
+            message: "The link must be a public Google Drive or Docs link.",
+        }),
+});
+
 export type AddRoomSchemaType = z.infer<typeof addRoomSchema>;
 export type EnrolledSubjectSchemaType = z.infer<typeof enrolledSubjectSchema>;
 export type AddThesisSchemaType = z.infer<typeof addThesisSchema>;
 export type UpdateThesisSchemaType = z.infer<typeof updateThesisSchema>;
+export type AddProposalSchemaType = z.infer<typeof addProposalSchema>;
