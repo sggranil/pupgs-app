@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+const gDriveOrDocsDomainRegex = /^https:\/\/(?:drive|docs)\.google\.com(?:$|\/)/;
+
 export const enrolledSubjectSchema = z.object({
     subject_name: z.string(),
     or_number: z.string().min(6, "OR Number is required."),
@@ -9,9 +11,14 @@ export const enrolledSubjectSchema = z.object({
 });
 
 export const addThesisSchema = z.object({
-    thesis_title: z.string().min(6, "Thesis title is required."),
-    file_url: z.string().min(6, "Concept paper attachment is required."),
-})
+    thesis_title: z.string().min(6, { message: "Thesis title is required." }),
+    file_url: z
+        .string()
+        .min(1, { message: "File URL is required." })
+        .regex(gDriveOrDocsDomainRegex, {
+            message: "Please enter a valid Google Drive or Google Docs link.",
+        }),
+});
 
 export const updateThesisSchema = z.object({
     is_confirmed: z.boolean().optional(),
@@ -20,11 +27,11 @@ export const updateThesisSchema = z.object({
 })
 
 export const addRoomSchema = z.object({
-  name: z.string().min(1, "Room name is required"),
-  location: z.string().optional(),
-  capacity: z
-    .union([z.string().regex(/^\d+$/, "Must be a number"), z.literal("")])
-    .optional(),
+    name: z.string().min(1, "Room name is required"),
+    location: z.string().optional(),
+    capacity: z
+        .union([z.string().regex(/^\d+$/, "Must be a number"), z.literal("")])
+        .optional(),
 });
 
 export type AddRoomSchemaType = z.infer<typeof addRoomSchema>;
