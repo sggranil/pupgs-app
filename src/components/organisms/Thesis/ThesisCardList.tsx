@@ -75,7 +75,7 @@ const ThesisCardList: React.FC<ThesisCardListProps> = ({ isUpdated, setIsUpdated
                     )
                 ) : (
                     <div className="h-48 col-span-full flex justify-center items-center">
-                        <p>No thesis found.</p>
+                        <p>No proposals found.</p>
                     </div>
                 )}
             </div>
