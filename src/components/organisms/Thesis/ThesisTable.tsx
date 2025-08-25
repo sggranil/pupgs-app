@@ -8,6 +8,8 @@ import ThesisConfirmationModal from "./ThesisConfirmationModal";
 import { Thesis } from "@/interface/thesis.interface";
 import { Adviser } from "@/interface/user.interface";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import { CONFIRMATION_STATUSES } from "@/constants/filters";
+import { formatStatus } from "@/utilities/StringFormatter";
 
 interface Subject {
     setIsUpdated: (isUpdated: boolean) => void;
@@ -31,7 +33,7 @@ const ThesisTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
         const matchesThesis =
             thesisFilter === "" || thesis.thesis_title.toLowerCase().includes(thesisFilter.toLowerCase());
         const matchesStatus =
-            statusFilter === "All" || thesis.is_confirmed === (statusFilter === "true");
+            statusFilter === "All" || thesis.status?.toLowerCase().includes(statusFilter.toLowerCase());
         const matchesName =
             searchQuery === "" ||
             `${thesis.user?.first_name ?? ""} ${thesis.user?.last_name ?? ""}`
@@ -52,7 +54,6 @@ const ThesisTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
 
     return (
         <div className="w-full overflow-x-auto">
-            {/* Filters */}
             <div className="mb-4 flex justify-end space-x-2">
                 <select
                     className="p-2 border rounded-md"
@@ -63,8 +64,11 @@ const ThesisTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                     }}
                 >
                     <option value="All">All</option>
-                    <option value="true">Confirmed</option>
-                    <option value="false">Pending Review</option>
+                    {CONFIRMATION_STATUSES.map((status) => (
+                        <option key={status.value} value={status.value}>
+                            {status.label}
+                        </option>
+                    ))}
                 </select>
                 <input
                     type="text"
@@ -117,7 +121,7 @@ const ThesisTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                                 </a>
                             </td>
                             <td className="p-3 text-sm text-gray-500">
-                                {!thesis.is_confirmed ? "Pending Review" : "Confirmed"}
+                                {formatStatus(thesis.status)}
                             </td>
                             {(userInfo?.role != "adviser" || userInfo?.role == "student") ? (
                                 <td className="p-3 text-sm text-gray-500">
@@ -130,7 +134,7 @@ const ThesisTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                                     >
                                         Change Status
                                     </button>
-                                    {thesis?.is_confirmed && (
+                                    {thesis?.status?.includes("approve") && (
                                         <button
                                             className="ml-2 bg-green-800 text-sm font-medium p-2 text-white rounded-md"
                                             onClick={() => {

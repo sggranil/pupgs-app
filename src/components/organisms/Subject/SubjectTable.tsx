@@ -5,6 +5,8 @@ import { useState } from "react";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import Modal from "../Modal";
 import SubjectConfirmationModal from "./SubjectConfirmationModal";
+import { formatStatus } from "@/utilities/StringFormatter";
+import { CONFIRMATION_OPTIONS } from "@/constants/filters";
 
 interface Subject {
     setIsUpdated: (isUpdated: boolean) => void;
@@ -24,7 +26,7 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
 
     const filteredData = userData.filter((subject) => {
         const matchesSubject = subjectFilter === "All" || subject.subject_name === subjectFilter;
-        const matchesStatus = statusFilter === "All" || String(subject.is_confirmed) === statusFilter;
+        const matchesStatus = statusFilter === "All" || subject.status === statusFilter;
         const matchesName = `${subject.student?.user?.first_name} ${subject.student?.user?.last_name}`
             .toLowerCase()
             .includes(searchQuery.toLowerCase());
@@ -71,8 +73,11 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                     }}
                 >
                     <option value="All">All</option>
-                    <option value="true">Confirmed</option>
-                    <option value="false">Pending Review/Denied</option>
+                    {CONFIRMATION_OPTIONS.map((status) => (
+                        <option key={status.value} value={status.value}>
+                            {status.label}
+                        </option>
+                    ))}
                 </select>
 
                 <input
@@ -118,11 +123,7 @@ const SubjectTable: React.FC<Subject> = ({ userData, setIsUpdated }) => {
                                 </a>
                             </td>
                             <td className="p-3 text-sm text-gray-500">
-                                {subject.is_confirmed
-                                    ? "Confirmed"
-                                    : subject.message
-                                    ? "Denied"
-                                    : "Pending Review"}
+                                {formatStatus(subject.status)}
                             </td>
                             {userInfo?.role !== "adviser" ? (
                                 <td className="p-3 text-sm text-gray-500">
