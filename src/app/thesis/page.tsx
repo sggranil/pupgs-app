@@ -23,8 +23,6 @@ export default function StudentDashboard() {
     };
 
     const userData = getUserInfoFromCookies();
-
-    const isSubjectConfirmed = subjectData?.some(subject => subject.is_confirmed) ?? false;
     
     useEffect(() => {
         fetchSubject();
@@ -42,7 +40,7 @@ export default function StudentDashboard() {
                     <h1 className="text-white text-xl font-bold p-2 pl-4">
                         Your Thesis
                     </h1>
-                    {(isSubjectConfirmed && userData?.role == "student") && 
+                    {userData?.role == "student" && 
                         <button
                             onClick={() => setThesisProposalModal(true)}
                             className="h-10 mx-2 px-3 py-2 text-sm font-semibold rounded-md whitespace-nowrap bg-white text-textPrimary"
@@ -51,17 +49,11 @@ export default function StudentDashboard() {
                         </button>
                     }
                 </div>
-                {isSubjectConfirmed ? (
-                    <ThesisCardList setIsUpdated={setIsThesisUpdated} isUpdated={isThesisUpdated} />
-                ) : (
-                    <div className="h-48 col-span-full flex justify-center items-center">
-                        <p>Please upload the receipt on your profile page to confirm.</p>
-                    </div>
-                )}
+                <ThesisCardList setIsUpdated={setIsThesisUpdated} isUpdated={isThesisUpdated} />
                 
             </div>
             <div className="h-0">
-                <Modal title="Add Thesis" isModalOpen={thesisProposalModal} setModalOpen={setThesisProposalModal}>
+                <Modal title="Upload Concept Paper" isModalOpen={thesisProposalModal} setModalOpen={setThesisProposalModal}>
                     <AddThesisModal setIsModalOpen={setThesisProposalModal} setIsUpdated={setIsThesisUpdated} />
                 </Modal>
             </div>
