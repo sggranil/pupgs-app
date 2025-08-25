@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, is_confirmed } = await request.json();
+        const { id, status } = await request.json();
 
         if (isNaN(id)) {
             return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         const updatedSubject = await prisma.enrolledSubject.update({
             where: { id },
             data: {
-                is_confirmed: is_confirmed,
+                status: status,
             },
         });
 

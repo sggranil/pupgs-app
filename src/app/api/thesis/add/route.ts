@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Look up student record based on user_id
         const student = await prisma.student.findUnique({
             where: { user_id: userId },
         });
@@ -56,12 +55,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Create the thesis and link user + student + proposal
         const newThesis = await prisma.thesis.create({
             data: {
                 thesis_title,
-                is_confirmed: false,
-                user: { connect: { id: userId } },
+                status: "pending_review",
                 student: { connect: { id: student.id } },
                 proposals: {
                     create: [{ file_url }],
@@ -77,7 +74,8 @@ export async function POST(request: NextRequest) {
             { status: 201 }
         );
 
-    } catch (err) {
+    } catch (err: any) {
+        console.error(err.message)
         return NextResponse.json(
             { message: "An error occurred during uploading: " + err },
             { status: 500 }

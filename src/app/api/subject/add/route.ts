@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { subject_name, or_number, attachment } = await request.json();
+        const { subject_name, or_number, attachment, status } = await request.json();
         const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
                 subject_name,
                 or_number,
                 attachment,
-                is_confirmed: false,
+                status: status,
             },
         });
 

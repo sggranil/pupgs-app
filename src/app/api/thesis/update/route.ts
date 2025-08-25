@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, thesis_title, file_url } = await request.json();
+        const { id, thesis_title, file_url, status } = await request.json();
         const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
         const updatedThesis = await prisma.thesis.update({
             where: { id },
-            data: { thesis_title, is_confirmed: false },
+            data: { thesis_title, status: status },
         });
 
         const existingProposal = await prisma.proposal.findFirst({
