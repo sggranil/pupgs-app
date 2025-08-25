@@ -1,9 +1,11 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { removeToasts, showToast } from "@/components/organisms/Toast";
 import useProposalRequest from "@/hooks/proposal";
+
+import { AddProposalSchemaType, addProposalSchema } from "@/types/api/thesis.types";
 
 interface RevisedProposalProps {
     setIsModalOpen: (modalOpen: boolean) => void;
@@ -12,87 +14,36 @@ interface RevisedProposalProps {
 }
 
 const AddRevisedProposalModal: React.FC<RevisedProposalProps> = ({ thesisId, setIsUpdated, setIsModalOpen }) => {
-    const [ loading, setLoading ] = useState<boolean>(false);
-    const [ selectedFile, setSelectedFile ] = useState<File | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
     const { addProposal } = useProposalRequest();
 
     const {
         register,
-        setValue,
-    } = useForm();
+        handleSubmit,
+        formState: { errors },
+    } = useForm<AddProposalSchemaType>({
+        resolver: zodResolver(addProposalSchema),
+        defaultValues: {
+            file_url: "",
+        },
+    });
 
-    const [ filePath, setFilePath ] = useState<string>("");
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setSelectedFile(file);
-
-            if (file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = () => setFilePath(reader.result as string);
-                reader.readAsDataURL(file);
-            } else {
-                setFilePath(URL.createObjectURL(file));
-            }
-        }
-    };
-
-    const uploadFile = async (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const url = "/api/file/upload";
-
-        const response = await fetch(url, {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error("File upload failed");
-        }
-
-        return response.json();
-    };
-
-    async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
+    async function handleFormSubmit(values: AddProposalSchemaType) {
         removeToasts();
-
-        if (!selectedFile && !filePath) {
-            showToast("Please upload an OR attachment", "error");
-            return;
-        }
-
         setLoading(true);
 
         try {
-            let uploadedFileUrl = filePath;
-
-            if (selectedFile) {
-                const uploadData = await uploadFile(selectedFile);
-
-                if (!uploadData.fileUrl) {
-                    throw new Error("Upload response missing file URL");
-                }
-
-                uploadedFileUrl = uploadData.fileUrl;
-                setFilePath(uploadedFileUrl);
-                setValue("file_url", uploadedFileUrl);
-            }
-
             const response = await addProposal({
                 thesis_id: thesisId,
-                file_url: uploadedFileUrl,
+                file_url: values.file_url,
             });
 
             if (response) {
-                showToast("File updated successfully!", "success");
+                showToast("Proposal link updated successfully!", "success");
                 setIsUpdated(true);
                 setIsModalOpen(false);
             } else {
-                showToast(response.message || "Unable to upload", "error");
+                showToast("Unable to upload", "error");
             }
         } catch (error) {
             showToast("An error occurred. Please try again.", "error");
@@ -102,47 +53,33 @@ const AddRevisedProposalModal: React.FC<RevisedProposalProps> = ({ thesisId, set
     }
 
     return (
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
             <div className="w-full py-4">
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
                         Proposal Attachment *
                     </label>
                     <input
-                        type="file"
-                        className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                        onChange={handleFileChange}
+                        type="text"
+                        className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                        placeholder="Paste your Google Drive or Docs link here"
+                        {...register("file_url")}
                     />
-
-                    {filePath && (
-                        <div className="mt-2">
-                            <p className="text-sm text-gray-600">Uploaded File:</p>
-                            {filePath.endsWith(".pdf") ? (
-                                <iframe
-                                    src={filePath}
-                                    className="mt-2 w-full h-64 border rounded"
-                                    title="PDF Preview"
-                                />
-                            ) : filePath.startsWith("data:image/") || filePath.includes("/uploads/") ? (
-                                <img src={filePath} alt="File preview" className="mt-2 w-32 h-32 object-cover border rounded" />
-                            ) : (
-                                <a href={filePath} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                    View File
-                                </a>
-                            )}
-                        </div>
+                    <p className="mt-2 text-textPrimary">The link must be a public Google Drive or Docs link.</p>
+                    {errors.file_url && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.file_url.message}
+                        </p>
                     )}
                 </div>
-
-                <input type="hidden" {...register("file_url")} value={filePath} />
 
                 <div className="flex flex-row gap-2">
                     <button
                         type="submit"
-                        disabled={!filePath || loading}
+                        disabled={loading}
                         className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
                     >
-                        {loading ? "Uploading..." : "Upload"}
+                        {loading ? "Submitting..." : "Submit"}
                     </button>
                 </div>
             </div>

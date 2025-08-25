@@ -30,6 +30,7 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
         defaultValues: {
             thesis_title: thesisData?.thesis_title || "",
             file_url: thesisData?.proposals?.[0]?.file_url || "",
+            status: thesisData?.status || ""
         },
     });
 
@@ -41,6 +42,7 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
                 id: thesisData?.id,
                 thesis_title: values.thesis_title,
                 file_url: values.file_url,
+                status: "pending_review"
             };
 
             if (thesisData) {
@@ -82,7 +84,7 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
             <div className="w-full py-4">
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
-                        Thesis Title *
+                        Concept Paper Title *
                     </label>
                     <input
                         type="text"
@@ -99,7 +101,7 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
 
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
-                        Thesis/Concept Paper Attachment *
+                        Concept Paper Attachment *
                     </label>
                     <input
                         type="text"
@@ -107,7 +109,7 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
                         placeholder="Your proposed thesis title"
                         {...register("file_url")}
                     />
-                    <p>It should be Google Drive Link, make it public.</p>
+                    <p className="mt-2 text-textPrimary">The link must be a public Google Docs or Drive link.</p>
                     {errors.file_url && (
                         <p className="text-red-500 text-sm mt-1">
                             {errors.file_url.message}

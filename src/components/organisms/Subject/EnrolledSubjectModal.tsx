@@ -187,10 +187,11 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
 
                 <div className="mb-4">
                     <label className="block text-textPrimary font-semibold mb-1">
-                        OR Attachment *
+                        OR Attachment * (Image file)
                     </label>
                     <input
                         type="file"
+                        accept="image/png, image/jpeg"
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         onChange={handleFileChange}
                     />
@@ -198,16 +199,19 @@ const EnrolledSubjectModal: React.FC<EnrolledSubjectProps> = ({ subjectData, set
                     {filePath && (
                         <div className="mt-2">
                             <p className="text-sm text-gray-600">Uploaded File:</p>
-                            {filePath.endsWith(".pdf") ? (
-                                <iframe
+                            {filePath.startsWith("data:image/") || filePath.includes("/uploads/") ? (
+                                <img
                                     src={filePath}
-                                    className="mt-2 w-full h-64 border rounded"
-                                    title="PDF Preview"
+                                    alt="File preview"
+                                    className="mt-2 w-32 h-32 object-cover border rounded"
                                 />
-                            ) : filePath.startsWith("data:image/") || filePath.includes("/uploads/") ? (
-                                <img src={filePath} alt="File preview" className="mt-2 w-32 h-32 object-cover border rounded" />
                             ) : (
-                                <a href={filePath} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                                <a
+                                    href={filePath}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 underline"
+                                >
                                     View File
                                 </a>
                             )}
