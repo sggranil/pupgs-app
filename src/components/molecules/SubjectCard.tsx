@@ -1,6 +1,7 @@
 "use client";
 
 import { EnrolledSubject } from "@/interface/thesis.interface";
+import { formatStatus } from "@/utilities/StringFormatter";
 
 interface Subject {
     userData: EnrolledSubject
@@ -13,9 +14,7 @@ const SubjectCard: React.FC<Subject> = ({ userData }) => {
                 <div>
                     <h2 className="text-md font-bold text-textPrimary">{userData.subject_name}</h2>
                     <p className="text-xs font-semibold text-textPrimary">OR #{userData.or_number}</p>
-                    <p className="text-xs text-gray-500 pt-2">Status: {
-                        !userData.is_confirmed ? userData.message ? "Denied" : "Pending Review" : "Confirmed" 
-                    }</p>
+                    <p className="text-xs text-gray-500 pt-2">Status: {formatStatus(userData.status)}</p>
                 </div>
             </div>
         </div>
