@@ -29,7 +29,7 @@ export default function Profile() {
     const [showEdit, setShowEdit] = useState<boolean>(false);
     const [showUpdate, setShowUpdate] = useState<boolean>(false);
 
-    const confirmedCount = subjectData?.filter(subject => subject.is_confirmed).length ?? 0;
+    const confirmedCount = subjectData?.filter(subject => subject.status).length ?? 0;
 
     const userData = getUserInfoFromCookies();
 

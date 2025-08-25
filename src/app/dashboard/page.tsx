@@ -54,7 +54,7 @@ export default function Dashboard() {
                     <div className="bg-white shadow-md rounded-lg p-4">
                         <h2 className="text-gray-700 text-md font-semibold">Confirmed Submissions</h2>
                         <p className="text-2xl font-bold text-green-600">
-                            {subjectData?.filter(subject => subject.is_confirmed).length || 0}
+                            {subjectData?.filter(subject => subject.status).length || 0}
                         </p>
                     </div>
                     <div className="bg-white shadow-md rounded-lg p-4">
@@ -62,7 +62,7 @@ export default function Dashboard() {
                         <p className="text-2xl font-bold text-yellow-500">
                             {
                                 subjectData?.filter(subject =>
-                                    subject.is_confirmed === false && !subject.message
+                                    subject.status === "pending_review" && !subject.message
                                 ).length || 0
                             }
                         </p>
@@ -72,7 +72,7 @@ export default function Dashboard() {
                         <p className="text-2xl font-bold text-red-600">
                             {
                                 subjectData?.filter(subject =>
-                                    subject.is_confirmed === false && subject.message
+                                    !subject.status?.includes("approve") === false && subject.message
                                 ).length || 0
                             }
                         </p>
