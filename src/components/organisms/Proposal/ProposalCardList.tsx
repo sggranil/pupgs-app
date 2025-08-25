@@ -12,13 +12,14 @@ import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 interface ProposalCardList {
     thesisId: string;
+    status: string
 }
 
-const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
-    const [ userProposal, setUserProposal ] = useState<Proposal[] | null>([]);
-    const [ loading, setLoading ] = useState<boolean>(false);
-    const [ proposalModal, setProposalModal ] = useState<boolean>(false);
-    const [ isUpdated, setIsUpdated ] = useState<boolean>(false);
+const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId, status }) => {
+    const [userProposal, setUserProposal] = useState<Proposal[] | null>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [proposalModal, setProposalModal] = useState<boolean>(false);
+    const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
     const userData = getUserInfoFromCookies();
 
@@ -38,11 +39,9 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
     }, [isUpdated]);
 
     return (
-        <div className="h-full">
+        <div className="border border-gray-200 rounded-md p-2 px-4 mb-4">
             <div className="flex align-center justify-between py-2 border-b border-gray-200">
-                <h1 className="text-md font-semibold p-2">
-                    Paper Proposal
-                </h1>
+                <h4 className='font-bold text-lg'>Paper Proposal</h4>
                 {userData?.role === "student" && (
                     <button
                         onClick={() => setProposalModal(true)}
@@ -63,7 +62,18 @@ const ProposalCardList: React.FC<ProposalCardList> = ({ thesisId }) => {
                         <div
                             key={data.id}
                         >
-                            <ProposalCard setIsUpdated={setIsUpdated} index={index} title={index === 0 ? `Initial Concept Paper` : `Revision No. ${index}`} proposal={data} />
+                            <ProposalCard
+                                setIsUpdated={setIsUpdated}
+                                index={index}
+                                title={
+                                    index === 0
+                                        ? `Initial Concept Paper`
+                                        : status === "pending_review"
+                                            ? `Concept Paper Revision ${index}`
+                                            : `Thesis Revision No. ${index}`
+                                }
+                                proposal={data}
+                            />
                         </div>
                     ))
                 ) : (
