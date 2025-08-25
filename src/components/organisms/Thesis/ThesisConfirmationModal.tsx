@@ -8,6 +8,7 @@ import { removeToasts, showToast } from '../Toast';
 import useThesisRequest from '@/hooks/thesis';
 import useAdviserRequest from '@/hooks/adviser';
 import { Adviser } from '@/interface/user.interface';
+import { CONFIRMATION_STATUSES, THESIS_MESSAGES } from '@/constants/filters';
 
 interface ThesisConfirmationProps {
     setIsModalOpen: (modalOpen: boolean) => void;
@@ -34,16 +35,17 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
         setValue,
         handleSubmit,
         watch,
+        formState: { errors },
     } = useForm<UpdateThesisSchemaType>({
         resolver: zodResolver(updateThesisSchema),
         defaultValues: {
-            is_confirmed: thesisData?.is_confirmed ?? true,
-            message: thesisData?.message,
+            status: thesisData?.status ?? "pending_review",
+            message: thesisData?.message ?? '',
             adviser_id: thesisData?.adviser_id ?? undefined,
         },
     });
 
-    const isConfirmed = watch('is_confirmed');
+    const isConfirmed = watch('status');
 
     useEffect(() => {
         fetchAdvisers();
@@ -69,21 +71,21 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
             const filtered = adviserData.filter((adviser) =>
                 `${adviser.user.first_name} ${adviser.user.last_name}`
                     .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
+                    .includes(searchQuery.toLowerCase()),
             );
             setFilteredAdvisers(filtered);
         }
     }, [searchQuery, adviserData]);
 
     useEffect(() => {
-        if (thesisData?.adviser_id) {
+        if (thesisData?.adviser_id && adviserData.length > 0) {
             const adviser = adviserData.find((a) => a.id === thesisData.adviser_id);
             if (adviser) {
                 setSearchQuery(`${adviser.user.first_name} ${adviser.user.last_name}`);
-                setValue('adviser_id', adviser.id);
+                setValue('adviser_id', adviser.id, { shouldValidate: true });
             }
         }
-    }, [thesisData, adviserData]);
+    }, [thesisData, adviserData, setValue]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -102,25 +104,20 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
         setLoading(true);
 
         try {
-            if (data.is_confirmed && !data.adviser_id) {
-                showToast('Please select a thesis adviser.', 'error');
-                setLoading(false);
-                return;
-            }
-
-            const textData = {
+            await confirmedThesis({
                 id: thesisData?.id,
-                is_confirmed: data.is_confirmed,
+                status: data.status,
                 adviser_id: data.adviser_id,
                 message: data.message,
-            };
-
-            await confirmedThesis(textData);
+            });
             showToast('Thesis updated successfully!', 'success');
             setIsUpdated(true);
             setIsModalOpen(false);
         } catch (error: any) {
-            showToast(`An error occurred. Please try again. ${error.message}`, 'error');
+            showToast(
+                `An error occurred. Please try again. ${error.message}`,
+                'error',
+            );
         } finally {
             setLoading(false);
         }
@@ -130,83 +127,48 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
         <form onSubmit={handleSubmit(onThesisConfirmation)}>
             <div className="w-full py-4">
                 <div className="mb-4">
-                    <label className="block text-textPrimary font-semibold mb-1">Confirmation</label>
+                    <label className="block text-textPrimary font-semibold mb-1">
+                        Confirmation
+                    </label>
                     <select
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        value={String(watch('is_confirmed'))}
-                        onChange={(e) =>
-                            setValue('is_confirmed', e.target.value === 'true', {
-                                shouldValidate: true,
-                            })
-                        }
+                        {...register('status')}
                     >
                         <option value="" disabled>
                             Confirmation
                         </option>
-                        <option value="true">Approve</option>
-                        <option value="false">Need Changes</option>
+                        {Object.entries(CONFIRMATION_STATUSES).map(([key, value]) => (
+                            <option key={key} value={value.value}>
+                                {value.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-textPrimary font-semibold mb-1">Message *</label><select
+                    <label className="block text-textPrimary font-semibold mb-1">
+                        Message *
+                    </label>
+                    <select
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        value={String(watch('message'))}
-                        onChange={(e) =>
-                            setValue('message', e.target.value, {
-                                shouldValidate: true,
-                            })
-                        }
+                        {...register('message')}
                     >
                         <option value="" disabled>
                             Choose a message
                         </option>
-
-                        {/* ✅ Positive Confirmations */}
-                        <optgroup label="✅ Positive Confirmations">
-                            <option value="I confirm that I have received the thesis in full and it is complete.">
-                            I confirm that I have received the thesis in full and it is complete.
-                            </option>
-                            <option value="The thesis has been received and reviewed without any issues.">
-                            The thesis has been received and reviewed without any issues.
-                            </option>
-                            <option value="I acknowledge receipt of the thesis and confirm it is properly formatted.">
-                            I acknowledge receipt of the thesis and confirm it is properly formatted.
-                            </option>
-                            <option value="Thesis document has been received and verified for completeness.">
-                            Thesis document has been received and verified for completeness.
-                            </option>
-                            <option value="I confirm successful submission of the thesis with all required sections included.">
-                            I confirm successful submission of the thesis with all required sections included.
-                            </option>
-                            <option value="I confirm that the thesis has been submitted on time and is accepted.">
-                            I confirm that the thesis has been submitted on time and is accepted.
-                            </option>
-                        </optgroup>
-
-                        {/* ⚠️ Neutral / Needs Attention */}
-                        <optgroup label="⚠️ Neutral / Needs Attention">
-                            <option value="Thesis has been received, but some sections are unclear.">
-                            Thesis has been received, but some sections are unclear.
-                            </option>
-                            <option value="I acknowledge receipt of the thesis, but formatting needs adjustments.">
-                            I acknowledge receipt of the thesis, but formatting needs adjustments.
-                            </option>
-                        </optgroup>
-
-                        {/* ❌ Negative / Issues */}
-                        <optgroup label="❌ Negative / Issues">
-                            <option value="The thesis file appears to be incomplete or corrupted.">
-                            The thesis file appears to be incomplete or corrupted.
-                            </option>
-                            <option value="I received the thesis, but the content does not match the submission guidelines.">
-                            I received the thesis, but the content does not match the submission guidelines.
-                            </option>
-                        </optgroup>
+                        {Object.entries(THESIS_MESSAGES).map(([groupKey, group]) => (
+                            <optgroup key={groupKey} label={group.label}>
+                                {group.options.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </optgroup>
+                        ))}
                     </select>
                 </div>
 
-                {isConfirmed === true && (
+                {isConfirmed !== 'pending_review' && (
                     <div className="mb-4 relative adviser-dropdown">
                         <label className="block text-textPrimary font-semibold mb-1">
                             Select Thesis Adviser *
@@ -220,6 +182,11 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setDropdownOpen(true)}
                         />
+                        {errors.adviser_id && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.adviser_id.message}
+                            </p>
+                        )}
 
                         {dropdownOpen && (
                             <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto shadow-md">
@@ -228,8 +195,12 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
                                         <li
                                             key={adviser.id}
                                             onClick={() => {
-                                                setValue('adviser_id', adviser.id, { shouldValidate: true });
-                                                setSearchQuery(`${adviser.user.first_name} ${adviser.user.last_name}`);
+                                                setValue('adviser_id', adviser.id, {
+                                                    shouldValidate: true,
+                                                });
+                                                setSearchQuery(
+                                                    `${adviser.user.first_name} ${adviser.user.last_name}`,
+                                                );
                                                 setDropdownOpen(false);
                                             }}
                                             className="cursor-pointer px-4 py-2 hover:bg-blue-100"
