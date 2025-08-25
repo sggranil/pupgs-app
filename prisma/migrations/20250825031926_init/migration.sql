@@ -58,7 +58,7 @@ CREATE TABLE "Thesis" (
     "student_id" INTEGER,
     "adviser_id" INTEGER,
     "defense_phase" TEXT,
-    "is_confirmed" BOOLEAN,
+    "status" TEXT,
     "message" TEXT,
     "user_id" INTEGER,
     "secretary_id" INTEGER,
@@ -89,7 +89,7 @@ CREATE TABLE "EnrolledSubject" (
     "subject_name" TEXT NOT NULL,
     "or_number" TEXT NOT NULL,
     "attachment" TEXT NOT NULL,
-    "is_confirmed" BOOLEAN,
+    "status" TEXT,
     "message" TEXT,
     "enrolled_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "EnrolledSubject_student_id_fkey" FOREIGN KEY ("student_id") REFERENCES "Student" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
