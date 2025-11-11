@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { thesis_title, file_url } = await request.json();
+        const { thesis_title, file_type, file_url } = await request.json();
         const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
@@ -60,12 +60,13 @@ export async function POST(request: NextRequest) {
                 thesis_title,
                 status: "pending_review",
                 student: { connect: { id: student.id } },
-                proposals: {
-                    create: [{ file_url }],
+                attachments: {
+                    create: [{ file_type, file_url }],
                 },
+                user: { connect: { id: user.id } },
             },
             include: {
-                proposals: true,
+                attachments: true,
             },
         });
 
