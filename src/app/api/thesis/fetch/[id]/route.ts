@@ -5,15 +5,18 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+        const { id } = await params;
+
         const thesis = await prisma.thesis.findFirst({
-            where: { id: parseInt(params.id) },
+            where: { id: parseInt(id) },
             include: {
-                proposals: true,
+                attachments: true,
                 room: true,
                 student: { include: { user: true } },
                 secretary: { include: { user: true } },
                 adviser: { include: { user: true } },
                 panelists: { include: { user: true } },
+                enrolled_subjects: { include: { thesis: true } },
             },
         });
 
@@ -74,7 +77,14 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
                 name: thesis.room.name,
                 location: thesis.room.location,
                 capacity: thesis.room.capacity,
-            } : null
+            } : null,
+            enrolled_subject: thesis.enrolled_subjects.map((subjects) => ({
+                id: subjects.id,
+                or_number: subjects.or_number,
+                attachment: subjects.attachment,
+                status: subjects.status,
+                subject_name: subjects.subject_name,
+            })),
         };
 
         return NextResponse.json({ data: safeThesis }, { status: 200 });

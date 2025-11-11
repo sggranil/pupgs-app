@@ -7,8 +7,10 @@ export async function GET(request: NextRequest,
     { params }: { params: { id: string } }
 ) {
     try {
+        const { id } = await params;
+
         const student = await prisma.student.findUnique({
-            where: { user_id: parseInt(params.id) },
+            where: { user_id: parseInt(id) },
         });
 
         if (!student) {
@@ -18,7 +20,7 @@ export async function GET(request: NextRequest,
             );
         }
         const subject = await prisma.enrolledSubject.findMany({
-            where: { student_id: parseInt(params.id) },
+            where: { student_id: parseInt(id) },
         });
 
         if (!subject) {
