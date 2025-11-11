@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, status, message, adviser_id } = await request.json();
+        const { id, status, message, adviser_id, user_id } = await request.json();
 
         const thesisId = Number(id);
         if (!thesisId || isNaN(thesisId)) {
@@ -19,16 +19,17 @@ export async function POST(request: NextRequest) {
             where: { id: thesisId },
             data: {
                 adviser_id,
+                user_id,
                 status,
                 message,
             },
         });
 
         return NextResponse.json(
-            { 
-                message: "Thesis updated successfully", 
+            {
+                message: "Thesis updated successfully",
                 id: thesisId,
-                data: confirmedThesis 
+                data: confirmedThesis
             },
             { status: 200 }
         );
