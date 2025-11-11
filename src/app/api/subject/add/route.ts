@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { subject_name, or_number, attachment, status } = await request.json();
+        const { subject_name, or_number, attachment, status, thesis_id } = await request.json();
         const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
@@ -26,12 +26,21 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!subject_name || !or_number || !attachment) {
+        if (!subject_name || !or_number || !attachment || !thesis_id) {
             return NextResponse.json(
-                { message: "Fields are required" },
+                { message: "All fields are required" },
                 { status: 400 }
             );
         }
+
+        const thesisIdNum = parseInt(thesis_id);
+        if (isNaN(thesisIdNum)) {
+            return NextResponse.json(
+                { message: "Invalid thesis_id" },
+                { status: 400 }
+            );
+        }
+
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -61,6 +70,7 @@ export async function POST(request: NextRequest) {
                 or_number,
                 attachment,
                 status: status,
+                thesis_id: thesisIdNum
             },
         });
 
@@ -70,7 +80,7 @@ export async function POST(request: NextRequest) {
         );
     } catch (err) {
         return NextResponse.json(
-            { message: "An error occurred during adding. " + err},
+            { message: "An error occurred during adding. " + err },
             { status: 500 }
         );
     }
