@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, thesis_title, file_url, status } = await request.json();
+        const { id, thesis_title, file_type, file_url, status } = await request.json();
         const userIdCookie = await getUserId();
 
         if (!userIdCookie) {
@@ -53,23 +53,23 @@ export async function POST(request: NextRequest) {
             data: { thesis_title, status: status },
         });
 
-        const existingProposal = await prisma.proposal.findFirst({
+        const existingAttachments = await prisma.attachment.findFirst({
             where: { thesis_id: id },
         });
 
-        if (existingProposal) {
-            await prisma.proposal.update({
-                where: { id: existingProposal.id },
+        if (existingAttachments) {
+            await prisma.attachment.update({
+                where: { id: existingAttachments.id },
                 data: { file_url, uploaded_at: new Date() },
             });
         } else {
-            await prisma.proposal.create({
-                data: { thesis_id: id, file_url },
+            await prisma.attachment.create({
+                data: { thesis_id: id, file_type, file_url },
             });
         }
 
         return NextResponse.json(
-            { message: "Thesis and proposal updated successfully", data: updatedThesis },
+            { message: "Thesis and attachment updated successfully", data: updatedThesis },
             { status: 200 }
         );
     } catch (err) {
