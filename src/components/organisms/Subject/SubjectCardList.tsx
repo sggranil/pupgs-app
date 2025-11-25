@@ -19,9 +19,15 @@ interface SubjectCardListProps {
   setSubjectData: (subjectData: EnrolledSubject[]) => void;
 }
 
-const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdated, setSubjectData }) => {
-  const [enrolledSubjectModal, setEnrolledSubjectModal] = useState<boolean>(false);
-  const [selectedSubject, setSelectedSubject] = useState<EnrolledSubject | null>(null);
+const SubjectCardList: React.FC<SubjectCardListProps> = ({
+  isUpdated,
+  setIsUpdated,
+  setSubjectData,
+}) => {
+  const [enrolledSubjectModal, setEnrolledSubjectModal] =
+    useState<boolean>(false);
+  const [selectedSubject, setSelectedSubject] =
+    useState<EnrolledSubject | null>(null);
   const [userSubject, setUserSubject] = useState<EnrolledSubject[] | null>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const { getAllSubject } = useSubjectRequest();
@@ -62,19 +68,28 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
   };
 
   const renderModalContent = () => {
-    if (!selectedSubject) {
-      return null;
-    }
+    if (!selectedSubject) return null;
 
-    // Student view logic
+    // Student view
     if (userData?.role === "student") {
       switch (selectedSubject.status) {
+        case "pending_review":
+          return (
+            <div className="pt-6">
+              <p className="font-semibold text-lg">Receipt Status</p>
+              <p>
+                Your receipt with Official Receipt{" "}
+                <strong>#{selectedSubject.or_number}</strong> is currently
+                <strong> pending review</strong> by the staff.
+              </p>
+            </div>
+          );
         case "reupload_required":
         case "invalid":
         case "rejected":
-          // Show the form for students who need to re-upload
           return (
             <EnrolledSubjectModal
+              userId={userData?.userId}
               subjectData={selectedSubject}
               setIsUpdated={setIsUpdated}
               setIsModalOpen={setEnrolledSubjectModal}
@@ -82,15 +97,23 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
           );
         case "confirmed":
         case "acknowledged":
-        case "pending_review":
-          // Show a message for students whose receipt is being processed or is valid
           return (
             <div className="pt-6">
               <p className="font-semibold text-lg">Receipt Status</p>
-              <p>Your receipt with Official Receipt <strong>#{selectedSubject.or_number}</strong> has been processed by our staff.</p>
+              <p>
+                Your receipt with Official Receipt{" "}
+                <strong>#{selectedSubject.or_number}</strong> has been processed
+                by our staff.
+              </p>
               <div className="py-4">
-                <p><strong>Status:</strong> {selectedSubject.status === "pending_review" ? "Pending Review" : "Confirmed"}</p>
-                {selectedSubject.message && <p><strong>Notes:</strong> {selectedSubject.message}</p>}
+                <p className="capitalize">
+                  <strong>Status:</strong> {selectedSubject.status}
+                </p>
+                {selectedSubject.message && (
+                  <p>
+                    <strong>Notes:</strong> {selectedSubject.message}
+                  </p>
+                )}
               </div>
             </div>
           );
@@ -99,10 +122,11 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
       }
     }
 
-    // Admin/Adviser view logic
+    // Admin/Adviser view
     if (userData?.role === "admin" || userData?.role === "adviser") {
       return (
         <EnrolledSubjectModal
+          userId={userData?.userId}
           subjectData={selectedSubject}
           setIsUpdated={setIsUpdated}
           setIsModalOpen={setEnrolledSubjectModal}
@@ -122,15 +146,21 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
           </div>
         ) : userSubject && userSubject.length > 0 ? (
           userData?.role === "student" ? (
-            userSubject.map((subject) => (
-              <div
-                className="cursor-pointer"
-                key={subject.id}
-                onClick={() => handleCardClick(subject)}
-              >
-                <SubjectCard userData={subject} />
-              </div>
-            ))
+            userSubject.map((subject) => {
+              const isDisabled = subject.status === "pending_review";
+
+              return (
+                <div
+                  key={subject.id}
+                  className={`cursor-pointer ${
+                    isDisabled ? "opacity-50 pointer-events-none" : ""
+                  }`}
+                  onClick={() => !isDisabled && handleCardClick(subject)}
+                  title={isDisabled ? "Pending review, cannot edit" : ""}>
+                  <SubjectCard subjectData={subject} />
+                </div>
+              );
+            })
           ) : (
             <div className="col-span-full">
               <SubjectTable
@@ -142,11 +172,9 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
         ) : (
           <div className="h-48 col-span-full flex flex-col justify-center items-center space-y-4">
             <p>
-              {userData?.role === "admin" ? (
-                "No receipt data available."
-              ) : (
-                "Upload your receipt to confirm payment"
-              )}
+              {userData?.role === "admin"
+                ? "No receipt data available."
+                : "Upload your receipt to confirm payment"}
             </p>
           </div>
         )}
@@ -155,8 +183,7 @@ const SubjectCardList: React.FC<SubjectCardListProps> = ({ isUpdated, setIsUpdat
       <Modal
         title="Receipt Information"
         isModalOpen={enrolledSubjectModal}
-        setModalOpen={setEnrolledSubjectModal}
-      >
+        setModalOpen={setEnrolledSubjectModal}>
         {renderModalContent()}
       </Modal>
     </div>
