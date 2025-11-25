@@ -1,4 +1,5 @@
 export const POSITIONS = [
+  "Official",
   "Dean",
   "Director",
   "Chief, Academic Assessor",
