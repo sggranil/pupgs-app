@@ -2,7 +2,7 @@ import { requestHandler } from "@/services/RequestServices";
 import { THESIS_API } from "@/constants/urls";
 
 const useThesisRequest = () => {
-    const getAllThesis= async () => {
+    const getAllThesis = async () => {
         const response = await requestHandler({
             method: 'GET',
             url: THESIS_API.GET_ALL_THESIS_URL
@@ -10,7 +10,7 @@ const useThesisRequest = () => {
         return response.json()
     }
 
-    const fetchThesis= async (id: number) => {
+    const fetchThesis = async (id: number) => {
         const response = await requestHandler({
             method: 'GET',
             url: THESIS_API.FETCH_THESIS_URL(id)
@@ -18,7 +18,7 @@ const useThesisRequest = () => {
         return response.json()
     }
 
-    const getThesis= async (id: number) => {
+    const getThesis = async (id: number) => {
         const response = await requestHandler({
             method: 'GET',
             url: THESIS_API.GET_THESIS_URL(id)

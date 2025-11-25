@@ -8,15 +8,17 @@ export const DEFENSE_PHASE = {
 }
 
 export const CONFIRMATION_STATUSES = [
-  { value: 'pending_review', label: 'Pending Review' },
-  { value: 'approve_for_proposal_defense', label: 'Approve for Proposal Defense' },
-  { value: 'approve_for_pre_oral', label: 'Approve for Pre-Oral Defense' },
-  { value: 'approve_for_final_defense', label: 'Approve for Final Defense' },
-  { value: 'minor_revisions', label: 'Minor Revisions Needed' },
-  { value: 'major_revisions', label: 'Major Revisions Needed' },
-  { value: 'revise_and_resubmit', label: 'Revise and Resubmit' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'on_hold', label: 'On Hold' },
+    { value: 'pending_review', label: 'Concept Paper Pending Review' },
+    { value: 'approve_for_proposal_defense', label: 'Approve for Proposal Defense' },
+    { value: 'approve_for_urec', label: 'Approve for UREC Endorsement' },
+    { value: 'approve_for_statistic', label: 'Approve for Statistical Endorsement' },
+    { value: 'approve_for_pre-oral_defense', label: 'Approve for Pre-Oral Defense' },
+    { value: 'approve_for_final_defense', label: 'Approve for Final Defense' },
+    { value: 'minor_revisions', label: 'Minor Revisions Needed' },
+    { value: 'major_revisions', label: 'Major Revisions Needed' },
+    { value: 'revise_and_resubmit', label: 'Revise and Resubmit' },
+    { value: 'withdrawn', label: 'Withdrawn' },
+    { value: 'on_hold', label: 'On Hold' },
 ];
 
 export const THESIS_MESSAGES = {
@@ -85,3 +87,11 @@ export const RECEIPT_MESSAGES = {
         ],
     },
 };
+
+export const FILE_TYPES = [
+    { value: 'proposal', label: 'Paper Proposal' },
+    { value: 'urec', label: 'UREC Compilation' },
+    { value: 'twd', label: 'TWD Compilation' },
+    { value: 'grammarian', label: 'Grammarian Certificate' },
+    { value: 'statistician', label: 'Statistician Certificate' },
+]

@@ -1,5 +1,6 @@
 export const AUTH_API = {
     REGISTER_USER_URL: "/auth/register",
+    REGISTER_ADMIN_URL: (code: string) => `/auth/register/${code}`,
     LOGIN_USER_URL: "/auth/login",
 };
 
@@ -30,10 +31,10 @@ export const THESIS_API = {
     DELETE_THESIS_URL: (id: number) => `/thesis/delete/${id}`,
 }
 
-export const PROPOSAL_API = {
-    GET_PROPOSAL_URL: (id: number) => `/thesis/proposal/get/${id}`,
-    ADD_PROPOSAL_URL: "/thesis/proposal/add",
-    DELETE_PROPOSAL_URL: (id: number) => `/thesis/proposal/delete/${id}`,
+export const ATTACHMENT_API = {
+    GET_ATTACHMENT_URL: (id: number) => `/thesis/attachment/get/${id}`,
+    ADD_ATTACHMENT_URL: "/thesis/attachment/add",
+    DELETE_ATTACHMENT_URL: (id: number) => `/thesis/attachment/delete/${id}`,
 }
 
 export const ROOM_API = {
