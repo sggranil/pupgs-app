@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
     try {
-        const theses = await prisma.thesis.findMany({
+        const thesis = await prisma.thesis.findMany({
             include: {
-                proposals: true,
+                attachments: true,
                 room: true,
                 user: true,
                 student: {
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
             },
         });
 
-        if (!theses || theses.length === 0) {
+        if (!thesis || thesis.length === 0) {
             return NextResponse.json(
                 { message: "Thesis not found." },
                 { status: 404 }
@@ -73,11 +73,11 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-            data: theses,
+            data: thesis,
             status: 200
         });
     } catch (err) {
-        console.error("Error fetching theses:", err);
+        console.error("Error fetching thesis:", err);
         return NextResponse.json(
             { message: "An error occurred during fetching" },
             { status: 500 }

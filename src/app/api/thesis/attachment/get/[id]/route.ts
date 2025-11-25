@@ -5,7 +5,10 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const thesisId = Number(params.id);
+        const { id } = await params;
+
+        const thesisId = Number(id);
+
         if (isNaN(thesisId)) {
             return NextResponse.json(
                 { message: "Invalid Thesis ID." },
@@ -13,20 +16,21 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             );
         }
 
-        const proposal = await prisma.proposal.findMany({
+        const attachment = await prisma.attachment.findMany({
             where: { thesis_id: thesisId },
         });
 
-        if (!proposal) {
+        // Always check for array length when using findMany
+        if (attachment.length === 0) {
             return NextResponse.json(
-                { message: "Thesis not found." },
+                { message: "Thesis not found or has no attachments." },
                 { status: 404 }
             );
         }
 
-        return NextResponse.json({ 
-            data: proposal,
-            status: 200 
+        return NextResponse.json({
+            data: attachment,
+            status: 200
         });
     } catch (err) {
         console.error("Error fetching thesis:", err);

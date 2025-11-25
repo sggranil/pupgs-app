@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { thesis_id, file_url } = await request.json();
+        const { thesis_id, file_type, file_url } = await request.json();
 
-        if (!thesis_id || !file_url || typeof file_url !== 'string') {
+        if (!thesis_id || !file_type || !file_url || typeof file_url !== 'string') {
             return NextResponse.json(
                 { message: "Thesis ID or file URL is missing or invalid." },
                 { status: 400 }
@@ -25,9 +25,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        await prisma.proposal.create({
+        await prisma.attachment.create({
             data: {
                 thesis_id: Number(thesis_id),
+                file_type: file_type,
                 file_url: file_url,
             },
         });
@@ -37,8 +38,8 @@ export async function POST(request: NextRequest) {
             { status: 201 }
         );
     } catch (err) {
-        
-        if (err instanceof Error){
+
+        if (err instanceof Error) {
             console.log("Error: ", err.stack)
         }
         return NextResponse.json(

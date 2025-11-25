@@ -5,10 +5,66 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+        const { id } = await params;
+
         const thesis = await prisma.thesis.findMany({
-            where: { student_id: parseInt(params.id) },
+            where: { user_id: parseInt(id) },
             include: {
-                proposals: true,
+                attachments: true,
+                room: true,
+                user: true,
+                student: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                first_name: true,
+                                last_name: true,
+                                standing: true,
+                                program: true,
+                            }
+                        }
+                    }
+                },
+                adviser: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                first_name: true,
+                                last_name: true,
+                                position: true,
+                                program: true,
+                            }
+                        }
+                    }
+                },
+                secretary: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                first_name: true,
+                                last_name: true,
+                                position: true,
+                                program: true,
+                            }
+                        }
+                    }
+                },
+                panelists: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                first_name: true,
+                                last_name: true,
+                                position: true,
+                                program: true,
+                            }
+                        }
+                    }
+                },
             },
         });
 
@@ -19,9 +75,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             );
         }
 
-        return NextResponse.json({ 
+        return NextResponse.json({
             data: thesis,
-            status: 200 
+            status: 200
         });
     } catch (err) {
         return NextResponse.json(

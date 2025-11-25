@@ -7,9 +7,10 @@ export async function GET(request: NextRequest,
     { params }: { params: { id: string } }
 ) {
     try {
+        const { id } = await params;
 
         const user = await prisma.user.findFirst({
-            where: { id: parseInt(params.id) },
+            where: { id: parseInt(id) },
         });
 
         if (!user) {
@@ -19,9 +20,9 @@ export async function GET(request: NextRequest,
             );
         }
 
-        return NextResponse.json({ 
+        return NextResponse.json({
             data: user,
-            status: 200 
+            status: 200
         });
     } catch (err) {
         return NextResponse.json(

@@ -8,25 +8,27 @@ export interface Thesis {
   adviser?: Adviser;
   adviser_id?: number;
   defense_phase?: string;
-  is_confirmed?: boolean;
+  status: string | null;
   message?: string;
   user?: User;
   user_id?: number;
-  proposals: Proposal[];
+  attachments: Attachment[];
   panelists: Adviser[];
   secretary?: Adviser;
   secretary_id?: number;
   defense_date?: string;
   defense_time?: string;
+  enrolled_subjects?: EnrolledSubject[];
   room?: Room;
   room_id?: number;
   created_at: string;
 }
 
-export interface Proposal {
+export interface Attachment {
   id: number;
   thesis: Thesis;
   thesis_id: number;
+  file_type: string;
   file_url: string;
   uploaded_at: string;
 }
@@ -46,7 +48,9 @@ export interface EnrolledSubject {
   subject_name: string;
   or_number: string;
   attachment: string;
-  is_confirmed: boolean | null;
+  status: string | null;
   message: string | null;
+  thesis_id: number | null;
+  thesis?: Thesis[];
   enrolled_at: Date;
 }

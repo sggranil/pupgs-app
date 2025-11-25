@@ -20,7 +20,8 @@ const Modal = ({ title, isModalOpen, setModalOpen, children, ifLandscape }: Moda
                     onClick={() => setModalOpen(false)}
                 >
                     <div
-                        className={`bg-white p-6 rounded-lg shadow-lg w-[${width}px]`}
+                        className={`bg-white p-6 rounded-lg shadow-lg`}
+                        style={{ width: `${width}px` }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between border-b border-gray-200 py-2">

@@ -4,24 +4,26 @@ import fs from 'fs';
 
 const prisma = new PrismaClient();
 
-export async function POST(request: NextRequest, 
+export async function POST(request: NextRequest,
     { params }: { params: { id: string } }
 ) {
     try {
-        const proposal = await prisma.proposal.findUnique({
-            where: { id: parseInt(params.id) },
+        const { id } = await params;
+
+        const attachment = await prisma.attachment.findUnique({
+            where: { id: parseInt(id) },
             select: { file_url: true },
         });
 
-        if (!proposal) {
+        if (!attachment) {
             return NextResponse.json(
                 { message: "Subject not found." },
                 { status: 404 }
             );
         }
 
-        if (proposal.file_url) {
-            const filePath = proposal.file_url;
+        if (attachment.file_url) {
+            const filePath = attachment.file_url;
 
             if (filePath.startsWith('/uploads/')) {
                 const fullFilePath = `./public${filePath}`;
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest,
             }
         }
 
-        await prisma.proposal.delete({
+        await prisma.attachment.delete({
             where: { id: parseInt(params.id) },
         });
 

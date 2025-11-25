@@ -1,13 +1,14 @@
 "use client";
 
 import { Thesis } from "@/interface/thesis.interface";
-// import Image from "next/image";
+import { formatStatus } from "@/utilities/StringFormatter";
 
 interface ThesisProp {
     thesisData: Thesis
 }
 
 const ThesisCard: React.FC<ThesisProp> = ({ thesisData }) => {
+
     return (
         <div className="w-full">
             <div className="bg-white rounded-md shadow-md">
@@ -18,9 +19,7 @@ const ThesisCard: React.FC<ThesisProp> = ({ thesisData }) => {
                 />
                 <div className="items-center py-4 px-3">
                     <p className="text-md truncate font-semibold text-textPrimary">{thesisData.thesis_title}</p>
-                    <p className="text-xs text-gray-500">Status: {
-                        !thesisData.is_confirmed ? "Pending Review" : "Confirmed" 
-                    }</p>
+                    <p className="text-xs text-gray-500">Status: {formatStatus(thesisData.status)}</p>
                 </div>
             </div>
         </div>

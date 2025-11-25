@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, is_confirmed, message, adviser_id } = await request.json();
+        const { id, status, message, adviser_id, user_id } = await request.json();
 
-        if (isNaN(id)) {
+        const thesisId = Number(id);
+        if (!thesisId || isNaN(thesisId)) {
             return NextResponse.json(
                 { message: "Invalid ID" },
                 { status: 400 }
@@ -15,22 +16,27 @@ export async function POST(request: NextRequest) {
         }
 
         const confirmedThesis = await prisma.thesis.update({
-            where: { id },
+            where: { id: thesisId },
             data: {
-                adviser_id: adviser_id,
-                is_confirmed: is_confirmed,
-                message: message,
+                adviser_id,
+                user_id,
+                status,
+                message,
             },
         });
 
         return NextResponse.json(
-            { message: "Thesis updated successfully", data: confirmedThesis },
+            {
+                message: "Thesis updated successfully",
+                id: thesisId,
+                data: confirmedThesis
+            },
             { status: 200 }
         );
     } catch (err) {
         console.error(err);
         return NextResponse.json(
-            { message: "An error occurred while updating the subject" },
+            { message: "An error occurred while updating the thesis" },
             { status: 500 }
         );
     }

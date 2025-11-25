@@ -21,7 +21,7 @@ export async function POST(
 
         const thesis = await prisma.thesis.findUnique({
             where: { id: thesisId },
-            include: { proposals: true },
+            include: { attachments: true },
         });
 
         if (!thesis) {
@@ -31,8 +31,8 @@ export async function POST(
             );
         }
 
-        for (const proposal of thesis.proposals) {
-            const filePath = proposal.file_url;
+        for (const attachment of thesis.attachments) {
+            const filePath = attachment.file_url;
 
             if (filePath.startsWith('/uploads/')) {
                 const fullFilePath = path.join(process.cwd(), 'public', filePath);
@@ -42,17 +42,17 @@ export async function POST(
                 }
             }
 
-            await prisma.proposal.delete({ where: { id: proposal.id } });
+            await prisma.attachment.delete({ where: { id: attachment.id } });
         }
 
         await prisma.thesis.delete({ where: { id: thesisId } });
 
         return NextResponse.json(
-            { message: "Thesis and associated proposals deleted successfully." },
+            { message: "Thesis and associated attachments deleted successfully." },
             { status: 200 }
         );
     } catch (err) {
-        if (err instanceof Error){
+        if (err instanceof Error) {
             console.log("Error: ", err.stack)
         }
         return NextResponse.json(

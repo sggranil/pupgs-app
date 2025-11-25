@@ -7,6 +7,7 @@ import { enrolledSubjectSchema, EnrolledSubjectSchemaType } from '@/types/api/th
 import { removeToasts, showToast } from '../Toast';
 
 import useSubjectRequest from "@/hooks/subject";
+import { CONFIRMATION_OPTIONS, RECEIPT_MESSAGES } from '@/constants/filters';
 
 interface SubjectConfirmationProps {
     setIsModalOpen: (modalOpen: boolean) => void;
@@ -28,7 +29,7 @@ const SubjectConfirmationModal: React.FC<SubjectConfirmationProps> = ({ subjectD
             const values = getValues();
             const textData = {
                 id: subjectData?.id,
-                is_confirmed: values.is_confirmed,
+                status: values.status,
                 message: values.message
             };
 
@@ -52,32 +53,31 @@ const SubjectConfirmationModal: React.FC<SubjectConfirmationProps> = ({ subjectD
     } = useForm<EnrolledSubjectSchemaType>({
         resolver: zodResolver(enrolledSubjectSchema),
         defaultValues: {
-            is_confirmed: subjectData?.is_confirmed,
+            status: subjectData?.status,
             message: subjectData?.message,
         },
     });
-    
+
     return (
         <form onSubmit={onSubjectConfirmation}>
             <div className="w-full py-4">
                 <div className="mb-4">
-                    <label className="block text-textPrimary font-semibold mb-1">
+                    <label htmlFor="status" className="block text-textPrimary font-semibold mb-1">
                         Confirmation
                     </label>
                     <select
+                        id="status"
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        value={String(getValues("is_confirmed"))}
-                        onChange={(e) => {
-                            setValue("is_confirmed", e.target.value === "true", {
-                                shouldValidate: true,
-                            });
-                        }}
-                        >
+                        {...register("status")}
+                    >
                         <option value="" disabled>
                             Confirmation
                         </option>
-                        <option value="true">Approve</option>
-                        <option value="false">Need Changes</option>
+                        {CONFIRMATION_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
                     </select>
 
 
@@ -86,11 +86,23 @@ const SubjectConfirmationModal: React.FC<SubjectConfirmationProps> = ({ subjectD
                     <label className="block text-textPrimary font-semibold mb-1">
                         Message *
                     </label>
-                    <textarea
+                    <select
                         className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-                        placeholder="Message"
-                        {...register("message")}
-                    />
+                        {...register('message')}
+                    >
+                        <option value="" disabled>
+                            Choose a message
+                        </option>
+                        {Object.entries(RECEIPT_MESSAGES).map(([groupKey, group]) => (
+                            <optgroup key={groupKey} label={group.label}>
+                                {group.options.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </optgroup>
+                        ))}
+                    </select>
                 </div>
             </div>
             <div className="flex flex-row gap-2">

@@ -14,7 +14,7 @@ interface ThesisInfoCardProp {
     setIsUpdated: (isUpdated: boolean) => void;
 }
 
-const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, adviserData, roomData, subjectData, setIsUpdated }) => {
+const ThesisInfoCard: React.FC<ThesisInfoCardProp> = ({ thesisData, adviserData, roomData, setIsUpdated }) => {
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
     const userData = getUserInfoFromCookies();
 
