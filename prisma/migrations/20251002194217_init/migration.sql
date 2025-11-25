@@ -74,12 +74,13 @@ CREATE TABLE "Thesis" (
 );
 
 -- CreateTable
-CREATE TABLE "Proposal" (
+CREATE TABLE "Attachment" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "thesis_id" INTEGER NOT NULL,
+    "file_type" TEXT NOT NULL,
     "file_url" TEXT NOT NULL,
     "uploaded_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Proposal_thesis_id_fkey" FOREIGN KEY ("thesis_id") REFERENCES "Thesis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Attachment_thesis_id_fkey" FOREIGN KEY ("thesis_id") REFERENCES "Thesis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
