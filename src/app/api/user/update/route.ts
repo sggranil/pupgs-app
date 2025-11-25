@@ -33,6 +33,12 @@ export async function POST(request: NextRequest) {
             ...otherUpdates
         } = data;
 
+        Object.keys(otherUpdates).forEach((key) => {
+            if (otherUpdates[key] === "" || otherUpdates[key] === undefined) {
+                otherUpdates[key] = null;
+            }
+        });
+
         if (password || confirm_password) {
             if (!old_password) {
                 return NextResponse.json({ error: "Old password is required" }, { status: 400 });
