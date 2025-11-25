@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
         const updatedSubject = await prisma.enrolledSubject.update({
             where: { id },
-            data: body, 
+            data: body,
         });
 
         return NextResponse.json(
