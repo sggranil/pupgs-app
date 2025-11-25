@@ -75,46 +75,49 @@ model Consultation {
 }
 
 model Thesis {
-  id             Int             @id @default(autoincrement())
-  thesis_title   String
-  student        Student?        @relation(fields: [student_id], references: [id])
-  student_id     Int?
-  adviser        Adviser?        @relation(fields: [adviser_id], references: [id])
-  adviser_id     Int?
-  defense_phase  String?
-  is_confirmed   Boolean?
-  message        String?
-  user           User?           @relation(fields: [user_id], references: [id])
-  user_id        Int?
-  proposals      Proposal[]
-  panelists      Adviser[]       @relation("ThesisPanelists")  
-  secretary      Adviser?        @relation("ThesisSecretary", fields: [secretary_id], references: [id])
-  secretary_id   Int?
-  defense_date   DateTime?
-  defense_time   DateTime?
-  room           Room?           @relation(fields: [room_id], references: [id])
-  room_id        Int?
-  created_at     DateTime        @default(now())
-  consultations  Consultation[]  
+  id               Int               @id @default(autoincrement())
+  thesis_title     String
+  student          Student?          @relation(fields: [student_id], references: [id])
+  student_id       Int?
+  adviser          Adviser?          @relation(fields: [adviser_id], references: [id])
+  adviser_id       Int?
+  defense_phase    String?
+  status           String?
+  message          String?
+  user             User?             @relation(fields: [user_id], references: [id])
+  user_id          Int?
+  attachments      Attachment[]
+  panelists        Adviser[]         @relation("ThesisPanelists")
+  secretary        Adviser?          @relation("ThesisSecretary", fields: [secretary_id], references: [id])
+  secretary_id     Int?
+  defense_date     DateTime?
+  defense_time     DateTime?
+  room             Room?             @relation(fields: [room_id], references: [id])
+  room_id          Int?
+  enrolled_subjects EnrolledSubject[]
+  created_at       DateTime          @default(now())
+  consultations    Consultation[]
 }
 
-
-model Proposal {
+model Attachment {
   id          Int         @id @default(autoincrement())
   thesis      Thesis      @relation(fields: [thesis_id], references: [id])
   thesis_id   Int
+  file_type   String
   file_url    String
   uploaded_at DateTime    @default(now())
 }
 
 model EnrolledSubject {
-  id            Int         @id @default(autoincrement())
-  student       Student     @relation(fields: [student_id], references: [id])
-  student_id    Int
-  subject_name  String
-  or_number     String
-  attachment    String
-  is_confirmed  Boolean?
-  message       String?
-  enrolled_at   DateTime    @default(now())
+  id           Int      @id @default(autoincrement())
+  student      Student  @relation(fields: [student_id], references: [id])
+  student_id   Int
+  thesis       Thesis   @relation(fields: [thesis_id], references: [id])
+  thesis_id    Int
+  subject_name String
+  or_number    String
+  attachment   String
+  status       String?
+  message      String?
+  enrolled_at  DateTime @default(now())
 }
