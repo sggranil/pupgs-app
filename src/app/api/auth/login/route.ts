@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/utilities/TokenUtilities';
 import { setCookie } from '@/utilities/AuthUtilities';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
@@ -12,7 +10,7 @@ export async function POST(request: NextRequest) {
 
         if (!email || !password) {
             return NextResponse.json(
-                { message: "Email and password are required" },
+                { message: "Missing required fields: email and password." },
                 { status: 400 }
             );
         }
@@ -23,7 +21,7 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json(
-                { message: "No user found." },
+                { message: "Invalid credentials." },
                 { status: 401 }
             );
         }
@@ -47,6 +45,7 @@ export async function POST(request: NextRequest) {
         }, 86400); // 1 day
 
         const res = NextResponse.json({
+            message: "Login successful.",
             access_token: accessToken,
             refresh_token: refreshToken,
         });
@@ -58,7 +57,7 @@ export async function POST(request: NextRequest) {
     } catch (err) {
         console.error(err);
         return NextResponse.json(
-            { message: "An error occurred during login" },
+            { message: "An unexpected error occurred. Please try again later." },
             { status: 500 }
         );
     }
