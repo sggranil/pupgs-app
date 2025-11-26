@@ -1,13 +1,10 @@
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
-import assert from 'assert';
 
-// TODO: Find way to validate JWT_SECRET
-// assert(process.env.JWT_SECRET, 'JWT_SECRET is not defined in environment variables');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export function generateToken(payload: object, expiresIn: number = 3600): string {
     return jwt.sign(
-        payload, 
+        payload,
         JWT_SECRET as Secret,
         { expiresIn }
     );

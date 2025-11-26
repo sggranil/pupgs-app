@@ -5,8 +5,6 @@ import cookie from 'cookie';
 
 import { decodeToken } from './TokenUtilities';
 
-type UserInfoType = 'userId' | 'role' | 'email';
-
 // Server-side Cookie Utilities
 export const setCookie = (res: NextResponse, name: string, value: string, options: Partial<ResponseCookie> = {}
 ): void => {
