@@ -42,3 +42,6 @@ next-env.d.ts
 
 /public/uploads
 /prisma/db
+/generated/prisma
+
+/src/generated/prisma
