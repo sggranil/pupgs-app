@@ -1,123 +1,192 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// Uncomment if you are going to use your local DB
-// datasource db {
-//   provider = "sqlite"
-//   url      = env("DATABASE_URL")
-// }
+enum UserRole {
+  student
+  adviser
+  chairperson
+  dean
+  admin
+}
+
+enum DefensePhase {
+  concept_paper
+  thesis_proposal
+  urec
+  statistical_endorsement
+  pre_oral_defense
+  final_defense
+}
+
+enum ThesisStatus {
+  pending_review
+  approve_for_proposal_defense
+  approve_for_urec
+  approve_for_statistic
+  approve_for_pre_oral_defense
+  approve_for_final_defense
+  minor_revisions
+  major_revisions
+  revise_and_resubmit
+  withdrawn
+  on_hold
+}
+
+enum ThesisReceiptStatus {
+  pending_review
+  confirmed
+  reupload_required
+  invalid
+  rejected
+}
+
+enum ReceiptName {
+  thesis_proposal
+  pre_oral
+  final_defense
+}
+
+enum AuditOperation {
+  create
+  update
+  delete
+  login
+  logout
+  password_change
+}
+
+enum DeviceType {
+  web
+  mobile_ios
+  mobile_android
+  desktop_app
+  other
+}
 
 model User {
-  id              Int      @id @default(autoincrement())
-  email           String   @unique
-  password        String
-  first_name      String
-  middle_name     String?
-  last_name       String
-  ext_name        String?
-  prefix          String?
-  role            String
-  tel_number      String?
-  start_date      DateTime?
-  pass_date       DateTime?
-  standing        String?
-  program         String?
-  department      String?
-  position        String?
-  thesis          Thesis[]
-  adviser         Adviser? @relation
-  student         Student? @relation
-  is_deleted      Boolean  @default(false)
+  id                Int                 @id @default(autoincrement())
+  email             String              @unique
+  password          String
+  first_name        String
+  middle_name       String?
+  last_name         String
+  ext_name          String?
+  prefix            String?
+  role              UserRole
+  tel_number        String?
+  start_date        DateTime?
+  pass_date         DateTime?
+  standing          String?
+  program           String?
+  department        String?
+  position          String?
+  adviser           Adviser?
+  student           Student?
+  audit_logs        AuditLog[]
+  is_archived       Boolean             @default(false)
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
 }
 
 model Student {
-  id                Int      @id @default(autoincrement())
-  user              User     @relation(fields: [user_id], references: [id])
-  user_id           Int      @unique
+  id                Int                 @id @default(autoincrement())
+  user              User                @relation(fields: [user_id], references: [id])
+  user_id           Int                 @unique
   thesis            Thesis[]
-  enrolled_subject  EnrolledSubject[]
+  thesis_receipts   ThesisReceipt[]     @relation("StudentReceipts")
 }
 
 model Adviser {
-  id          Int         @id @default(autoincrement())
-  user        User        @relation(fields: [user_id], references: [id])
-  user_id     Int         @unique
-  thesis      Thesis[]
-  panelists   Thesis[]    @relation("ThesisPanelists")
-  secretary   Thesis[]    @relation("ThesisSecretary")
+  id                Int                 @id @default(autoincrement())
+  user              User                @relation(fields: [user_id], references: [id])
+  user_id           Int                 @unique
+  advised_theses    Thesis[]
+  panelists         Thesis[]            @relation("ThesisPanelists")
+  secretary         Thesis[]            @relation("ThesisSecretary")
 }
 
 model Room {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  location    String?
-  capacity    Int?
-  thesis      Thesis[]
-}
-
-model Consultation {
-  id             Int      @id @default(autoincrement())
-  date_time      DateTime @default(now())
-  location       String?
-  recommendation Int?
-  thesis         Thesis   @relation(fields: [thesis_id], references: [id])
-  thesis_id      Int
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  location          String?
+  capacity          Int?
+  thesis            Thesis[]
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
 }
 
 model Thesis {
-  id               Int               @id @default(autoincrement())
-  thesis_title     String
-  student          Student?          @relation(fields: [student_id], references: [id])
-  student_id       Int?
-  adviser          Adviser?          @relation(fields: [adviser_id], references: [id])
-  adviser_id       Int?
-  defense_phase    String?
-  status           String?
-  message          String?
-  user             User?             @relation(fields: [user_id], references: [id])
-  user_id          Int?
-  attachments      Attachment[]
-  panelists        Adviser[]         @relation("ThesisPanelists")
-  secretary        Adviser?          @relation("ThesisSecretary", fields: [secretary_id], references: [id])
-  secretary_id     Int?
-  defense_date     DateTime?
-  defense_time     DateTime?
-  room             Room?             @relation(fields: [room_id], references: [id])
-  room_id          Int?
-  enrolled_subjects EnrolledSubject[]
-  created_at       DateTime          @default(now())
-  consultations    Consultation[]
+  id                Int                 @id @default(autoincrement())
+  thesis_title      String
+  student           Student?            @relation(fields: [student_id], references: [id])
+  student_id        Int?              
+  adviser           Adviser?            @relation(fields: [adviser_id], references: [id])
+  adviser_id        Int?
+  defense_phase     DefensePhase?
+  status            ThesisStatus?
+  message           String?
+  attachments       Attachment[]
+  panelists         Adviser[]           @relation("ThesisPanelists")
+  secretary         Adviser?            @relation("ThesisSecretary", fields: [secretary_id], references: [id])
+  secretary_id      Int?
+  defense_schedule  DateTime?
+  room              Room?               @relation(fields: [room_id], references: [id])
+  room_id           Int?
+  thesis_receipts   ThesisReceipt[]
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
 }
 
 model Attachment {
-  id          Int         @id @default(autoincrement())
-  thesis      Thesis      @relation(fields: [thesis_id], references: [id])
-  thesis_id   Int
-  file_type   String
-  file_url    String
-  uploaded_at DateTime    @default(now())
+  id                Int                 @id @default(autoincrement())
+  thesis            Thesis              @relation(fields: [thesis_id], references: [id])
+  thesis_id         Int
+  file_type         String
+  file_url          String
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
 }
 
-model EnrolledSubject {
-  id           Int      @id @default(autoincrement())
-  student      Student  @relation(fields: [student_id], references: [id])
-  student_id   Int
-  thesis       Thesis   @relation(fields: [thesis_id], references: [id])
-  thesis_id    Int
-  subject_name String
-  or_number    String
-  attachment   String
-  status       String?
-  message      String?
-  enrolled_at  DateTime @default(now())
+model ThesisReceipt {
+  id                Int                 @id @default(autoincrement())
+  student           Student             @relation("StudentReceipts", fields: [student_id], references: [id])
+  student_id        Int
+  thesis            Thesis              @relation(fields: [thesis_id], references: [id])
+  thesis_id         Int
+  receipt_name      ReceiptName
+  or_number         String              @unique
+  attachment        String
+  status            ThesisReceiptStatus?
+  message           String?
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
 }
+
+model AuditLog {
+  id                Int                 @id @default(autoincrement())
+  operation         AuditOperation
+  message           String
+  table_name        String?
+  record_id         Int?
+  old_data          Json?
+  new_data          Json?
+  changed_by        User?               @relation(fields: [user_id], references: [id])
+  user_id           Int?
+  device_type       DeviceType?
+  device_id         String?
+  ip_address        String?
+  timestamp         DateTime            @default(now())
+}
+
