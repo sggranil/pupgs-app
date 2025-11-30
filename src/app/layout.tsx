@@ -1,21 +1,12 @@
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
-import { Source_Serif_4 } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const instrumentSans = Instrument_Sans({
+const inter = Inter({
   weight: ["400", "500", "600", "700"],
   style: ["normal"],
   subsets: ["latin"],
 });
-
-const sourceSerif4 = Source_Serif_4({
-  weight: ["200", "300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-source-serif-4",
-});
-
 
 export const metadata: Metadata = {
   title: "PUP Online Graduate Thesis Monitoring System",
@@ -33,7 +24,7 @@ export default function RootLayout({
         <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={`${instrumentSans.className} ${sourceSerif4.variable} antialiased`}>
+      <body className={`${inter.className} antialiased`}>
         {children}
       </body>
     </html>
