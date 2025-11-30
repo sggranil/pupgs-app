@@ -25,14 +25,14 @@ const Modal = ({ title, isModalOpen, setModalOpen, children, ifLandscape }: Moda
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                            <h2 className="text-textPrimary text-xl font-bold">
+                            <h2 className="text-content-primary text-xl font-bold">
                                 {title}
                             </h2>
                             <div
                                 onClick={() => setModalOpen(false)}
                                 className="rounded-md cursor-pointer"
                             >
-                                <ImCross className='text-textPrimary' />
+                                <ImCross className='text-content-primary' />
                             </div>
                         </div> 
                         <div className="py-2">
