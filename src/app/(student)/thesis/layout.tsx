@@ -1,6 +1,6 @@
 "use client";
 
-import Sidenav from "@/components/organisms/Sidenav";
+import Navbar from "@/components/templates/Navbar";
 import { withAuth } from "@/utilities/AuthWrapper";
 import { Toaster } from "react-hot-toast";
 
@@ -11,7 +11,7 @@ function ThesisPageLayout({
 }>) {
   return (
     <>
-      <Sidenav>{children}</Sidenav>
+      <Navbar>{children}</Navbar>
       <Toaster />
     </>
   );

@@ -3,8 +3,8 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 
 import Modal from "@/components/organisms/Modal";
-import AddThesisModal from "@/components/organisms/Thesis/AddThesisModal";
-import ThesisCardList from "@/components/organisms/Thesis/ThesisCardList";
+import AddThesisModal from "@/components/templates/Thesis/AddThesisModal";
+import ThesisCardList from "@/components/templates/Thesis/ThesisCardList";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 export default function StudentDashboard() {

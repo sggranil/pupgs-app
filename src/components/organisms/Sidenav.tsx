@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../molecules/Navbar";
+import Navbar from "./NavbarLinks";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { removeCookie } from "@/utilities/AuthUtilities";
 import { useRouter, usePathname  } from "next/navigation"
@@ -119,7 +119,7 @@ const Sidenav = ({
             </div>
 
             <div className="flex-1 flex flex-col md:ml-64">
-                <Navbar setIsOpen={setIsOpen}/>
+                <Navbar />
                 <div className="p-4">
                     {children}
                 </div>

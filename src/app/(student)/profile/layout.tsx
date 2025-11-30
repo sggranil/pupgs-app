@@ -1,6 +1,6 @@
 "use client";
 
-import Sidenav from "@/components/organisms/Sidenav";
+import Navbar from "@/components/templates/Navbar";
 import { withAuth } from "@/utilities/AuthWrapper";
 import { Toaster } from "react-hot-toast";
 
@@ -11,9 +11,9 @@ function ProfileLayout({
 }>) {
     return (
         <>
-            <Sidenav>
+            <Navbar>
                 {children}
-            </Sidenav>
+            </Navbar>
             <Toaster />
         </>
     );
