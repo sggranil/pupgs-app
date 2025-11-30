@@ -14,7 +14,7 @@ import useRoomRequest from "@/hooks/room";
 import useThesisRequest from "@/hooks/thesis";
 
 import { Adviser } from "@/interface/user.interface";
-import { EnrolledSubject, Room, Thesis } from "@/interface/thesis.interface";
+import { ThesisReceipt, Room, Thesis } from "@/interface/thesis.interface";
 
 import { showToast } from "@/components/organisms/Toast";
 import ThesisFiles from "@/components/organisms/Thesis/ThesisFiles";
@@ -24,7 +24,8 @@ export default function ThesisPage() {
   const [thesisData, setThesisData] = useState<Thesis | null>(null);
   const [adviserData, setAdviserData] = useState<Adviser[]>([]);
   const [roomData, setRoomData] = useState<Room[]>([]);
-  const [subjectData, setSubjectData] = useState<EnrolledSubject | null>(null);
+  const [thesisReceiptData, setThesisReceiptData] =
+    useState<ThesisReceipt | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
   const [isSubjectLoaded, setIsSubjectLoaded] = useState<boolean>(false);
@@ -209,13 +210,13 @@ export default function ThesisPage() {
                 adviserData={adviserData}
                 roomData={roomData}
                 thesisData={thesisData}
-                subjectData={subjectData}
+                subjectData={thesisReceiptData}
               />
               {userData?.role === "student" &&
                 thesisData?.status != "pending_review" && (
                   <ThesisFiles
                     thesisData={thesisData}
-                    subjectData={subjectData}
+                    subjectData={thesisReceiptData}
                     programChair={programChair}
                     dean={dean}
                   />

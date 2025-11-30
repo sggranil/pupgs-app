@@ -10,18 +10,16 @@ export interface Thesis {
   defense_phase?: string;
   status: string | null;
   message?: string;
-  user?: User;
-  user_id?: number;
   attachments: Attachment[];
   panelists: Adviser[];
   secretary?: Adviser;
   secretary_id?: number;
-  defense_date?: string;
-  defense_time?: string;
-  enrolled_subjects?: EnrolledSubject[];
+  defense_schedule?: Date;
   room?: Room;
   room_id?: number;
+  thesis_receipts?: ThesisReceipt[];
   created_at: string;
+  updated_at: Date;
 }
 
 export interface Attachment {
@@ -41,16 +39,17 @@ export interface Room {
   thesis?: Thesis[];
 }
 
-export interface EnrolledSubject {
+export interface ThesisReceipt {
   id: number;
   student: Student;
   student_id: number;
-  subject_name: string;
+  thesis_id: number | null;
+  thesis?: Thesis[];
+  receipt_name: string;
   or_number: string;
   attachment: string;
   status: string | null;
   message: string | null;
-  thesis_id: number | null;
-  thesis?: Thesis[];
-  enrolled_at: Date;
+  created_at: Date;
+  updated_at: Date;
 }
