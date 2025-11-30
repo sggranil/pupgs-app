@@ -7,7 +7,7 @@ const Navbar = ({
 }>) => {
     return (
         <div className="w-full">
-            <div className="flex md:justify-evenly justify-between items-center w-full shadow-md z-50 bg-white px-4">
+            <div className="fixed top-0 left-0 right-0 flex md:justify-evenly justify-between items-center w-full shadow-md z-50 bg-white px-4">
                 <div className="flex items-center">
                     <img
                         src="/pup.png"
@@ -23,7 +23,7 @@ const Navbar = ({
                 <NavbarLinks />
             </div>
 
-            <main className="flex flex-col items-center w-full bg-app-background mt-2">
+            <main className="flex flex-col items-center w-full bg-app-background min-h-screen overflow-hidden pt-16">
                 {children}
             </main>
         </div>
