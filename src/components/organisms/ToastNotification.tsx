@@ -15,7 +15,7 @@ const statusConfig = {
         borderColor: 'border-l-state-success',
         textColor: 'text-state-success',
         icon: (
-            <span className="material-symbols-rounded text-state-success" style={{ fontSize: '2rem' }}>
+            <span className="material-symbols-outlined text-state-success" style={{ fontSize: '2rem' }}>
                 check_circle
             </span>
         ),
