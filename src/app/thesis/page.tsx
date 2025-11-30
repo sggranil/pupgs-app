@@ -5,29 +5,13 @@ import { useState } from "react";
 import Modal from "@/components/organisms/Modal";
 import AddThesisModal from "@/components/organisms/Thesis/AddThesisModal";
 import ThesisCardList from "@/components/organisms/Thesis/ThesisCardList";
-import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
-import useSubjectRequest from "@/hooks/subject";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 export default function StudentDashboard() {
   const [thesisProposalModal, setThesisProposalModal] =
     useState<boolean>(false);
   const [isThesisUpdated, setIsThesisUpdated] = useState<boolean>(false);
-  // const [ subjectData, setSubjectData ] = useState<EnrolledSubject[] | null>([]);
-  const { getAllSubject } = useSubjectRequest();
-
-  // const fetchSubject = async () => {
-  //     const response = await getAllSubject();
-  //     if (response) {
-  //         setSubjectData(response.data);
-  //     }
-  // };
-
   const userData = getUserInfoFromCookies();
-
-  useEffect(() => {
-    // fetchSubject();
-  }, []);
 
   return (
     <div className="h-1/3">
