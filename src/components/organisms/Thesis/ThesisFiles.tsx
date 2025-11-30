@@ -1,19 +1,19 @@
 import React from "react";
 
-import FormOne from "@/components/forms/1. FormOne";
-import FormTwo from "@/components/forms/2. FormTwo";
-import FormThree from "@/components/forms/3. FormThree";
-import FormFour from "@/components/forms/4. FormFour";
-import FormHeader from "@/components/forms/component/FormHeader";
-import FormFive from "@/components/forms/5. FormFive";
-import FormSix from "@/components/forms/6. FormSix";
-import FormSeven from "@/components/forms/7. FormSeven";
-import FormEight from "@/components/forms/8. FormEight";
-import FormNine from "@/components/forms/9. FormNine";
-import FormTen from "@/components/forms/10. FormTen";
-import FormEleven from "@/components/forms/11. FormEleven";
-import FormTwelve from "@/components/forms/12. FormTwelve";
-import FormThirteen from "@/components/forms/13. FormThirteen";
+import FormOne from "@/components/templates/forms/1. FormOne";
+import FormTwo from "@/components/templates/forms/2. FormTwo";
+import FormThree from "@/components/templates/forms/3. FormThree";
+import FormFour from "@/components/templates/forms/4. FormFour";
+import FormHeader from "@/components/templates/forms/component/FormHeader";
+import FormFive from "@/components/templates/forms/5. FormFive";
+import FormSix from "@/components/templates/forms/6. FormSix";
+import FormSeven from "@/components/templates/forms/7. FormSeven";
+import FormEight from "@/components/templates/forms/8. FormEight";
+import FormNine from "@/components/templates/forms/9. FormNine";
+import FormTen from "@/components/templates/forms/10. FormTen";
+import FormEleven from "@/components/templates/forms/11. FormEleven";
+import FormTwelve from "@/components/templates/forms/12. FormTwelve";
+import FormThirteen from "@/components/templates/forms/13. FormThirteen";
 import FormDownloadableCard from "@/components/molecules/Thesis/FormDownloadableCard";
 import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
 
