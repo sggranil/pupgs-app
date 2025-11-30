@@ -1,5 +1,6 @@
 "use client";
 
+import Background from "@/components/molecules/Background";
 import { Toaster } from "react-hot-toast";
 
 export default function RegisterLayout({
@@ -9,7 +10,9 @@ export default function RegisterLayout({
 }>) {
   return (
     <>
-      {children}
+      <Background>
+        {children}
+      </Background>
       <Toaster />
     </>
   );
