@@ -2,7 +2,6 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { removeToasts, showToast } from "@/components/organisms/Toast";
 import useAttachmentRequest from "@/hooks/attachment";
 
 import {
@@ -10,6 +9,8 @@ import {
   addAttachmentSchema,
 } from "@/types/api/thesis.types";
 import { FILE_TYPES } from "@/constants/filters";
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 interface RevisedAttachmentProps {
   setIsModalOpen: (modalOpen: boolean) => void;

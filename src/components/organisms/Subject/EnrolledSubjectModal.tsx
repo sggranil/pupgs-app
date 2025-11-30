@@ -2,7 +2,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { removeToasts, showToast } from "@/components/organisms/Toast";
 import {
   enrolledSubjectSchema,
   EnrolledSubjectSchemaType,
@@ -10,6 +9,8 @@ import {
 import useSubjectRequest from "@/hooks/subject";
 import { Thesis } from "@/interface/thesis.interface";
 import useThesisRequest from "@/hooks/thesis";
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 interface EnrolledSubjectProps {
   userId: string;

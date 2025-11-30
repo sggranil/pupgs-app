@@ -4,9 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { enrolledSubjectSchema, EnrolledSubjectSchemaType } from '@/types/api/thesis.types';
-import { removeToasts, showToast } from '../Toast';
 
 import useSubjectRequest from "@/hooks/subject";
+import { showToast, removeToasts } from "@/components/templates/Toaster";
+
 import { CONFIRMATION_OPTIONS, RECEIPT_MESSAGES } from '@/constants/filters';
 
 interface SubjectConfirmationProps {

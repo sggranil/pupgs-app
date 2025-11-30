@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { registerSchema } from "@/types/api/auth.types";
-import { removeToasts, showToast } from "@/components/organisms/Toast";
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 import useAuthRequest from "@/hooks/auth";
 

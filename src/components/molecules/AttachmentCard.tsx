@@ -1,8 +1,9 @@
 import { Attachment } from "@/interface/thesis.interface";
 import { formatDate } from "@/utilities/DateUtilities";
 import useProposalRequest from "@/hooks/attachment";
-import { showToast } from "../organisms/Toast";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+
+import { showToast } from "@/components/templates/Toaster";
 
 interface AttachmentCardProps {
   index: number;

@@ -4,8 +4,9 @@ import React, { FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { addRoomSchema, AddRoomSchemaType } from '@/types/api/thesis.types';;
-import { showToast, removeToasts } from "../Toast";
+import { addRoomSchema, AddRoomSchemaType } from '@/types/api/thesis.types';
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 interface AddRoomModalProps {
   setIsModalOpen: (modalOpen: boolean) => void;

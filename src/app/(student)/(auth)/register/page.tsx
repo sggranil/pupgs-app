@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/types/api/auth.types";
-import { removeToasts, showToast } from "@/components/organisms/Toast";
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 import useAuthRequest from "@/hooks/auth";
 import Layout from "./layout";
@@ -35,25 +37,18 @@ export default function RegistrationPage() {
 
   const onSubmit: SubmitHandler<RegisterSchemaType> = async (formData) => {
     removeToasts();
-
     setLoading(true);
 
     try {
       const responseData = await registerUser(formData);
 
       if (responseData && responseData.access_token) {
-        router.push(`/thesis`);
+        router.replace(`/thesis`);
       } else {
-        showToast(
-          responseData?.message,
-          "error"
-        );
+        showToast(responseData?.message, "error");
       }
     } catch (error) {
-      showToast(
-        "An unexpected error occurred. Please try again later.",
-        "error"
-      );
+      showToast("An unexpected error occurred. Please try again later.", "error");
     } finally {
       setLoading(false);
     }
@@ -231,9 +226,9 @@ export default function RegistrationPage() {
 
         <p className="text-center mt-4">
           Already have an account?{" "}
-          <a className="text-brand-primary underline" href="/login">
+          <Link className="text-brand-primary underline" href="/login">
             Login
-          </a>
+          </Link>
         </p>
       </form>
     </Layout>

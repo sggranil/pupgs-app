@@ -5,7 +5,6 @@ import { z } from "zod";
 import useUserRequest from "@/hooks/user";
 import { useForm } from "react-hook-form";
 
-import { removeToasts, showToast } from "@/components/organisms/Toast";
 import { updateUserSchema } from "@/types/api/auth.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -14,6 +13,8 @@ import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { DEPARTMENTS } from "@/constants/departments";
 import { COURSES } from "@/constants/course";
 import { POSITIONS } from "@/constants/positions";
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 interface EditProfileProps {
   userData: User | null;

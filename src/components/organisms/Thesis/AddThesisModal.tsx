@@ -2,9 +2,10 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { removeToasts, showToast } from "@/components/organisms/Toast";
 import { addThesisSchema, AddThesisSchemaType } from "@/types/api/thesis.types";
 import useThesisRequest from "@/hooks/thesis";
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 interface AddThesisProps {
   setIsModalOpen: (modalOpen: boolean) => void;

@@ -6,7 +6,7 @@ import {
   updateThesisSchema,
   UpdateThesisSchemaType,
 } from "@/types/api/thesis.types";
-import { removeToasts, showToast } from "../Toast";
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 import useThesisRequest from "@/hooks/thesis";
 import useAdviserRequest from "@/hooks/adviser";

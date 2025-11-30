@@ -16,9 +16,10 @@ import useThesisRequest from "@/hooks/thesis";
 import { Adviser } from "@/interface/user.interface";
 import { ThesisReceipt, Room, Thesis } from "@/interface/thesis.interface";
 
-import { showToast } from "@/components/organisms/Toast";
 import ThesisFiles from "@/components/organisms/Thesis/ThesisFiles";
 import DefensePhaseInfo from "@/components/organisms/Subject/DefensePhaseInfo";
+
+import { showToast } from "@/components/templates/Toaster";
 
 export default function ThesisPage() {
   const [thesisData, setThesisData] = useState<Thesis | null>(null);

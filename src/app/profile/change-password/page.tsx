@@ -6,11 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 
-import { showToast, removeToasts } from "@/components/organisms/Toast";
 import useUserRequest from "@/hooks/user";
 import { updateUserSchema } from "@/types/api/auth.types";
 
 import { useRouter } from "next/navigation";
+
+import { showToast, removeToasts } from "@/components/templates/Toaster";
 
 type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 

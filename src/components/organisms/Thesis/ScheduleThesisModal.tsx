@@ -5,7 +5,7 @@ import { Thesis, Room } from "@/interface/thesis.interface";
 import useThesisRequest from "@/hooks/thesis";
 import useRoomRequest from "@/hooks/room";
 import { useEffect, useState } from "react";
-import { showToast } from "../Toast";
+import { showToast } from "@/components/templates/Toaster";
 
 const TIME_OPTIONS = [
     "08:00", "09:00", "10:00", "11:00",
