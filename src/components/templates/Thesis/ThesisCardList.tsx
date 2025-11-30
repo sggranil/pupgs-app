@@ -7,7 +7,7 @@ import { Thesis } from "@/interface/thesis.interface";
 import useThesisRequest from "@/hooks/thesis";
 
 import ThesisCard from "@/components/molecules/ThesisCard";
-import ThesisTable from "@/components/organisms/Thesis/ThesisTable";
+import ThesisTable from "@/components/templates/Thesis/ThesisTable";
 
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 

@@ -1,19 +1,19 @@
 import React from "react";
 
-import FormOne from "@/components/templates/forms/1. FormOne";
-import FormTwo from "@/components/templates/forms/2. FormTwo";
-import FormThree from "@/components/templates/forms/3. FormThree";
-import FormFour from "@/components/templates/forms/4. FormFour";
-import FormHeader from "@/components/templates/forms/component/FormHeader";
-import FormFive from "@/components/templates/forms/5. FormFive";
-import FormSix from "@/components/templates/forms/6. FormSix";
-import FormSeven from "@/components/templates/forms/7. FormSeven";
-import FormEight from "@/components/templates/forms/8. FormEight";
-import FormNine from "@/components/templates/forms/9. FormNine";
-import FormTen from "@/components/templates/forms/10. FormTen";
-import FormEleven from "@/components/templates/forms/11. FormEleven";
-import FormTwelve from "@/components/templates/forms/12. FormTwelve";
-import FormThirteen from "@/components/templates/forms/13. FormThirteen";
+import FormOne from "@/components/templates/Forms/1. FormOne";
+import FormTwo from "@/components/templates/Forms/2. FormTwo";
+import FormThree from "@/components/templates/Forms/3. FormThree";
+import FormFour from "@/components/templates/Forms/4. FormFour";
+import FormHeader from "@/components/templates/Forms/component/FormHeader";
+import FormFive from "@/components/templates/Forms/5. FormFive";
+import FormSix from "@/components/templates/Forms/6. FormSix";
+import FormSeven from "@/components/templates/Forms/7. FormSeven";
+import FormEight from "@/components/templates/Forms/8. FormEight";
+import FormNine from "@/components/templates/Forms/9. FormNine";
+import FormTen from "@/components/templates/Forms/10. FormTen";
+import FormEleven from "@/components/templates/Forms/11. FormEleven";
+import FormTwelve from "@/components/templates/Forms/12. FormTwelve";
+import FormThirteen from "@/components/templates/Forms/13. FormThirteen";
 import FormDownloadableCard from "@/components/molecules/Thesis/FormDownloadableCard";
 import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
 
