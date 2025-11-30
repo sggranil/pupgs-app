@@ -7,7 +7,7 @@ import { SquarePen, X } from "lucide-react";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 import AttachmentCardList from "@/components/organisms/Attachment/AttachmentCardList";
-import ThesisInfoCard from "@/components/organisms/Thesis/ThesisInfoCard";
+import ThesisInfoCard from "@/components/templates/Thesis/ThesisInfoCard";
 
 import useAdviserRequest from "@/hooks/adviser";
 import useRoomRequest from "@/hooks/room";
@@ -16,7 +16,7 @@ import useThesisRequest from "@/hooks/thesis";
 import { Adviser } from "@/interface/user.interface";
 import { ThesisReceipt, Room, Thesis } from "@/interface/thesis.interface";
 
-import ThesisFiles from "@/components/organisms/Thesis/ThesisFiles";
+import ThesisFiles from "@/components/templates/Thesis/ThesisFiles";
 import DefensePhaseInfo from "@/components/organisms/Subject/DefensePhaseInfo";
 
 import { showToast } from "@/components/templates/Toaster";
