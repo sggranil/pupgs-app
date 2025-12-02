@@ -23,7 +23,7 @@ const Navbar = ({
                 <NavbarLinks />
             </div>
 
-            <main className="flex flex-col items-center w-full bg-app-background min-h-screen overflow-hidden pt-16">
+            <main className="flex flex-col items-center w-full bg-app-surface min-h-screen overflow-hidden pt-16">
                 {children}
             </main>
         </div>

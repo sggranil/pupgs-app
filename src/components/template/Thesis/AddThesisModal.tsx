@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { addThesisSchema, AddThesisSchemaType } from "@/types/api/thesis.types";
 import useThesisRequest from "@/hooks/thesis";
-import { showToast, removeToasts } from "@/components/templates/Toaster";
+import { showToast, removeToasts } from "@/components/template/Toaster";
 
 interface ThesisDataType {
   id: string | number;
@@ -132,7 +132,8 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
 
         <div className="mb-4">
           <label className="block text-content-primary font-semibold mb-1">
-            Concept Paper Attachment <span className="text-brand-primary">*</span>
+            Concept Paper Attachment{" "}
+            <span className="text-brand-primary">*</span>
           </label>
           <input
             type="text"
@@ -141,7 +142,11 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
             {...register("file_url")}
           />
           <p className="mt-2 text-textPrimary">
-            The link must be a public <span className="text-brand-primary">Google Docs or Google Drive</span> link.
+            The link must be a public{" "}
+            <span className="text-brand-primary">
+              Google Docs or Google Drive
+            </span>{" "}
+            link.
           </p>
           {errors.file_url && (
             <p className="text-state-danger text-sm mt-1">

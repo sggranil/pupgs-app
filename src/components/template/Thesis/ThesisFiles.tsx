@@ -14,7 +14,7 @@ import FormTen from "@/components/templates/Forms/10. FormTen";
 import FormEleven from "@/components/templates/Forms/11. FormEleven";
 import FormTwelve from "@/components/templates/Forms/12. FormTwelve";
 import FormThirteen from "@/components/templates/Forms/13. FormThirteen";
-import FormDownloadableCard from "@/components/molecules/Thesis/FormDownloadableCard";
+import FormDownloadableCard from "@/components/templates/Thesis/FormDownloadableCard";
 import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
 
 interface ThesisFilesProps {
