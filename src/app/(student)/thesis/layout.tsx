@@ -1,7 +1,7 @@
 "use client";
 
-import Navbar from "@/components/templates/Navbar";
-import { withAuth } from "@/utilities/AuthWrapper";
+import { AuthGuard } from "@/components/organisms/AuthGuard";
+import Navbar from "@/components/template/Navbar";
 import { Toaster } from "react-hot-toast";
 
 function ThesisPageLayout({
@@ -11,10 +11,12 @@ function ThesisPageLayout({
 }>) {
   return (
     <>
-      <Navbar>{children}</Navbar>
+      <AuthGuard roles={["student", "adviser"]}>
+        <Navbar>{children}</Navbar>
+      </AuthGuard>
       <Toaster />
     </>
   );
 }
 
-export default withAuth(ThesisPageLayout, ["student", "adviser", "admin"]);
+export default ThesisPageLayout;

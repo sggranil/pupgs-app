@@ -2,74 +2,82 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 
+import { Thesis } from "@/interface/thesis.interface";
+import useThesisRequest from "@/hooks/thesis";
+
 import Modal from "@/components/organisms/Modal";
-import AddThesisModal from "@/components/templates/Thesis/AddThesisModal";
-import ThesisCardList from "@/components/templates/Thesis/ThesisCardList";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import ManageThesisModal from "@/components/organisms/Modals/ManageThesisModal";
+
+import ThesisCardList from "@/components/template/Thesis/ThesisCardList";
+import ThesisCardSkeleton from "@/components/template/SkeletonContainer/ThesisSkeleton";
+
+import { showToast } from "@/components/template/Toaster";
 
 export default function StudentDashboard() {
+  const { getStudentThesis } = useThesisRequest();
+
+  const [thesisData, setThesisData] = useState<Thesis[]>([]);
   const [thesisProposalModal, setThesisProposalModal] =
     useState<boolean>(false);
   const [isThesisUpdated, setIsThesisUpdated] = useState<boolean>(false);
-  const userData = getUserInfoFromCookies();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  async function onStudentThesisFetch() {
+    try {
+      const request = await getStudentThesis(1);
+      setThesisData(request.data);
+    } catch (err) {
+      showToast("Unable to process your request.", "error", "Server Error");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    onStudentThesisFetch();
+  }, [isThesisUpdated]);
 
   return (
-    <div className="flex md:flex-row flex-col gap-4 md:w-1/2 w-full md:px-0 px-8 py-4">
-      <div className="bg-white md:w-1/3 w-full ring-1 ring-black ring-opacity-10 transition-opacity p-4 rounded-md">
-        <p className="text-content-primary font-bold">Thesis Information/Filters</p>
-      </div>
+    <>
+      <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full lg:px-32 py-4 px-8">
+        <div className="bg-white w-full md:w-1/3 ring-1 ring-black ring-opacity-10 transition-opacity p-4 md:mb-0 rounded-md md:block hidden">
+          <div className="flex flex-col justify-between border-b border-gray-200">
+            <h3 className="text-content-primary text-md font-bold mb-2">
+              Announcements
+            </h3>
+          </div>
+        </div>
 
-      <div className="bg-white md:w-2/3 w-full ring-1 ring-black ring-opacity-10 transition-opacity p-4 rounded-md">
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-content-primary text-md font-bold">Your Thesis</h1>
+        <div className="bg-white w-full md:w-1/2 ring-1 ring-black ring-opacity-10 transition-opacity p-4 rounded-md">
+          <div className="flex items-center justify-between border-b border-gray-200">
+            <h1 className="text-content-primary text-lg font-bold">
+              My Thesis
+            </h1>
+
             <button
               onClick={() => setThesisProposalModal(true)}
-              className="text-sm font-semibold rounded-md whitespace-nowrap bg-white text-textPrimary px-3 py-1 hover:bg-gray-100 transition duration-150"
-            >
-              Upload Proposal
+              className="text-sm font-semibold rounded-md whitespace-nowrap bg-brand-primary text-app-background px-3 py-2 hover:bg-brand-primary-hover transition duration-150 mb-2">
+              Make a Proposal
             </button>
           </div>
-
-          <ThesisCardList
-            setIsUpdated={setIsThesisUpdated}
-            isUpdated={isThesisUpdated}
-          />
+          {isLoading ? (
+            <ThesisCardSkeleton />
+          ) : (
+            <ThesisCardList thesisData={thesisData} />
+          )}
         </div>
       </div>
-    </div>
-    // <div className="h-1/3">
-    //   <div
-    //     className="w-full h-1/3 py-12 rounded-md"
-    //     style={{
-    //       backgroundImage: "url('/maroon-bg.jpg')",
-    //     }}>
-    //     <div className="flex align-center justify-between">
-    //       <h1 className="text-white text-xl font-bold p-2 pl-4">Your Thesis</h1>
-    //       {userData?.role == "student" && (
-    //         <button
-    //           onClick={() => setThesisProposalModal(true)}
-    //           className="h-10 mx-2 px-3 py-2 text-sm font-semibold rounded-md whitespace-nowrap bg-white text-textPrimary">
-    //           Upload Proposal
-    //         </button>
-    //       )}
-    //     </div>
-    //     <ThesisCardList
-    //       setIsUpdated={setIsThesisUpdated}
-    //       isUpdated={isThesisUpdated}
-    //     />
-    //   </div>
-    //   <div className="h-0">
-    //     <Modal
-    //       title="Upload Concept Paper"
-    //       isModalOpen={thesisProposalModal}
-    //       setModalOpen={setThesisProposalModal}>
-    //       <AddThesisModal
-    //         setIsModalOpen={setThesisProposalModal}
-    //         setIsUpdated={setIsThesisUpdated}
-    //       />
-    //     </Modal>
-    //   </div>
-    // </div>
+
+      <Modal
+        title="Upload Proposal/Concept Paper"
+        isModalOpen={thesisProposalModal}
+        modalType="form"
+        setModalOpen={setThesisProposalModal}>
+        <ManageThesisModal
+          setIsModalOpen={setThesisProposalModal}
+          setIsUpdated={setIsThesisUpdated}
+        />
+      </Modal>
+    </>
   );
 }
