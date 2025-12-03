@@ -10,7 +10,7 @@ import {
 } from "@/types/api/thesis.types";
 import { FILE_TYPES } from "@/constants/filters";
 
-import { showToast, removeToasts } from "@/components/templates/Toaster";
+import { showToast, removeToasts } from "@/components/template/Toaster";
 
 interface RevisedAttachmentProps {
   setIsModalOpen: (modalOpen: boolean) => void;

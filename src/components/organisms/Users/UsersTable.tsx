@@ -5,7 +5,7 @@ import useUserRequest from "@/hooks/user";
 import Modal from "@/components/organisms/Modal";
 import { User } from "@/interface/user.interface";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
-import EditProfile from "../EditProfile";
+import ManageUserModal from "@/components/organisms/Modals/ManageUserModal";
 import AddUserModal from "./AddUserModal";
 
 const UsersTable = () => {
@@ -182,7 +182,7 @@ const UsersTable = () => {
         title="Edit User"
         isModalOpen={isModalOpen}
         setModalOpen={setIsModalOpen}>
-        <EditProfile
+        <ManageUserModal
           userData={selectedUser}
           isShowEdit={setIsModalOpen}
           isUpdated={setIsRefresh}
