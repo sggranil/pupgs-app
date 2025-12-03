@@ -75,6 +75,24 @@ enum DeviceType {
   other
 }
 
+enum NotificationType {
+  submission_draft
+  submission_final
+  approval_request
+  approved
+  rejected
+  revisions_required
+
+  meeting_scheduled
+  meeting_cancelled
+  message_received
+  deadline_reminder
+
+  panel_assigned
+  adviser_assigned
+  role_updated
+}
+
 model User {
   id                Int                 @id @default(autoincrement())
   email             String              @unique
@@ -96,6 +114,8 @@ model User {
   student           Student?
   audit_logs        AuditLog[]
   is_archived       Boolean             @default(false)
+  notifications_received      Notification[]      @relation("RecipientNotifications")
+  notifications_sent          Notification[]      @relation("SenderNotifications")
   created_at        DateTime            @default(now())
   updated_at        DateTime            @default(now())
 }
@@ -145,6 +165,8 @@ model Thesis {
   room              Room?               @relation(fields: [room_id], references: [id])
   room_id           Int?
   thesis_receipts   ThesisReceipt[]
+  theme             String?
+  background_image  String?
   created_at        DateTime            @default(now())
   updated_at        DateTime            @default(now())
 }
@@ -190,3 +212,18 @@ model AuditLog {
   timestamp         DateTime            @default(now())
 }
 
+model Notification {
+  id                Int                @id @default(autoincrement())
+  type              NotificationType
+  read              Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  recipientId       Int
+  recipient         User               @relation("RecipientNotifications", fields: [recipientId], references: [id])
+  senderId          Int?
+  sender            User?              @relation("SenderNotifications", fields: [senderId], references: [id])
+  title             String
+  message           String?
+  link              String?
+
+  @@index([recipientId, createdAt])
+}
