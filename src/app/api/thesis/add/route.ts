@@ -1,51 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from "next/server";
-import { getUserId } from '@/utilities/AuthUtilities';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { thesis_title, file_type, file_url } = await request.json();
-        const userIdCookie = await getUserId();
+        const { user_id, thesis_title, file_type, file_url } = await request.json();
 
-        if (!userIdCookie) {
-            return NextResponse.json(
-                { message: "User ID is missing in cookies" },
-                { status: 401 }
-            );
-        }
-
-        const userId = parseInt(userIdCookie);
-
-        if (isNaN(userId)) {
-            return NextResponse.json(
-                { message: "Invalid User ID" },
-                { status: 400 }
-            );
-        }
-
-        if (!thesis_title || !file_url) {
+        if (!user_id || !thesis_title || !file_type || !file_url) {
             return NextResponse.json(
                 { message: "Fields are required" },
                 { status: 400 }
             );
         }
 
-        // Check if user exists
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-        });
-
-        if (!user) {
-            return NextResponse.json(
-                { message: "No user found." },
-                { status: 401 }
-            );
-        }
-
         const student = await prisma.student.findUnique({
-            where: { user_id: userId },
+            where: { user_id: Number(user_id) },
         });
 
         if (!student) {
@@ -55,7 +23,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const newThesis = await prisma.thesis.create({
+        const thesis = await prisma.thesis.create({
             data: {
                 thesis_title,
                 status: "pending_review",
@@ -63,15 +31,18 @@ export async function POST(request: NextRequest) {
                 attachments: {
                     create: [{ file_type, file_url }],
                 },
-                user: { connect: { id: user.id } },
             },
-            include: {
-                attachments: true,
+            select: {
+                id: true,
+                thesis_title: true,
+                status: true,
+                created_at: true,
+                updated_at: true,
             },
         });
 
         return NextResponse.json(
-            { message: "Thesis uploaded successfully", data: newThesis },
+            { message: "Concept paper created successfully.", data: thesis },
             { status: 201 }
         );
 
