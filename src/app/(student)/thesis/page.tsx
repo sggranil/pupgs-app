@@ -12,8 +12,10 @@ import ThesisCardList from "@/components/template/Thesis/ThesisCardList";
 import ThesisCardSkeleton from "@/components/template/SkeletonContainer/ThesisSkeleton";
 
 import { showToast } from "@/components/template/Toaster";
+import { useUserContext } from "@/context/UserContext";
 
 export default function StudentDashboard() {
+  const { user, isLoading: isUserContextLoading } = useUserContext();
   const { getStudentThesis } = useThesisRequest();
 
   const [thesisData, setThesisData] = useState<Thesis[]>([]);
@@ -22,20 +24,41 @@ export default function StudentDashboard() {
   const [isThesisUpdated, setIsThesisUpdated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  async function onStudentThesisFetch() {
+  async function onStudentThesisFetch(studentId: number) {
     try {
-      const request = await getStudentThesis(1);
+      const request = await getStudentThesis(studentId);
       setThesisData(request.data);
-    } catch (err) {
-      showToast("Unable to process your request.", "error", "Server Error");
+    } catch (err: any) {
+      showToast(
+        "Unable to process your request. " + err.message,
+        "error",
+        "Server Error"
+      );
     } finally {
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    onStudentThesisFetch();
-  }, [isThesisUpdated]);
+    if (isUserContextLoading) {
+      setIsLoading(true); // Ensure component loading state reflects context loading
+      return;
+    }
+
+    if (user) {
+      const studentId = Number(user.id);
+
+      if (isNaN(studentId)) {
+        setIsLoading(false);
+        showToast("Invalid User ID.", "error", "Authentication Error");
+        return;
+      }
+
+      onStudentThesisFetch(studentId);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isThesisUpdated, user, isUserContextLoading]);
 
   return (
     <>

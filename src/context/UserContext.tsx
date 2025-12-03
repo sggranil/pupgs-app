@@ -5,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
 interface UserData {
-  id: string;
+  id: number;
   role: string;
   email: string;
 }
@@ -49,10 +49,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useUser = () => {
+export const useUserContext = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error("useUser must be used within a UserProvider");
+    throw new Error("useUserContext must be used within a UserProvider");
   }
   return context;
 };
