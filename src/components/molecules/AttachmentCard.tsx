@@ -3,7 +3,7 @@ import { formatDate } from "@/utilities/DateUtilities";
 import useProposalRequest from "@/hooks/attachment";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 
-import { showToast } from "@/components/templates/Toaster";
+import { showToast } from "@/components/template/Toaster";
 
 interface AttachmentCardProps {
   index: number;
