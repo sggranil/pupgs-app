@@ -10,6 +10,14 @@ const useThesisRequest = () => {
         return response.json()
     }
 
+    const getStudentThesis = async (id: number) => {
+        const response = await requestHandler({
+            method: 'GET',
+            url: THESIS_API.GET_STUDENT_THESIS(id)
+        })
+        return response.json()
+    }
+
     const fetchThesis = async (id: number) => {
         const response = await requestHandler({
             method: 'GET',
@@ -81,6 +89,7 @@ const useThesisRequest = () => {
 
     return {
         getAllThesis,
+        getStudentThesis,
         fetchThesis,
         getThesis,
         addThesis,

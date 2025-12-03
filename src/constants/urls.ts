@@ -22,6 +22,7 @@ export const SUBJECT_API = {
 export const THESIS_API = {
     FETCH_THESIS_URL: (id: number) => `/thesis/fetch/${id}`,
     GET_ALL_THESIS_URL: "/thesis/get",
+    GET_STUDENT_THESIS: (id: number) => `/thesis/student/${id}`,
     GET_THESIS_URL: (id: number) => `/thesis/get/${id}`,
     ADD_THESIS_URL: "/thesis/add",
     UPDATE_THESIS_URL: "/thesis/update",
