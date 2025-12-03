@@ -5,29 +5,24 @@ import { useForm } from "react-hook-form";
 import { addThesisSchema, AddThesisSchemaType } from "@/types/api/thesis.types";
 import useThesisRequest from "@/hooks/thesis";
 import { showToast, removeToasts } from "@/components/template/Toaster";
+import { Thesis } from "@/interface/thesis.interface";
 
-interface ThesisDataType {
-  id: string | number;
-  thesis_title: string;
-  file_type: string;
-  status: string;
-  proposals?: { file_url: string }[];
-}
-
-interface AddThesisProps {
+interface ManageThesisProps {
   setIsModalOpen: (modalOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
-  thesisData?: ThesisDataType;
+  thesisData?: Thesis;
 }
 
-const AddThesisModal: React.FC<AddThesisProps> = ({
+const ManageThesisModal: React.FC<ManageThesisProps> = ({
   thesisData,
   setIsUpdated,
   setIsModalOpen,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [deleteThesisData, setDeleteThesisData] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const { addThesis, updateThesis, deleteThesis } = useThesisRequest();
+
+  const isEditing = !!thesisData;
 
   const {
     register,
@@ -37,9 +32,7 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
     resolver: zodResolver(addThesisSchema),
     defaultValues: {
       thesis_title: thesisData?.thesis_title || "",
-      file_type: thesisData?.file_type || "",
-      status: thesisData?.status || "",
-      file_url: thesisData?.proposals?.[0]?.file_url || "",
+      file_url: thesisData?.attachments?.[0]?.file_url || "",
     },
   });
 
@@ -55,31 +48,40 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
         status: "pending_review",
       };
 
-      if (thesisData) {
+      let response;
+      if (isEditing) {
+        if (!thesisData?.id) {
+          throw new Error("Missing thesis ID for update operation.");
+        }
+
         const updatePayload = {
           ...basePayload,
           id: thesisData.id,
         };
-        const response = await updateThesis(updatePayload);
-        try {
-          showToast(response.message, "success");
-        } catch (e) {
-          showToast(response.message, "error");
-        }
+        response = await updateThesis(updatePayload);
       } else {
-        const response = await addThesis(basePayload);
-        try {
-          showToast(response.message, "success");
-        } catch (e) {
-          showToast(response.message, "error");
-        }
+        response = await addThesis(basePayload);
+      }
+
+      if (response && response.message) {
+        showToast(response.message, "success");
+      } else {
+        showToast(
+          isEditing
+            ? "Thesis updated successfully!"
+            : "Thesis submitted successfully!",
+          "success"
+        );
       }
 
       setIsUpdated(true);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Submission error:", error);
-      showToast("An error occurred. Please try again.", "error");
+      const errorMessage =
+        (error as any)?.message ||
+        "An error occurred during submission. Please try again.";
+      showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -91,22 +93,26 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
       return;
     }
 
-    setDeleteThesisData(true);
+    setDeleteLoading(true);
     try {
       const response = await deleteThesis(Number(thesisData.id));
 
-      if (response) {
-        showToast("Subject deleted successfully!", "success");
-        setIsUpdated(true);
-        setIsModalOpen(false);
+      if (response && response.message) {
+        showToast(response.message, "success");
       } else {
-        showToast("Unable to delete subject", "error");
+        showToast("Concept paper deleted successfully!", "success");
       }
+
+      setIsUpdated(true);
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Deletion error:", error);
-      showToast("An error occurred. Please try again.", "error");
+      const errorMessage =
+        (error as any)?.message ||
+        "An error occurred during deletion. Please try again.";
+      showToast(errorMessage, "error");
     } finally {
-      setDeleteThesisData(false);
+      setDeleteLoading(false);
     }
   }
 
@@ -114,10 +120,13 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="w-full py-4">
         <div className="mb-4">
-          <label className="block text-content-primary font-semibold mb-1">
+          <label
+            htmlFor="thesis_title"
+            className="block text-content-primary font-semibold mb-1">
             Concept Paper Title <span className="text-brand-primary">*</span>
           </label>
           <input
+            id="thesis_title"
             type="text"
             className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
             placeholder="Your proposed thesis title"
@@ -130,20 +139,24 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
           )}
         </div>
 
+        {/* Concept Paper Attachment */}
         <div className="mb-4">
-          <label className="block text-content-primary font-semibold mb-1">
+          <label
+            htmlFor="file_url"
+            className="block text-content-primary font-semibold mb-1">
             Concept Paper Attachment{" "}
             <span className="text-brand-primary">*</span>
           </label>
           <input
+            id="file_url"
             type="text"
             className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
             placeholder="Paste your public Google Docs or Drive link"
             {...register("file_url")}
           />
-          <p className="mt-2 text-textPrimary">
-            The link must be a public{" "}
-            <span className="text-brand-primary">
+          <p className="mt-2 text-textPrimary text-sm">
+            The link must be a public
+            <span className="text-brand-primary font-medium">
               Google Docs or Google Drive
             </span>{" "}
             link.
@@ -158,17 +171,24 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
         <div className="flex flex-row gap-2">
           <button
             type="submit"
-            disabled={loading || deleteThesisData}
+            disabled={loading || deleteLoading}
             className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75">
-            {loading ? "Submitting..." : thesisData ? "Update" : "Submit"}
+            {loading
+              ? isEditing
+                ? "Updating..."
+                : "Submitting..."
+              : isEditing
+              ? "Update"
+              : "Submit"}
           </button>
-          {thesisData && (
+
+          {isEditing && (
             <button
               type="button"
-              disabled={loading || deleteThesisData}
+              disabled={loading || deleteLoading}
               onClick={handleDeleteThesis}
-              className="w-full mt-6 py-2 border-2 border-brand-primary text-bgPrimary bg-transparent font-bold rounded-lg hover:opacity-75 disabled:opacity-50">
-              {deleteThesisData ? "Deleting..." : "Delete"}
+              className="w-full mt-6 py-2 border-2 border-brand-primary text-brand-primary bg-transparent font-bold rounded-lg hover:bg-brand-primary-hover hover:border-brand-primary-hover hover:text-brand-primary-hover disabled:opacity-50 transition-colors duration-150">
+              {deleteLoading ? "Deleting..." : "Delete"}
             </button>
           )}
         </div>
@@ -177,4 +197,4 @@ const AddThesisModal: React.FC<AddThesisProps> = ({
   );
 };
 
-export default AddThesisModal;
+export default ManageThesisModal;

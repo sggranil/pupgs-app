@@ -14,9 +14,9 @@ import { DEPARTMENTS } from "@/constants/departments";
 import { COURSES } from "@/constants/course";
 import { POSITIONS } from "@/constants/positions";
 
-import { showToast, removeToasts } from "@/components/templates/Toaster";
+import { showToast, removeToasts } from "@/components/template/Toaster";
 
-interface EditProfileProps {
+interface ManageUserProps {
   userData: User | null;
   fromUserProfile?: boolean | null;
   isShowEdit: (showEdit: boolean) => void;
@@ -25,7 +25,7 @@ interface EditProfileProps {
 
 type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 
-const EditProfle: React.FC<EditProfileProps> = ({
+const ManageUserModal: React.FC<ManageUserProps> = ({
   userData,
   isShowEdit,
   isUpdated,
@@ -172,7 +172,7 @@ const EditProfle: React.FC<EditProfileProps> = ({
             </div>
             <div>
               <label className="block text-textPrimary font-semibold mb-1">
-                Name Extension
+                Extension
               </label>
               <input
                 type="text"
@@ -201,11 +201,11 @@ const EditProfle: React.FC<EditProfileProps> = ({
           </div>
           <div>
             <label className="block text-textPrimary font-semibold mb-1">
-              Comprehensive Exam Pass Date
+              Comprehensive Exam
             </label>
             <input
               type="date"
-              placeholder="YYYY-MM-DD"
+              placeholder="Passing Date"
               className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
               {...register("pass_date")}
               defaultValue={
@@ -369,4 +369,4 @@ const EditProfle: React.FC<EditProfileProps> = ({
   );
 };
 
-export default EditProfle;
+export default ManageUserModal;
