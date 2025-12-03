@@ -11,7 +11,7 @@ import { updateUserSchema } from "@/types/api/auth.types";
 
 import { useRouter } from "next/navigation";
 
-import { showToast, removeToasts } from "@/components/templates/Toaster";
+import { showToast, removeToasts } from "@/components/template/Toaster";
 
 type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 
@@ -22,7 +22,7 @@ export default function ChangePasswordPage() {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  
+
   const router = useRouter();
 
   const {
@@ -56,7 +56,7 @@ export default function ChangePasswordPage() {
         "success"
       );
       reset();
-      router.push("/profile")
+      router.push("/profile");
     } catch (error) {
       if (error instanceof Error) {
         showToast(error.message, "error");
