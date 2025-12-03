@@ -9,7 +9,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/types/api/auth.types";
 
-import { showToast, removeToasts } from "@/components/templates/Toaster";
+import { showToast, removeToasts } from "@/components/template/Toaster";
 
 import useAuthRequest from "@/hooks/auth";
 import Layout from "./layout";
@@ -31,7 +31,7 @@ export default function RegistrationPage() {
       middle_name: "",
       ext_name: "",
       role: "student",
-      terms_accepted: false, 
+      terms_accepted: false,
     },
   });
 
@@ -48,7 +48,10 @@ export default function RegistrationPage() {
         showToast(responseData?.message, "error");
       }
     } catch (error) {
-      showToast("An unexpected error occurred. Please try again later.", "error");
+      showToast(
+        "An unexpected error occurred. Please try again later.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,7 +73,6 @@ export default function RegistrationPage() {
             </span>
           </div>
         </div>
-
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* First Name */}
           <div>
@@ -102,13 +104,10 @@ export default function RegistrationPage() {
               placeholder="Last Name"
             />
             {errors.last_name && (
-              <p className="text-red-500 text-sm">
-                {errors.last_name.message}
-              </p>
+              <p className="text-red-500 text-sm">{errors.last_name.message}</p>
             )}
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-4 mt-2">
           {/* Middle Name */}
           <div>
@@ -140,13 +139,10 @@ export default function RegistrationPage() {
               placeholder="Ex. Jr., Sr., III..."
             />
             {errors.ext_name && (
-              <p className="text-red-500 text-sm">
-                {errors.ext_name.message}
-              </p>
+              <p className="text-red-500 text-sm">{errors.ext_name.message}</p>
             )}
           </div>
         </div>
-
         <div className="grid grid-row-1 gap-2 mt-2">
           <div>
             <label className="block text-content-primary font-semibold mb-1">
@@ -174,9 +170,7 @@ export default function RegistrationPage() {
               placeholder="Password"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm">
-                {errors.password.message}
-              </p>
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
           </div>
 
@@ -197,7 +191,6 @@ export default function RegistrationPage() {
             )}
           </div>
         </div>
-
         {/* Terms and Conditions Checkbox - Now registered with RHF */}
         <div className="flex items-center mt-4">
           <input
@@ -206,24 +199,27 @@ export default function RegistrationPage() {
             className="mr-2 cursor-pointer"
           />
           <label className="text-content-primary">
-            I agree to the <a className="text-brand-primary underline" href="https://www.pup.edu.ph/terms/">Terms and Conditions</a>.
+            I agree to the{" "}
+            <a
+              className="text-brand-primary underline"
+              href="https://www.pup.edu.ph/terms/">
+              Terms and Conditions
+            </a>
+            .
           </label>
         </div>
-        
-        {/* Display terms_accepted error if needed */}
+        s
         {errors.terms_accepted && (
           <p className="text-red-500 text-sm mt-1">
             {errors.terms_accepted.message}
           </p>
         )}
-
         <button
           type="submit"
           disabled={loading}
           className="w-full mt-6 py-2 bg-brand-primary text-app-background font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75">
           {loading ? "Registering..." : "Register"}
         </button>
-
         <p className="text-center mt-4">
           Already have an account?{" "}
           <Link className="text-brand-primary underline" href="/login">

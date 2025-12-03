@@ -1,22 +1,19 @@
 "use client";
 
-import Navbar from "@/components/templates/Navbar";
-import { withAuth } from "@/utilities/AuthWrapper";
+import Navbar from "@/components/template/Navbar";
 import { Toaster } from "react-hot-toast";
 
 function ProfileLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <>
-            <Navbar>
-                {children}
-            </Navbar>
-            <Toaster />
-        </>
-    );
+  return (
+    <>
+      <Navbar>{children}</Navbar>
+      <Toaster />
+    </>
+  );
 }
 
-export default withAuth(ProfileLayout);
+export default ProfileLayout;

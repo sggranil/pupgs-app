@@ -9,7 +9,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/types/api/auth.types";
 
-import { showToast, removeToasts } from "@/components/templates/Toaster";
+import { showToast, removeToasts } from "@/components/template/Toaster";
 
 import useAuthRequest from "@/hooks/auth";
 import Layout from "./layout";
@@ -43,7 +43,10 @@ export default function LoginPage() {
         showToast(responseData?.message, "error");
       }
     } catch (error) {
-      showToast("An unexpected error occurred. Please try again later.", "error");
+      showToast(
+        "An unexpected error occurred. Please try again later.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -78,7 +81,9 @@ export default function LoginPage() {
               placeholder="Registered PUP Email"
             />
             {errors.email && (
-              <p className="text-state-danger text-sm">{errors.email.message}</p>
+              <p className="text-state-danger text-sm">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -93,9 +98,7 @@ export default function LoginPage() {
               placeholder="Password"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm">
-                {errors.password.message}
-              </p>
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
           </div>
         </div>
