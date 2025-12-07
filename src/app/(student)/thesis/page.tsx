@@ -16,7 +16,7 @@ import { useUserContext } from "@/context/UserContext";
 
 export default function StudentDashboard() {
   const { user, isLoading: isUserContextLoading } = useUserContext();
-  const { getStudentThesis } = useThesisRequest();
+  const { getUserThesis } = useThesisRequest();
 
   const [thesisData, setThesisData] = useState<Thesis[]>([]);
   const [thesisProposalModal, setThesisProposalModal] =
@@ -26,7 +26,7 @@ export default function StudentDashboard() {
 
   async function onStudentThesisFetch(studentId: number) {
     try {
-      const request = await getStudentThesis(studentId);
+      const request = await getUserThesis(studentId);
       setThesisData(request.data);
     } catch (err: any) {
       showToast(
@@ -41,7 +41,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     if (isUserContextLoading) {
-      setIsLoading(true); // Ensure component loading state reflects context loading
+      setIsLoading(true);
       return;
     }
 
