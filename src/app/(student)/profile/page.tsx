@@ -4,21 +4,21 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 import { User } from "@/interface/user.interface";
-import { EnrolledSubject } from "@/interface/thesis.interface";
+import { Attachment } from "@/interface/thesis.interface";
 
 import useUserRequest from "@/hooks/user";
 
 import Modal from "@/components/organisms/Modal";
 import EnrolledSubjectModal from "@/components/organisms/Subject/EnrolledSubjectModal";
 import SubjectCardList from "@/components/organisms/Subject/SubjectCardList";
-import EditProfile from "@/components/organisms/EditProfile";
+import ManageUserModal from "@/components/organisms/Modals/ManageUserModal";
 
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import UsersTable from "@/components/organisms/Users/UsersTable";
 
 export default function Profile() {
   const [userProfile, setUserProfile] = useState<User | null>(null);
-  const [subjectData, setSubjectData] = useState<EnrolledSubject[] | null>([]);
+  const [subjectData, setSubjectData] = useState<Attachment[] | null>([]);
 
   const [enrolledSubjectModal, setEnrolledSubjectModal] =
     useState<boolean>(false);
@@ -148,8 +148,9 @@ export default function Profile() {
       <Modal
         title="Edit Profile"
         isModalOpen={showEdit}
+        modalType="info"
         setModalOpen={setShowEdit}>
-        <EditProfile
+        <ManageUserModal
           isUpdated={setShowUpdate}
           isShowEdit={setShowEdit}
           userData={userProfile}
