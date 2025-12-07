@@ -6,7 +6,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         const { id } = await params;
 
         const thesis = await prisma.thesis.findMany({
-            where: { student_id: parseInt(id) },
+            where: {
+                OR: [
+                    { student_id: parseInt(id) },
+                    { adviser_id: parseInt(id) }
+                ]
+            },
             select: {
                 id: true,
                 thesis_title: true,
