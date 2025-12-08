@@ -42,9 +42,9 @@ export const useFetchThesis = (id: number | undefined | null) => {
 export const useGetThesis = (id: number | undefined | null) => {
     const isEnabled = !!id;
 
-    return useQuery<Thesis, Error>({
+    return useQuery<ResponsePayloadResult, Error>({
         queryKey: THESIS_KEYS.detail(id as number),
-        queryFn: () => handleGetRequest<Thesis>(THESIS_API.GET_THESIS_URL(id as number)),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(THESIS_API.GET_THESIS_URL(id as number)),
         enabled: isEnabled,
     });
 };
@@ -59,12 +59,6 @@ export const useAddThesis = () => {
 export const useUpdateThesis = () => {
     return useMutation<Thesis, Error, object>({
         mutationFn: (body: any) => handlePostRequest<Thesis>(THESIS_API.UPDATE_THESIS_URL, body),
-    });
-};
-
-export const useUpdateThesisInfo = () => {
-    return useMutation<Thesis, Error, object>({
-        mutationFn: (body: any) => handlePostRequest<Thesis>(THESIS_API.UPDATE_THESIS_INFO_URL, body),
     });
 };
 
@@ -93,7 +87,6 @@ const ThesisService = {
     useGetThesis,
     useAddThesis,
     useUpdateThesis,
-    useUpdateThesisInfo,
     useConfirmedThesis,
     useScheduleThesis,
     useDeleteThesis
