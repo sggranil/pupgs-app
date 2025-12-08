@@ -9,7 +9,7 @@ import Modal from "@/components/organisms/Modal";
 import ManageThesisModal from "@/components/organisms/Modals/ManageThesisModal";
 
 import ThesisCardList from "@/components/template/Thesis/ThesisCardList";
-import ThesisCardSkeleton from "@/components/template/SkeletonContainer/ThesisSkeleton";
+import ThesisCardContainerSkeleton from "@/components/template/SkeletonContainer/ThesisCardSkeleton";
 
 import { useUserContext } from "@/providers/UserProvider";
 
@@ -38,9 +38,9 @@ export default function StudentDashboard() {
     <>
       <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full lg:px-32 py-4 px-8">
         {/* Announcements Panel */}
-        <div className="bg-white w-full md:w-1/3 ring-1 ring-black ring-opacity-10 transition-opacity p-4 md:mb-0 rounded-md md:block hidden">
-          <div className="flex flex-col justify-between border-b border-gray-200">
-            <h3 className="text-content-primary text-md font-bold mb-2">
+        <div className="bg-white w-full md:w-1/3 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-4 pb-2 md:mb-0 rounded-md md:block hidden">
+          <div className="flex flex-col justify-between">
+            <h3 className="text-content-primary text-md font-bold">
               Announcements
             </h3>
           </div>
@@ -49,21 +49,21 @@ export default function StudentDashboard() {
           </p>
         </div>
 
-        <div className="bg-white w-full md:w-1/2 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-2 pb-2 rounded-md">
-          <div className="flex items-center justify-between border-b border-gray-200">
-            <h1 className="text-content-primary text-lg font-bold">
+        <div className="bg-white w-full md:w-1/2 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-4 pb-2 rounded-md">
+          <div className="flex items-center justify-between">
+            <h1 className="text-content-primary text-md font-bold">
               My Thesis
             </h1>
 
             <button
               onClick={() => setThesisProposalModal(true)}
-              className="text-sm font-semibold rounded-md whitespace-nowrap bg-brand-primary text-app-background px-3 py-2 hover:bg-brand-primary-hover transition duration-150 mb-2">
+              className="text-sm font-semibold rounded-md whitespace-nowrap bg-brand-primary text-app-background px-3 py-2 hover:bg-brand-primary-hover transition duration-150">
               Make a Proposal
             </button>
           </div>
 
           {isOverallLoading ? (
-            <ThesisCardSkeleton />
+            <ThesisCardContainerSkeleton   />
           ) : error ? (
             <p className="text-red-600 text-center py-8">
               Error fetching data: {error.message}
