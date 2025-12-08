@@ -231,64 +231,71 @@
 // }
 "use client";
 
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { use } from "react";
 
-import useThesisRequest from "@/hooks/thesis";
-import { useUserContext } from "@/context/UserContext";
+import { useGetThesis } from "@/hooks/thesis";
 
 import { Thesis } from "@/interface/thesis.interface";
+import ThesisInfoLoadingState from "@/components/template/SkeletonContainer/ThesisInfoSkeleton";
 
-import { showToast } from "@/components/template/Toaster";
+import { ThesisTitle } from "@/components/organisms/Thesis/ThesisTitle";
+import AttachmentCardList from "@/components/organisms/Attachment/AttachmentCardList";
 
-export default function ThesisInfoPage({ params }: { params: { id: number } }) {
-  const { id } = params;
-  const { user, isLoading: isUserContextLoading } = useUserContext();
-  const { getThesis } = useThesisRequest();
+export default function ThesisInfoPage({ params }: { params: Promise<{ id: number }> }) {
+  const { id } = use(params);
 
-  const [thesisData, setThesisData] = useState<Thesis>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const {
+    data: thesisData,
+    isLoading: isThesisLoading,
+    error,
+    refetch
+  } = useGetThesis(id);
 
-  async function onGetThesisFetch(studentId: number) {
-    try {
-      const request = await getThesis(studentId);
-      setThesisData(request.data);
-    } catch (err: any) {
-      showToast(
-        "Unable to process your request. " + err.message,
-        "error",
-        "Server Error"
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const handleThesisUpdated = () => {
+    refetch();
+  };
+
+  const thesisInfo = (thesisData?.data as Thesis);
+
+  if (isThesisLoading) {
+    return <ThesisInfoLoadingState />
   }
 
-  useEffect(() => {
-    if (isUserContextLoading) {
-      setIsLoading(true);
-      return;
-    }
-
-    if (user) {
-      const studentId = Number(user.id);
-
-      if (isNaN(studentId)) {
-        setIsLoading(false);
-        showToast("Invalid User ID.", "error", "Authentication Error");
-        return;
-      }
-
-      onGetThesisFetch(studentId);
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
-
   return (
-    <div>
-      <h1>Title: {id}</h1>
-      <p>Data: {thesisData?.thesis_title}</p>
-    </div>
+    <>
+      <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full lg:px-32 py-4 px-8">
+        <div className="flex flex-col w-full md:w-1/2 gap-4">
+          {/* Header Panel */}
+          <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-2 pb-2 rounded-md">
+            <h1 className="text-content-primary text-lg font-bold pb-1 pt-2">
+              <ThesisTitle thesisId={thesisInfo.id} thesisTitle={thesisInfo.thesis_title} setIsUpdated={handleThesisUpdated} />
+            </h1>
+            <div className="mb-2">
+              <span className="text-content-primary font-normal pr-2">
+                {thesisInfo.student?.user.last_name}, {" "}
+                {thesisInfo.student?.user.first_name}
+              </span>
+              <span className="border-l-2 border-grey-800 pl-2">{thesisInfo.student?.user.program}</span>
+            </div>
+          </div>
+
+          {/* Attachments Panel */}
+          <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-2 pb-2 rounded-md">
+            <h1 className="text-content-primary text-md font-bold pb-1 pt-2">
+              Attachments
+            </h1>
+            <AttachmentCardList thesisId={thesisInfo.id} status={""} />
+          </div>
+        </div>
+
+        <div className="bg-white w-full md:w-1/3 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-2 pb-2 rounded-md">
+          <div className="flex flex-col justify-between">
+            <h3 className="text-content-primary text-md font-bold pb-1 pt-2">
+              Information
+            </h3>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
