@@ -12,11 +12,17 @@ export const handleGetRequest = async <T>(url: string): Promise<T> => {
             try {
                 const errorBody = await response.json();
                 errorMessage = errorBody.message || errorBody.error || errorMessage;
-            } catch {}
+            } catch { } 
             throw new Error(errorMessage);
         }
-        
-        return response.json() as Promise<T>; 
+
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            return response.json() as Promise<T>;
+        }
+        return {} as T;
+
     } catch (err: any) {
         console.error("GET Request Error:", url, err);
         throw new Error(err.message || "A network or internal error occurred.");
@@ -24,10 +30,11 @@ export const handleGetRequest = async <T>(url: string): Promise<T> => {
 };
 
 export const handlePostRequest = async <T, B = object>(url: string, body?: B): Promise<T> => {
+    console.log(body)
     try {
         const response = await requestHandler({
             method: 'POST',
-            body: body, 
+            body: JSON.stringify(body),
             url: url
         });
 
@@ -36,11 +43,19 @@ export const handlePostRequest = async <T, B = object>(url: string, body?: B): P
             try {
                 const errorBody = await response.json();
                 errorMessage = errorBody.message || errorBody.error || errorMessage;
-            } catch {}
+            } catch (jsonParseError) {
+                console.warn("Could not parse error response as JSON:", jsonParseError);
+            }
             throw new Error(errorMessage);
         }
 
-        return response.json() as Promise<T>;
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            return response.json() as Promise<T>;
+        }
+        return {} as T;
+
     } catch (err: any) {
         console.error("POST Request Error:", url, err);
         throw new Error(err.message || "A network or internal error occurred during mutation.");
