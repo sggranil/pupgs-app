@@ -30,7 +30,6 @@ export const handleGetRequest = async <T>(url: string): Promise<T> => {
 };
 
 export const handlePostRequest = async <T, B = object>(url: string, body?: B): Promise<T> => {
-    console.log(body)
     try {
         const response = await requestHandler({
             method: 'POST',
