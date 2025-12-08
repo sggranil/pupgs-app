@@ -12,8 +12,7 @@ interface ThesisCardListProps {
 const ThesisCardList: React.FC<ThesisCardListProps> = ({ thesisData }) => {
   return (
     <div className="w-full mt-2">
-      {thesisData.length > 0 ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 py-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 py-2">
           {thesisData.map((thesis) => (
             <Link
               className="cursor-pointer"
@@ -23,11 +22,6 @@ const ThesisCardList: React.FC<ThesisCardListProps> = ({ thesisData }) => {
             </Link>
           ))}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 py-2">
-          <p>No Thesis Data Available</p>
-        </div>
-      )}
     </div>
   );
 };
