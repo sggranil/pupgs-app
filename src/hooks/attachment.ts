@@ -3,6 +3,7 @@ import { ATTACHMENT_API } from "@/constants/urls";
 
 import { handleGetRequest, handlePostRequest } from "@/hooks/request"; 
 import { ResponsePayloadResult } from '@/interface/request.interface';
+import { Attachment } from '@/interface/thesis.interface';
 
 const ATTACHMENT_KEYS = {
     all: ['attachment'] as const,
@@ -21,8 +22,15 @@ export const useGetAttachment = (id: number | undefined | null) => {
     });
 };
 
+export const useAddAttachment = () => {
+    return useMutation<Attachment, Error, object>({
+        mutationFn: (body: any) => handlePostRequest<Attachment>(ATTACHMENT_API.ADD_ATTACHMENT_URL, body),
+    });
+};
+
 const AttachmentService = {
-    useGetAttachment
+    useGetAttachment,
+    useAddAttachment
 }
 
 export default AttachmentService;
