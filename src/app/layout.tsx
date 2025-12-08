@@ -39,11 +39,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <UserProvider>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
-        </UserProvider>
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

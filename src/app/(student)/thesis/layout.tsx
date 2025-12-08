@@ -3,6 +3,7 @@
 import { AuthGuard } from "@/components/organisms/AuthGuard";
 import Navbar from "@/components/template/Navbar";
 import { Toaster } from "react-hot-toast";
+import { UserProvider } from "@/providers/UserProvider";
 
 function ThesisPageLayout({
   children,
@@ -10,12 +11,12 @@ function ThesisPageLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <UserProvider>
       <AuthGuard roles={["student", "adviser"]}>
         <Navbar>{children}</Navbar>
       </AuthGuard>
       <Toaster />
-    </>
+    </UserProvider>
   );
 }
 
