@@ -5,7 +5,7 @@ import { Attachment } from "@/interface/thesis.interface";
 
 import AttachmentCard from "@/components/molecules/AttachmentCard";
 
-import Modal from "../Modal";
+import Modal from "@/components/organisms/Modal";
 import ManageAttachmentModal from "@/components/organisms/Modals/ManageAttachmentModal";
 
 interface AttachmentCardList {
