@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { useGetAttachment } from "@/hooks/attachment";
 import { Attachment } from "@/interface/thesis.interface";
-import useAttachmentRequest from "@/hooks/attachment";
 
 import AttachmentCard from "@/components/molecules/AttachmentCard";
+
 import Modal from "../Modal";
-import AddRevisedAttachmentModal from "./AddRevisedAttachmentModal";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import ManageAttachmentModal from "@/components/organisms/Modals/ManageAttachmentModal";
 
 interface AttachmentCardList {
-  thesisId: string;
+  thesisId: number;
   status: string;
 }
 
@@ -19,61 +17,65 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
   thesisId,
   status,
 }) => {
-  const [userAttachment, setUserAttachment] = useState<Attachment[] | null>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [AttachmentModal, setAttachmentModal] = useState<boolean>(false);
-  const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
-  const userData = getUserInfoFromCookies();
+  const {
+      data: attachmentData,
+      isLoading: isAttachmentLoading,
+      error,
+      refetch
+    } = useGetAttachment(thesisId);
+  
+    const handleAttachmentUpdated = () => {
+      refetch();
+    };
+  
+    // const isOverallLoading = isUserContextLoading || isThesisLoading;
+    const listData = (attachmentData?.data || [] as Attachment[]);
+  // const [userAttachment, setUserAttachment] = useState<Attachment[] | null>([]);
+  // const [loading, setLoading] = useState<boolean>(false);
+  // const [AttachmentModal, setAttachmentModal] = useState<boolean>(false);
+  // const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
-  const { getAttachment } = useAttachmentRequest();
+  // const userData = getUserInfoFromCookies();
 
-  const fetchAttachment = async () => {
-    setLoading(true);
-    const response = await getAttachment(Number(thesisId));
-    if (response) {
-      setUserAttachment(response?.data);
-      setLoading(false);
-    }
-  };
+  // const { getAttachment } = useAttachmentRequest();
 
-  useEffect(() => {
-    fetchAttachment();
-  }, [isUpdated]);
+  // const fetchAttachment = async () => {
+  //   setLoading(true);
+  //   const response = await getAttachment(Number(thesisId));
+  //   if (response) {
+  //     setUserAttachment(response?.data);
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchAttachment();
+  // }, [isUpdated]);
 
   return (
-    <div className="border border-gray-200 rounded-md p-2 px-4 mb-4">
-      <div className="flex align-center justify-between py-2 border-b border-gray-200">
-        <h4 className="font-bold text-lg">Paper Attachment</h4>
-        {userData?.role === "student" && (
-          <button
-            onClick={() => setAttachmentModal(true)}
-            className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white">
-            Add Documents
-          </button>
-        )}
-      </div>
+    <>
       <div className="py-2">
-        {loading ? (
+        {isAttachmentLoading ? (
           <div className="h-48 col-span-full flex justify-center items-center">
             <p>Loading...</p>
           </div>
-        ) : userAttachment && userAttachment.length > 0 ? (
+        ) : listData && listData.length > 0 ? (
           ["proposal", "urec", "twd", "grammarian", "statistician"].map(
             (type) => {
-              const attachmentsByType = userAttachment.filter(
-                (attachment) => attachment.file_type === type
+              const attachmentsByType = listData.filter(
+                (attachment: any) => attachment.file_type === type
               );
 
               if (attachmentsByType.length === 0) return null; // Skip if no attachments of this type
 
               return (
                 <div key={type} className="mb-4">
-                  <h5 className="font-semibold mb-2 capitalize">
+                  {/* <h5 className="font-semibold mb-2 capitalize">
                     {type} Compilation
-                  </h5>
+                  </h5> */}
                   <div className="grid grid-cols-2 gap-2">
-                    {attachmentsByType.map((attachment, index) => (
+                    {attachmentsByType.map((attachment: any, index: any) => (
                       <AttachmentCard
                         key={attachment.id}
                         index={index}
@@ -87,7 +89,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
                             : `Revision No. ${index}`
                         }
                         attachment={attachment}
-                        setIsUpdated={setIsUpdated}
+                        setIsUpdated={handleAttachmentUpdated}
                       />
                     ))}
                   </div>
@@ -102,17 +104,17 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
         )}
       </div>
 
-      <Modal
+      {/* <Modal
         title="Upload Documents"
         isModalOpen={AttachmentModal}
         setModalOpen={setAttachmentModal}>
-        <AddRevisedAttachmentModal
+        <ManageAttachmentModal
           thesisId={thesisId}
           setIsUpdated={setIsUpdated}
           setIsModalOpen={setAttachmentModal}
         />
-      </Modal>
-    </div>
+      </Modal> */}
+    </>
   );
 };
 

@@ -20,18 +20,18 @@ const AttachmentCard: React.FC<AttachmentCardProps> = ({
 }) => {
   const userData = getUserInfoFromCookies();
 
-  const { deleteAttachment } = useProposalRequest();
+  // const { deleteAttachment } = useProposalRequest();
 
   async function handleDeleteProposal() {
     setIsUpdated(false);
     try {
-      const response = await deleteAttachment(Number(attachment.id));
-      if (response) {
-        showToast("Proposal updated successfully!", "success");
-        setIsUpdated(true);
-      } else {
-        showToast("Unable to delete proposal", "error");
-      }
+      // const response = await deleteAttachment(Number(attachment.id));
+      // if (response) {
+      //   showToast("Proposal updated successfully!", "success");
+      //   setIsUpdated(true);
+      // } else {
+      //   showToast("Unable to delete proposal", "error");
+      // }
     } catch (error) {
       showToast("An error occurred. Please try again.", "error");
     }
