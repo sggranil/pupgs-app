@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { UserProvider } from "@/context/UserContext";
+import { UserProvider } from "@/providers/UserProvider";
+import { QueryProvider } from "@/providers/QueryProvider";
 
 import "./globals.css";
 
@@ -38,7 +39,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          <QueryProvider>
+            {children}
+          </QueryProvider>
+        </UserProvider>
       </body>
     </html>
   );
