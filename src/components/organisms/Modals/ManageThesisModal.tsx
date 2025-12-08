@@ -3,24 +3,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { addThesisSchema, AddThesisSchemaType } from "@/types/api/thesis.types";
-import useThesisRequest from "@/hooks/thesis";
 import { showToast, removeToasts } from "@/components/template/Toaster";
 import { Thesis } from "@/interface/thesis.interface";
+import { useAddThesis, useDeleteThesis, useUpdateThesis } from "@/hooks/thesis";
 
 interface ManageThesisProps {
   setIsModalOpen: (modalOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
   thesisData?: Thesis;
+  userId: number
 }
 
 const ManageThesisModal: React.FC<ManageThesisProps> = ({
   thesisData,
   setIsUpdated,
   setIsModalOpen,
+  userId
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
-  const { addThesis, updateThesis, deleteThesis } = useThesisRequest();
+
+  const { mutateAsync: addThesis } = useAddThesis();
+  const { mutateAsync: updateThesis } = useUpdateThesis();
+  const { mutateAsync: deleteThesis } = useDeleteThesis();
 
   const isEditing = !!thesisData;
 
@@ -42,10 +47,10 @@ const ManageThesisModal: React.FC<ManageThesisProps> = ({
 
     try {
       const basePayload = {
+        user_id: userId,
         thesis_title: values.thesis_title,
         file_type: "proposal",
         file_url: values.file_url,
-        status: "pending_review",
       };
 
       let response;
@@ -139,7 +144,6 @@ const ManageThesisModal: React.FC<ManageThesisProps> = ({
           )}
         </div>
 
-        {/* Concept Paper Attachment */}
         <div className="mb-4">
           <label
             htmlFor="file_url"
@@ -155,7 +159,7 @@ const ManageThesisModal: React.FC<ManageThesisProps> = ({
             {...register("file_url")}
           />
           <p className="mt-2 text-textPrimary text-sm">
-            The link must be a public
+            The link must be a public{" "}
             <span className="text-brand-primary font-medium">
               Google Docs or Google Drive
             </span>{" "}
@@ -178,8 +182,8 @@ const ManageThesisModal: React.FC<ManageThesisProps> = ({
                 ? "Updating..."
                 : "Submitting..."
               : isEditing
-              ? "Update"
-              : "Submit"}
+                ? "Update"
+                : "Submit"}
           </button>
 
           {isEditing && (
