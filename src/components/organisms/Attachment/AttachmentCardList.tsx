@@ -7,6 +7,7 @@ import AttachmentCard from "@/components/molecules/AttachmentCard";
 
 import Modal from "@/components/organisms/Modal";
 import ManageAttachmentModal from "@/components/organisms/Modals/ManageAttachmentModal";
+import AttachmentCardSkeleton from "@/components/molecules/Skeleton/AttachmentCarSkeleton";
 
 interface AttachmentCardList {
   thesisId: number;
@@ -19,18 +20,18 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
 }) => {
 
   const {
-      data: attachmentData,
-      isLoading: isAttachmentLoading,
-      error,
-      refetch
-    } = useGetAttachment(thesisId);
-  
-    const handleAttachmentUpdated = () => {
-      refetch();
-    };
-  
-    // const isOverallLoading = isUserContextLoading || isThesisLoading;
-    const listData = (attachmentData?.data || [] as Attachment[]);
+    data: attachmentData,
+    isLoading: isAttachmentLoading,
+    error,
+    refetch
+  } = useGetAttachment(thesisId);
+
+  const handleAttachmentUpdated = () => {
+    refetch();
+  };
+
+  // const isOverallLoading = isUserContextLoading || isThesisLoading;
+  const listData = (attachmentData?.data || [] as Attachment[]);
   // const [userAttachment, setUserAttachment] = useState<Attachment[] | null>([]);
   // const [loading, setLoading] = useState<boolean>(false);
   // const [AttachmentModal, setAttachmentModal] = useState<boolean>(false);
@@ -57,9 +58,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
     <>
       <div className="py-2">
         {isAttachmentLoading ? (
-          <div className="h-48 col-span-full flex justify-center items-center">
-            <p>Loading...</p>
-          </div>
+          <AttachmentCardSkeleton />
         ) : listData && listData.length > 0 ? (
           ["proposal", "urec", "twd", "grammarian", "statistician"].map(
             (type) => {
@@ -81,12 +80,11 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
                         index={index}
                         title={
                           index === 0
-                            ? `Initial ${type} ${
-                                type === "proposal" ? "Paper" : "Document"
-                              } `
+                            ? `Initial ${type} ${type === "proposal" ? "Paper" : "Document"
+                            } `
                             : status === "pending_review"
-                            ? `Pending Revision No. ${index}`
-                            : `Revision No. ${index}`
+                              ? `Pending Revision No. ${index}`
+                              : `Revision No. ${index}`
                         }
                         attachment={attachment}
                         setIsUpdated={handleAttachmentUpdated}
