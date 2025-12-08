@@ -12,19 +12,19 @@ import { FILE_TYPES } from "@/constants/filters";
 
 import { showToast, removeToasts } from "@/components/template/Toaster";
 
-interface RevisedAttachmentProps {
+interface ManageAttachmentProps {
   setIsModalOpen: (modalOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
-  thesisId: string;
+  thesisId: number;
 }
 
-const AddRevisedAttachmentModal: React.FC<RevisedAttachmentProps> = ({
+const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
   thesisId,
   setIsUpdated,
   setIsModalOpen,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { addAttachment } = useAttachmentRequest();
+  // const { addAttachment } = useAttachmentRequest();
 
   const {
     register,
@@ -43,19 +43,19 @@ const AddRevisedAttachmentModal: React.FC<RevisedAttachmentProps> = ({
     setLoading(true);
 
     try {
-      const response = await addAttachment({
-        thesis_id: thesisId,
-        file_type: values.file_type,
-        file_url: values.file_url,
-      });
+      // const response = await addAttachment({
+      //   thesis_id: thesisId,
+      //   file_type: values.file_type,
+      //   file_url: values.file_url,
+      // });
 
-      if (response) {
-        showToast("Proposal link updated successfully!", "success");
-        setIsUpdated(true);
-        setIsModalOpen(false);
-      } else {
-        showToast("Unable to upload", "error");
-      }
+      // if (response) {
+      //   showToast("Proposal link updated successfully!", "success");
+      //   setIsUpdated(true);
+      //   setIsModalOpen(false);
+      // } else {
+      //   showToast("Unable to upload", "error");
+      // }
     } catch (error) {
       showToast("An error occurred. Please try again.", "error");
     } finally {
@@ -120,4 +120,4 @@ const AddRevisedAttachmentModal: React.FC<RevisedAttachmentProps> = ({
   );
 };
 
-export default AddRevisedAttachmentModal;
+export default ManageAttachmentModal;
