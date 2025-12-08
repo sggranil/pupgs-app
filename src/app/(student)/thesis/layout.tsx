@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { AuthGuard } from "@/components/organisms/AuthGuard";
+import { AuthGuard } from "@/providers/AuthGuard";
 import Navbar from "@/components/template/Navbar";
 import { Toaster } from "react-hot-toast";
 import { UserProvider } from "@/providers/UserProvider";
