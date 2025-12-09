@@ -113,7 +113,7 @@ model User {
   adviser           Adviser?
   student           Student?
   audit_logs        AuditLog[]
-  is_archived       Boolean             @default(false)
+  is_archived       Boolean?             @default(false)
   notifications_received      Notification[]      @relation("RecipientNotifications")
   notifications_sent          Notification[]      @relation("SenderNotifications")
   created_at        DateTime            @default(now())
@@ -167,16 +167,20 @@ model Thesis {
   thesis_receipts   ThesisReceipt[]
   theme             String?
   background_image  String?
+  is_archived       Boolean?            @default(false)
   created_at        DateTime            @default(now())
   updated_at        DateTime            @default(now())
 }
 
 model Attachment {
   id                Int                 @id @default(autoincrement())
+  title             String?
+  description       String?
   thesis            Thesis              @relation(fields: [thesis_id], references: [id])
   thesis_id         Int
   file_type         String
   file_url          String
+  is_archived       Boolean?            @default(false)
   created_at        DateTime            @default(now())
   updated_at        DateTime            @default(now())
 }
@@ -192,6 +196,7 @@ model ThesisReceipt {
   attachment        String
   status            ThesisReceiptStatus?
   message           String?
+  is_archived       Boolean             @default(false)
   created_at        DateTime            @default(now())
   updated_at        DateTime            @default(now())
 }
@@ -213,17 +218,18 @@ model AuditLog {
 }
 
 model Notification {
-  id                Int                @id @default(autoincrement())
-  type              NotificationType
-  read              Boolean            @default(false)
-  createdAt         DateTime           @default(now())
-  recipientId       Int
-  recipient         User               @relation("RecipientNotifications", fields: [recipientId], references: [id])
-  senderId          Int?
-  sender            User?              @relation("SenderNotifications", fields: [senderId], references: [id])
-  title             String
-  message           String?
-  link              String?
+  id                 Int                @id @default(autoincrement())
+  type               NotificationType
+  read               Boolean            @default(false)
+  recipient_id       Int
+  recipient          User               @relation("RecipientNotifications", fields: [recipient_id], references: [id])
+  sender_id          Int?
+  sender             User?              @relation("SenderNotifications", fields: [sender_id], references: [id])
+  title              String
+  message            String?
+  link               String?
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @default(now())
 
-  @@index([recipientId, createdAt])
+  @@index([recipient_id, created_at])
 }
