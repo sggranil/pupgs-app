@@ -2,8 +2,6 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import useAttachmentRequest from "@/hooks/attachment";
-
 import {
   AddAttachmentSchemaType,
   addAttachmentSchema,
@@ -11,6 +9,7 @@ import {
 import { FILE_TYPES } from "@/constants/filters";
 
 import { showToast, removeToasts } from "@/components/template/Toaster";
+import { useAddAttachment } from "@/hooks/attachment";
 
 interface ManageAttachmentProps {
   setIsModalOpen: (modalOpen: boolean) => void;
@@ -24,7 +23,8 @@ const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
   setIsModalOpen,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  // const { addAttachment } = useAttachmentRequest();
+
+  const { mutateAsync: addAttachment } = useAddAttachment();
 
   const {
     register,
@@ -32,10 +32,6 @@ const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
     formState: { errors },
   } = useForm<AddAttachmentSchemaType>({
     resolver: zodResolver(addAttachmentSchema),
-    defaultValues: {
-      file_type: "",
-      file_url: "",
-    },
   });
 
   async function handleFormSubmit(values: AddAttachmentSchemaType) {
@@ -43,19 +39,31 @@ const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
     setLoading(true);
 
     try {
-      // const response = await addAttachment({
-      //   thesis_id: thesisId,
-      //   file_type: values.file_type,
-      //   file_url: values.file_url,
-      // });
+      const payload = {
+        thesis_id: thesisId,
+        title: values.title,
+        file_type: values.file_type,
+        file_url: values.file_url,
+      };
 
-      // if (response) {
-      //   showToast("Proposal link updated successfully!", "success");
-      //   setIsUpdated(true);
-      //   setIsModalOpen(false);
-      // } else {
-      //   showToast("Unable to upload", "error");
-      // }
+      addAttachment(
+        { payload: payload },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            setIsUpdated(true);
+            showToast(
+              `You added a new ${values.file_type} attachment.`,
+              "success",
+              "Attachment Uploaded"
+            );
+          },
+          onError: (error) => {
+            setIsModalOpen(false);
+            showToast(error.message, "error");
+          },
+        }
+      );
     } catch (error) {
       showToast("An error occurred. Please try again.", "error");
     } finally {
@@ -65,16 +73,31 @@ const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <div className="w-full py-4">
+      <div className="w-full py-2">
+        <div className="mb-4">
+          <label className="text-sm block text-context-primary font-semibold mb-1">
+            Title <span className="text-brand-primary">*</span>
+          </label>
+          <input
+            type="text"
+            className="w-full p-2 text-sm border border-gray-300 rounded-md text-context-primary bg-white"
+            placeholder="Add your Attachment Title"
+            {...register("title")}
+          />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+          )}
+        </div>
+
         <div className="mb-4">
           <label
             htmlFor="file_type"
-            className="block text-textPrimary font-semibold mb-1">
-            Program
+            className="text-sm block text-context-primary font-semibold mb-1">
+            Program <span className="text-brand-primary">*</span>
           </label>
           <select
             id="file_type"
-            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+            className="w-full p-2 border text-sm border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500"
             {...register("file_type")}>
             <option value="" disabled>
               Select a File Type
@@ -88,17 +111,19 @@ const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
         </div>
 
         <div className="mb-4">
-          <label className="block text-textPrimary font-semibold mb-1">
-            Proposal Attachment *
+          <label className="text-sm block text-context-primary font-semibold mb-1">
+            Link Attachment <span className="text-brand-primary">*</span>
           </label>
           <input
             type="text"
-            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+            className="w-full p-2 text-sm border border-gray-300 rounded-md text-context-primary bg-white"
             placeholder="Paste your Google Drive or Docs link here"
             {...register("file_url")}
           />
-          <p className="mt-2 text-textPrimary">
-            The link must be a public Google Drive or Docs link.
+          <p className="mt-2 text-content-primary text-sm">
+            The link must be a public{" "}
+            <span className="text-brand-primary">Google Drive or Docs</span>{" "}
+            link.
           </p>
           {errors.file_url && (
             <p className="text-red-500 text-sm mt-1">
@@ -111,7 +136,7 @@ const ManageAttachmentModal: React.FC<ManageAttachmentProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50">
+            className="w-full mt-6 py-2 bg-brand-primary text-white font-semibold rounded-md hover:bg-brand-primary-hover disabled:opacity-75">
             {loading ? "Submitting..." : "Submit"}
           </button>
         </div>
