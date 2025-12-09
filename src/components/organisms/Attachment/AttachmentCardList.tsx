@@ -1,117 +1,151 @@
 "use client";
 
-import { useGetAttachment } from "@/hooks/attachment";
+import { useState } from "react";
+
 import { Attachment } from "@/interface/thesis.interface";
 
 import AttachmentCard from "@/components/molecules/AttachmentCard";
 
 import Modal from "@/components/organisms/Modal";
 import ManageAttachmentModal from "@/components/organisms/Modals/ManageAttachmentModal";
-import AttachmentCardSkeleton from "@/components/molecules/Skeleton/AttachmentCarSkeleton";
+
+import ActionButton from "@/components/molecules/ActionButton";
 
 interface AttachmentCardList {
   thesisId: number;
-  status: string;
+  attachments: Attachment[];
+  status?: string;
+  setIsUpdated: (isUpdated: boolean) => void;
 }
 
 const AttachmentCardList: React.FC<AttachmentCardList> = ({
   thesisId,
+  attachments,
   status,
+  setIsUpdated,
 }) => {
-  const {
-    data: attachmentData,
-    isLoading: isAttachmentLoading,
-    error,
-    refetch,
-  } = useGetAttachment(thesisId);
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
-  const handleAttachmentUpdated = () => {
-    refetch();
+  const getCardTitle = (
+    type: string,
+    index: number,
+    status?: string,
+    title?: string
+  ) => {
+    let sectionName = "";
+    switch (type) {
+      case "proposal":
+        sectionName = "Thesis Proposal Document";
+        break;
+      case "urec":
+        sectionName = "UREC Document";
+        break;
+      case "twd":
+        sectionName = "TWD Document";
+        break;
+      case "grammarian":
+        sectionName = "Grammarian Report";
+        break;
+      case "statistician":
+        sectionName = "Statistician Report";
+        break;
+      default:
+        sectionName = "Attachment";
+    }
+
+    if (index === 0 && !title) {
+      return `Initial ${sectionName}`;
+    } else {
+      if (status === "pending_review") {
+        return `${title} (Pending)`;
+      } else {
+        return title;
+      }
+    }
   };
-
-  // const isOverallLoading = isUserContextLoading || isThesisLoading;
-  const listData = attachmentData?.data || ([] as Attachment[]);
-  // const [userAttachment, setUserAttachment] = useState<Attachment[] | null>([]);
-  // const [loading, setLoading] = useState<boolean>(false);
-  // const [AttachmentModal, setAttachmentModal] = useState<boolean>(false);
-  // const [isUpdated, setIsUpdated] = useState<boolean>(false);
-
-  // const userData = getUserInfoFromCookies();
-
-  // const { getAttachment } = useAttachmentRequest();
-
-  // const fetchAttachment = async () => {
-  //   setLoading(true);
-  //   const response = await getAttachment(Number(thesisId));
-  //   if (response) {
-  //     setUserAttachment(response?.data);
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchAttachment();
-  // }, [isUpdated]);
 
   return (
     <>
-      <div className="py-2">
-        {isAttachmentLoading ? (
-          <AttachmentCardSkeleton />
-        ) : listData && listData.length > 0 ? (
-          ["proposal", "urec", "twd", "grammarian", "statistician"].map(
-            (type) => {
-              const attachmentsByType = listData.filter(
-                (attachment: any) => attachment.file_type === type
-              );
+      <div className="w-full">
+        <div className="flex items-center justify-between pt-4">
+          <h3 className="text-content-primary text-md font-bold">
+            Information
+          </h3>
+          {/* {userData?.role === "admin" && ( */}
+          <ActionButton
+            icon="add_link"
+            label="Add Link"
+            onClick={() => setModalOpen(true)}
+          />
+          {/* // )} */}
+        </div>
+        {["proposal", "urec", "twd", "grammarian", "statistician"].map(
+          (type) => {
+            const attachmentsByType = attachments.filter(
+              (attachment) => attachment.file_type === type
+            );
 
-              if (attachmentsByType.length === 0) return null; // Skip if no attachments of this type
+            if (attachmentsByType.length === 0) return null;
 
-              return (
-                <div key={type} className="">
-                  {/* <h5 className="font-semibold mb-2 capitalize">
-                    {type} Compilation
-                  </h5> */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {attachmentsByType.map((attachment: any, index: any) => (
-                      <AttachmentCard
-                        key={attachment.id}
-                        index={index}
-                        title={
-                          index === 0
-                            ? `Initial ${type} ${
-                                type === "proposal" ? "Paper" : "Document"
-                              } `
-                            : status === "pending_review"
-                            ? `Pending Revision No. ${index}`
-                            : `Revision No. ${index}`
-                        }
-                        attachment={attachment}
-                        setIsUpdated={handleAttachmentUpdated}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
+            let sectionTitle = "";
+            switch (type) {
+              case "proposal":
+                sectionTitle = "Proposal Documents";
+                break;
+              case "urec":
+                sectionTitle = "UREC Documents";
+                break;
+              case "twd":
+                sectionTitle = "TWD Documents";
+                break;
+              case "grammarian":
+                sectionTitle = "Grammarian Reports";
+                break;
+              case "statistician":
+                sectionTitle = "Statistician Reports";
+                break;
+              default:
+                sectionTitle = "Other Attachments";
             }
-          )
-        ) : (
-          <div className="h-48 col-span-full flex justify-center items-center">
-            <p>No Attachment found.</p>
-          </div>
+
+            return (
+              <div key={type} className="mb-2">
+                <h2 className="text-content-secondary text-xs font-bold pt-2">
+                  {sectionTitle}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {attachmentsByType.map((attachment, index) => (
+                    <AttachmentCard
+                      key={attachment.id}
+                      index={index}
+                      title={getCardTitle(
+                        type,
+                        index,
+                        status,
+                        attachment.title
+                      )}
+                      attachment={attachment}
+                      file_type={type}
+                      setIsUpdated={setIsUpdated}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          }
         )}
       </div>
 
-      {/* <Modal
+      <Modal
         title="Upload Documents"
-        isModalOpen={AttachmentModal}
-        setModalOpen={setAttachmentModal}>
+        isModalOpen={isModalOpen}
+        setModalOpen={setModalOpen}>
         <ManageAttachmentModal
           thesisId={thesisId}
           setIsUpdated={setIsUpdated}
-          setIsModalOpen={setAttachmentModal}
+          setIsModalOpen={setModalOpen}
         />
-      </Modal> */}
+      </Modal>
     </>
   );
 };
