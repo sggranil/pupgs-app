@@ -18,12 +18,11 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
   thesisId,
   status,
 }) => {
-
   const {
     data: attachmentData,
     isLoading: isAttachmentLoading,
     error,
-    refetch
+    refetch,
   } = useGetAttachment(thesisId);
 
   const handleAttachmentUpdated = () => {
@@ -31,7 +30,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
   };
 
   // const isOverallLoading = isUserContextLoading || isThesisLoading;
-  const listData = (attachmentData?.data || [] as Attachment[]);
+  const listData = attachmentData?.data || ([] as Attachment[]);
   // const [userAttachment, setUserAttachment] = useState<Attachment[] | null>([]);
   // const [loading, setLoading] = useState<boolean>(false);
   // const [AttachmentModal, setAttachmentModal] = useState<boolean>(false);
@@ -69,7 +68,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
               if (attachmentsByType.length === 0) return null; // Skip if no attachments of this type
 
               return (
-                <div key={type} className="mb-4">
+                <div key={type} className="">
                   {/* <h5 className="font-semibold mb-2 capitalize">
                     {type} Compilation
                   </h5> */}
@@ -80,11 +79,12 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
                         index={index}
                         title={
                           index === 0
-                            ? `Initial ${type} ${type === "proposal" ? "Paper" : "Document"
-                            } `
+                            ? `Initial ${type} ${
+                                type === "proposal" ? "Paper" : "Document"
+                              } `
                             : status === "pending_review"
-                              ? `Pending Revision No. ${index}`
-                              : `Revision No. ${index}`
+                            ? `Pending Revision No. ${index}`
+                            : `Revision No. ${index}`
                         }
                         attachment={attachment}
                         setIsUpdated={handleAttachmentUpdated}

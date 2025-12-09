@@ -38,8 +38,10 @@ const AttachmentCard: React.FC<AttachmentCardProps> = ({
   }
 
   return (
-    <div className="w-full" key={index}>
-      <div className="flex items-center justify-between p-3 bg-white rounded-md shadow-md">
+    <div
+      className="w-full ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm"
+      key={index}>
+      <div className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm">
         <div>
           <h2 className="text-md font-semibold text-textPrimary capitalize">
             {title}

@@ -7,7 +7,7 @@ const Navbar = ({
 }>) => {
   return (
     <div className="w-full">
-      <div className="fixed top-0 left-0 right-0 flex md:justify-evenly justify-between items-center w-full shadow-md z-50 bg-white px-4">
+      <div className="fixed top-0 left-0 right-0 flex md:justify-evenly justify-between items-center w-full border-b border-gray-300 z-50 bg-white px-4">
         <div className="flex items-center">
           <img src="/pup.png" alt="Logo" className="w-10 h-10 mr-3" />
           <div className="flex flex-col space-y-0.05">

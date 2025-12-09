@@ -38,7 +38,7 @@ const ThesisCard: React.FC<ThesisProp> = ({ thesisData }) => {
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-md shadow-md">
+      <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm overflow-hidden">
         <div className="relative w-full h-32 rounded-sm bg-gray-50">
           <div
             className={`absolute inset-0 ${randomColorClass} opacity-50 rounded-md`}></div>
@@ -47,7 +47,7 @@ const ThesisCard: React.FC<ThesisProp> = ({ thesisData }) => {
             width={500}
             height={300}
             src="/pup-bg.png"
-            className="w-full h-32 rounded-md"
+            className="w-full h-32 rounded-sm"
           />
         </div>
         <div className="items-center py-4 px-3">
