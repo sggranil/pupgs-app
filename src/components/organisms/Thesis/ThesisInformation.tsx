@@ -7,6 +7,8 @@ import { Thesis } from "@/interface/thesis.interface";
 import Modal from "@/components/organisms/Modal";
 import ScheduleThesisModal from "@/components/organisms/Modals/ScheduleThesisModal";
 
+import ActionButton from "@/components/molecules/ActionButton";
+
 interface ThesisInformationProps {
   thesisData: Thesis;
   setIsUpdated: (isUpdated: boolean) => void;
@@ -23,15 +25,15 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
       <div className="flex items-center justify-between pt-4">
         <h3 className="text-content-primary text-md font-bold">Information</h3>
         {/* {userData?.role === "admin" && ( */}
-        <button
+        <ActionButton
+          icon="edit_square"
+          label="Edit"
           onClick={() => setModalOpen(true)}
-          className="text-xs text-content-primary hover:text-content-secondary">
-          <span className="material-symbols-rounded">edit_square</span>
-        </button>
+        />
         {/* // )} */}
       </div>
 
-      <div className="grid grid-cols-2 gap-2 py-2">
+      <div className="grid grid-cols-2 gap-2 pt-2 pb-3">
         <div>
           <span className="font-semibold text-xs text-content-secondary">
             Thesis Adviser

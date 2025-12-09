@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useUpdateThesis } from "@/hooks/thesis";
-import { SquarePen, X } from "lucide-react";
+
 import { showToast } from "@/components/template/Toaster";
+import ActionButton from "@/components/molecules/ActionButton";
 
 interface ThesisTitleProps {
   thesisId: number;
@@ -78,15 +79,11 @@ export const ThesisTitle: React.FC<ThesisTitleProps> = ({
           </button>
         </div>
       ) : (
-        <div className="flex items-center text-wrap">
+        <div className="flex flex-row items-center text-wrap">
           <h1 className="text-content-primary text-lg md:text-xl font-bold break-all">
             "{thesisTitle}"
           </h1>
-          <button
-            onClick={() => setIsEditTitle(true)}
-            className="p-1 pl-2 text-content-primary hover:text-content-secondary flex flex-row items-center">
-            <span className="material-symbols-rounded">edit_square</span>
-          </button>
+          <ActionButton icon="edit" onClick={() => setIsEditTitle(true)} />
         </div>
       )}
     </div>
