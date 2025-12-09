@@ -21,10 +21,11 @@ export default function StudentDashboard() {
     data: thesisData,
     isLoading: isThesisLoading,
     error,
-    refetch
+    refetch,
   } = useUserThesis(userId);
 
-  const [thesisProposalModal, setThesisProposalModal] = useState<boolean>(false);
+  const [thesisProposalModal, setThesisProposalModal] =
+    useState<boolean>(false);
 
   const handleThesisUpdated = () => {
     setThesisProposalModal(false);
@@ -32,7 +33,7 @@ export default function StudentDashboard() {
   };
 
   const isOverallLoading = isUserContextLoading || isThesisLoading;
-  const listData = (thesisData?.data || [] as Thesis[]);
+  const listData = thesisData?.data || ([] as Thesis[]);
 
   return (
     <>
@@ -63,15 +64,16 @@ export default function StudentDashboard() {
           </div>
 
           {isOverallLoading ? (
-            <ThesisCardContainerSkeleton   />
+            <ThesisCardContainerSkeleton />
           ) : error ? (
             <p className="text-red-600 text-center py-8">
               Error fetching data: {error.message}
-            </p>) : listData.length > 0 ? (
-              <ThesisCardList thesisData={listData} />
-            ) : (
+            </p>
+          ) : listData.length > 0 ? (
+            <ThesisCardList thesisData={listData} />
+          ) : (
             <p className="text-gray-500 text-center py-24">
-              No thesis proposals found. Make a proposal now!
+              No thesis proposals found. Make a proposal now.
             </p>
           )}
         </div>
