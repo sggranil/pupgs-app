@@ -43,7 +43,7 @@ export const ROOM_API = {
     GET_ALL_ROOM_URL: "/room/get",
     ADD_ROOM_URL: "/room/add",
     DELETE_ROOM_URL: (id: number) => `/room/delete/${id}`,
-    AVAILABLE_ROOM_URL: (id: number, date: string) => `/room/availability/${id}/${date}`,
+    AVAILABLE_ROOM_URL: (date: Date) => `/room/availability/${date}`,
 }
 
 export const ADVISER_API = {
