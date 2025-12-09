@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { ImCross } from "react-icons/im";
 
 interface ModalProps {
   title: string;
@@ -42,18 +41,18 @@ const Modal = ({
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
           onClick={() => setModalOpen(false)}>
           <div
-            className={`bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-hidden`}
+            className={`bg-white p-4 rounded-md max-h-[90vh] overflow-hidden`}
             style={modalStyle}
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-gray-200 py-2">
-              <h2 className="text-content-primary text-xl font-bold">
+            <div className="flex flex-row items-center justify-between border-b border-gray-200 py-2">
+              <h2 className="text-content-primary text-lg font-semibold">
                 {title}
               </h2>
-              <div
+              <button
                 onClick={() => setModalOpen(false)}
                 className="rounded-md cursor-pointer">
-                <ImCross className="text-content-primary" />
-              </div>
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
             <div className="py-2 px-1 max-h-[80vh] overflow-y-auto scrollbar-hidden">
               {children}
