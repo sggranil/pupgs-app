@@ -41,6 +41,8 @@ export const addRoomSchema = z.object({
 });
 
 export const addAttachmentSchema = z.object({
+    title: z.string().min(3, "Attachment title is required"),
+    description: z.string().optional(),
     file_type: z.string().optional(),
     file_url: z.string()
         .url("Please enter a valid URL.")
