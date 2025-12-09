@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!data.is_adviser_created || !data.is_adviser_created == null) {
-            setCookie(res, 'access_token', accessToken, { maxAge: 1800 });
+            setCookie(res, 'access_token', accessToken, { maxAge: 86400 });
             setCookie(res, 'refresh_token', refreshToken, { maxAge: 86400 });
         }
 
