@@ -11,20 +11,19 @@ interface ManageThesisProps {
   setIsModalOpen: (modalOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
   thesisData?: Thesis;
-  userId: number
+  userId: number;
 }
 
 const ManageThesisModal: React.FC<ManageThesisProps> = ({
   thesisData,
   setIsUpdated,
   setIsModalOpen,
-  userId
+  userId,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
 
   const { mutateAsync: addThesis } = useAddThesis();
-  const { mutateAsync: updateThesis } = useUpdateThesis();
   const { mutateAsync: deleteThesis } = useDeleteThesis();
 
   const isEditing = !!thesisData;
@@ -46,43 +45,32 @@ const ManageThesisModal: React.FC<ManageThesisProps> = ({
     setLoading(true);
 
     try {
-      const basePayload = {
+      const payload = {
         user_id: userId,
         thesis_title: values.thesis_title,
         file_type: "proposal",
         file_url: values.file_url,
       };
 
-      let response;
-      if (isEditing) {
-        if (!thesisData?.id) {
-          throw new Error("Missing thesis ID for update operation.");
+      addThesis(
+        { ...payload },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            setIsUpdated(true);
+            showToast(
+              "You added a new proposal",
+              "success",
+              "Proposal Uploaded"
+            );
+          },
+          onError: (error) => {
+            setIsModalOpen(false);
+            showToast(error.message, "error");
+          },
         }
-
-        const updatePayload = {
-          ...basePayload,
-          id: thesisData.id,
-        };
-        response = await updateThesis(updatePayload);
-      } else {
-        response = await addThesis(basePayload);
-      }
-
-      if (response && response.message) {
-        showToast(response.message, "success");
-      } else {
-        showToast(
-          isEditing
-            ? "Thesis updated successfully!"
-            : "Thesis submitted successfully!",
-          "success"
-        );
-      }
-
-      setIsUpdated(true);
-      setIsModalOpen(false);
+      );
     } catch (error) {
-      console.error("Submission error:", error);
       const errorMessage =
         (error as any)?.message ||
         "An error occurred during submission. Please try again.";
@@ -182,8 +170,8 @@ const ManageThesisModal: React.FC<ManageThesisProps> = ({
                 ? "Updating..."
                 : "Submitting..."
               : isEditing
-                ? "Update"
-                : "Submit"}
+              ? "Update"
+              : "Submit"}
           </button>
 
           {isEditing && (
