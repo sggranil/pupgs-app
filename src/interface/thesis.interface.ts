@@ -1,4 +1,4 @@
-import { User, Adviser, Student } from "./user.interface";
+import { Adviser, Student } from "@/interface/user.interface";
 
 export interface Thesis {
   id: number;
@@ -37,19 +37,35 @@ export interface Room {
   location?: string;
   capacity?: number;
   thesis?: Thesis[];
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Attachment {
+  id: number;
+  title?: string;
+  description?: string;
+  thesis: Thesis;
+  thesis_id: number;
+  file_type: string;
+  file_url: string;
+  is_archived?: boolean;
+  created_at: Date;
+  updated_at: Date
 }
 
 export interface ThesisReceipt {
   id: number;
   student: Student;
   student_id: number;
-  thesis_id: number | null;
-  thesis?: Thesis[];
+  thesis: Thesis;
+  thesis_id: number;
   receipt_name: string;
   or_number: string;
   attachment: string;
-  status: string | null;
-  message: string | null;
+  status?: string;
+  message?: string;
+  is_archived: boolean;
   created_at: Date;
   updated_at: Date;
 }
