@@ -32,13 +32,6 @@ export async function POST(request: NextRequest) {
                     create: [{ file_type, file_url }],
                 },
             },
-            select: {
-                id: true,
-                thesis_title: true,
-                status: true,
-                created_at: true,
-                updated_at: true,
-            },
         });
 
         return NextResponse.json(
