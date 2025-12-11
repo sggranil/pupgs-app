@@ -59,8 +59,15 @@ export const addAttachmentSchema = z.object({
         }),
 });
 
+export const manageThesisReceiptSchema = z.object({
+    receipt_name: z.string().optional(),
+    or_number: z.string(),
+    attachment: z.string()
+});
+
 export type AddRoomSchemaType = z.infer<typeof addRoomSchema>;
 export type AddThesisSchemaType = z.infer<typeof addThesisSchema>;
 export type UpdateThesisScheduleSchemaType = z.infer<typeof updateThesisScheduleSchema>;
 export type UpdateThesisSchemaType = z.infer<typeof updateThesisSchema>;
 export type AddAttachmentSchemaType = z.infer<typeof addAttachmentSchema>;
+export type ManageThesisReceiptSchemaType = z.infer<typeof manageThesisReceiptSchema>;
