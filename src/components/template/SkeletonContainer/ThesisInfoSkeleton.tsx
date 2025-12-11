@@ -8,6 +8,7 @@ const ThesisInfoLoadingState: React.FC = () => {
           <div className="pb-1 pt-2">
             <div className="bg-gray-100 animate-pulse h-8 w-3/4 rounded-md"></div>
             <div className="bg-gray-100 animate-pulse h-6 w-1/4 rounded-md mt-2"></div>
+            <div className="bg-gray-100 animate-pulse h-4 w-1/2 rounded-md mt-2"></div>
           </div>
         </div>
         <div className="bg-white px-4 pt-2 pb-3 rounded-md">
@@ -20,11 +21,28 @@ const ThesisInfoLoadingState: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white w-full md:w-1/2 px-4 pt-2 pb-3 rounded-md">
-        <div className="pb-1 pt-2">
-          <div className="bg-gray-100 animate-pulse h-6 w-1/4 rounded-md"></div>
+      <div className="flex flex-col w-full md:w-1/2 gap-4">
+        <div className="bg-white px-4 pt-2 pb-3 rounded-md">
+          <div className="pb-1 pt-2">
+            <div className="bg-gray-100 animate-pulse h-6 w-1/4 rounded-md"></div>
+          </div>
+          <AttachmentCardSkeleton />
         </div>
-        <AttachmentCardSkeleton />
+
+        <div className="bg-white px-4 pt-2 pb-3 rounded-md">
+          <div className="pb-1 pt-2">
+            <div className="bg-gray-100 animate-pulse h-6 w-1/3 rounded-md"></div>
+            <div className="bg-gray-100 animate-pulse h-4 w-1/4 rounded-md mt-2"></div>
+          </div>
+          <AttachmentCardSkeleton />
+        </div>
+
+        <div className="bg-white px-4 pt-2 pb-3 rounded-md">
+          <div className="pb-1 pt-2">
+            <div className="bg-gray-100 animate-pulse h-6 w-1/4 rounded-md"></div>
+          </div>
+          <AttachmentCardSkeleton />
+        </div>
       </div>
     </div>
   );
