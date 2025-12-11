@@ -208,7 +208,7 @@ export default function RegistrationPage() {
             .
           </label>
         </div>
-        s
+
         {errors.terms_accepted && (
           <p className="text-red-500 text-sm mt-1">
             {errors.terms_accepted.message}
