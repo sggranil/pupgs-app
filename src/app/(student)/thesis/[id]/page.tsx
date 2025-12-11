@@ -11,6 +11,8 @@ import { ThesisTitle } from "@/components/organisms/Thesis/ThesisTitle";
 import AttachmentCardList from "@/components/organisms/Attachment/AttachmentCardList";
 
 import ThesisInformation from "@/components/organisms/Thesis/ThesisInformation";
+import ThesisReceiptCardList from "@/components/organisms/ThesisReceipt/ThesisReceiptCardList";
+import { useUserContext } from "@/providers/UserProvider";
 
 export default function ThesisInfoPage({
   params,
@@ -18,6 +20,8 @@ export default function ThesisInfoPage({
   params: Promise<{ id: number }>;
 }) {
   const { id } = use(params);
+  const { user, isLoading: isUserContextLoading } = useUserContext();
+  const userId = user?.id ?? Number(user?.id);
 
   const {
     data: thesisData,
@@ -68,11 +72,12 @@ export default function ThesisInfoPage({
 
         <div className="flex flex-col w-full md:w-1/2 gap-4">
           <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pb-2 rounded-md">
-            {/* <AttachmentCardList
-              thesisId={thesisInfo.id}
-              attachments={thesisInfo.attachments}
+            <ThesisReceiptCardList
+              userId={userId}
+              thesisId={id}
+              receipts={thesisInfo?.thesis_receipts}
               setIsUpdated={handleThesisUpdated}
-            /> */}
+            />
           </div>
 
           <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pb-2 rounded-md">
