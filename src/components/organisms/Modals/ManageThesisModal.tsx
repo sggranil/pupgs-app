@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { addThesisSchema, AddThesisSchemaType } from "@/types/api/thesis.types";
 import { showToast, removeToasts } from "@/components/template/Toaster";
 import { Thesis } from "@/interface/thesis.interface";
-import { useAddThesis, useDeleteThesis, useUpdateThesis } from "@/hooks/thesis";
+import { useAddThesis, useDeleteThesis } from "@/hooks/thesis";
 
 interface ManageThesisProps {
   setIsModalOpen: (modalOpen: boolean) => void;
