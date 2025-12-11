@@ -13,6 +13,7 @@ import AttachmentCardList from "@/components/organisms/Attachment/AttachmentCard
 import ThesisInformation from "@/components/organisms/Thesis/ThesisInformation";
 import ThesisReceiptCardList from "@/components/organisms/ThesisReceipt/ThesisReceiptCardList";
 import { useUserContext } from "@/providers/UserProvider";
+import ThesisFiles from "@/components/template/Thesis/ThesisFiles";
 
 export default function ThesisInfoPage({
   params,
@@ -20,7 +21,7 @@ export default function ThesisInfoPage({
   params: Promise<{ id: number }>;
 }) {
   const { id } = use(params);
-  const { user, isLoading: isUserContextLoading } = useUserContext();
+  const { user } = useUserContext();
   const userId = user?.id ?? Number(user?.id);
 
   const {
@@ -85,6 +86,14 @@ export default function ThesisInfoPage({
               thesisId={thesisInfo.id}
               attachments={thesisInfo.attachments}
               setIsUpdated={handleThesisUpdated}
+            />
+          </div>
+          <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pb-2 rounded-md">
+            <ThesisFiles
+              thesisData={thesisInfo}
+              thesisReceipt={null}
+              programChair={null}
+              dean={null}
             />
           </div>
         </div>

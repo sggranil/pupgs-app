@@ -45,7 +45,7 @@ export default function StudentDashboard() {
               Announcements
             </h3>
           </div>
-          <p className="text-gray-500 text-center py-24">
+          <p className="text-gray-500 text-center text-sm py-16">
             No announcements yet.
           </p>
         </div>

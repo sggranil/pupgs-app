@@ -9,8 +9,6 @@ import { Attachment } from "@/interface/thesis.interface";
 import useUserRequest from "@/hooks/user";
 
 import Modal from "@/components/organisms/Modal";
-import EnrolledSubjectModal from "@/components/organisms/Subject/EnrolledSubjectModal";
-import SubjectCardList from "@/components/organisms/Subject/SubjectCardList";
 import ManageUserModal from "@/components/organisms/Modals/ManageUserModal";
 
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
@@ -29,9 +27,6 @@ export default function Profile() {
 
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [showUpdate, setShowUpdate] = useState<boolean>(false);
-
-  const confirmedCount =
-    subjectData?.filter((subject) => subject.status).length ?? 0;
 
   const userData = getUserInfoFromCookies();
 
@@ -125,7 +120,6 @@ export default function Profile() {
                 each defense stage below.
               </p>
               <button
-                disabled={confirmedCount > 2}
                 onClick={() => setEnrolledSubjectModal(true)}
                 className={`w-half h-10 px-4 text-sm font-normal rounded-md whitespace-nowrap disabled:opacity-50 bg-bgPrimary text-white`}>
                 Upload Receipt
