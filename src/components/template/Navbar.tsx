@@ -1,10 +1,14 @@
 import NavbarLinks from "@/components/organisms/NavbarLinks";
+import { useUserContext } from "@/providers/UserProvider";
 
 const Navbar = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const { user, isLoading: isUserContextLoading } = useUserContext();
+  const userId = user?.id ?? Number(user?.id);
+
   return (
     <div className="w-full">
       <div className="fixed top-0 left-0 right-0 flex md:justify-evenly justify-between items-center w-full border-b border-gray-300 z-50 bg-white px-4">
@@ -20,7 +24,7 @@ const Navbar = ({
           </div>
         </div>
 
-        <NavbarLinks />
+        <NavbarLinks userId={userId} />
       </div>
 
       <main className="flex flex-col items-center w-full bg-app-surface min-h-screen overflow-hidden pt-16">
