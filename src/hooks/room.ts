@@ -13,9 +13,9 @@ const ROOM_KEYS = {
 };
 
 export const useAllRooms = () => {
-    return useQuery<Room[], Error>({
+    return useQuery<ResponsePayloadResult, Error>({
         queryKey: ROOM_KEYS.lists(),
-        queryFn: () => handleGetRequest<Room[]>(ROOM_API.GET_ALL_ROOM_URL),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(ROOM_API.GET_ALL_ROOM_URL),
     });
 };
 

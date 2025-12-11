@@ -13,14 +13,14 @@ export async function GET(request: NextRequest) {
 
         if (!subject) {
             return NextResponse.json(
-                { message: "Adviser not found." },
+                { message: "Advisers not found." },
                 { status: 401 }
             );
         }
 
-        return NextResponse.json({ 
+        return NextResponse.json({
             data: subject,
-            status: 200 
+            status: 200
         });
     } catch (err) {
         return NextResponse.json(

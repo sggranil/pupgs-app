@@ -111,6 +111,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
 
       <Modal
         title="Update Information"
+        modalType="info"
         isModalOpen={isModalOpen}
         setModalOpen={setModalOpen}>
         <ScheduleThesisModal
