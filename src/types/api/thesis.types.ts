@@ -14,6 +14,14 @@ export const addThesisSchema = z.object({
     status: z.string().optional(),
 });
 
+export const updateThesisScheduleSchema = z.object({
+    defense_date: z.string().optional(),
+    defense_time: z.string().optional(),
+    room_id: z.string().optional(),
+    secretary_id: z.string().optional(),
+    panelists: z.array(z.string()).min(3, "At least three panelist must be selected.").optional()
+})
+
 export const updateThesisSchema = z.object({
     status: z.string(),
     message: z.string(),
@@ -53,5 +61,6 @@ export const addAttachmentSchema = z.object({
 
 export type AddRoomSchemaType = z.infer<typeof addRoomSchema>;
 export type AddThesisSchemaType = z.infer<typeof addThesisSchema>;
+export type UpdateThesisScheduleSchemaType = z.infer<typeof updateThesisScheduleSchema>;
 export type UpdateThesisSchemaType = z.infer<typeof updateThesisSchema>;
 export type AddAttachmentSchemaType = z.infer<typeof addAttachmentSchema>;
