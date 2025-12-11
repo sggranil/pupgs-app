@@ -30,7 +30,8 @@ export default function RegistrationPage() {
     defaultValues: {
       middle_name: "",
       ext_name: "",
-      role: "student",
+      role: "adviser",
+      position: "Official",
       terms_accepted: false,
     },
   });
@@ -43,7 +44,7 @@ export default function RegistrationPage() {
       const responseData = await registerUser(formData);
 
       if (responseData && responseData.access_token) {
-        router.replace(`/thesis`);
+        router.replace(`/d033e22ae/dashboard`);
       } else {
         showToast(responseData?.message, "error");
       }
@@ -69,7 +70,7 @@ export default function RegistrationPage() {
               PUP Graduate Thesis Monitoring System
             </span>
             <span className="text-sm font-medium text-content-secondary">
-              REGISTRATION FORM
+              OFFICIALS REGISTRATION
             </span>
           </div>
         </div>
@@ -195,7 +196,7 @@ export default function RegistrationPage() {
         <div className="flex items-center mt-4">
           <input
             type="checkbox"
-            {...register("terms_accepted")} // <-- Register the field
+            {...register("terms_accepted")}
             className="mr-2 cursor-pointer"
           />
           <label className="text-content-primary">
@@ -208,7 +209,7 @@ export default function RegistrationPage() {
             .
           </label>
         </div>
-        s
+
         {errors.terms_accepted && (
           <p className="text-red-500 text-sm mt-1">
             {errors.terms_accepted.message}

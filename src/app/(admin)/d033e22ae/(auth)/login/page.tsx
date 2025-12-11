@@ -38,7 +38,7 @@ export default function LoginPage() {
       const responseData = await loginUser(formData);
 
       if (responseData && responseData.access_token) {
-        router.replace(`/thesis`);
+        router.replace(`/d033e22ae/dashboard`);
       } else {
         showToast(responseData?.message, "error");
       }
@@ -64,7 +64,7 @@ export default function LoginPage() {
               PUP Graduate Thesis Monitoring System
             </span>
             <span className="text-sm font-medium text-content-secondary">
-              LOGIN FORM
+              OFFICIALS PANEL
             </span>
           </div>
         </div>
@@ -111,7 +111,9 @@ export default function LoginPage() {
         </button>
         <p className="text-center mt-4">
           Doesn't have an account?{" "}
-          <Link className="text-brand-primary underline" href="/register">
+          <Link
+            className="text-brand-primary underline"
+            href="/d033e22ae/register">
             Register
           </Link>
         </p>
