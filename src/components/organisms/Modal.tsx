@@ -21,7 +21,7 @@ const Modal = ({
 
   switch (modalType) {
     case "pdf":
-      modalStyle = { width: "90%" };
+      modalStyle = { width: "100%" };
       break;
 
     case "info":
@@ -29,9 +29,7 @@ const Modal = ({
       break;
 
     case "form":
-    default:
-      modalStyle = { width: "fit-content" };
-      break;
+      modalStyle = { width: "1100px" };
   }
 
   return (
