@@ -7,23 +7,18 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const userId = await getUserId();
-        const data = await request.json();
+        const { user_id, payload } = await request.json();
 
-        if (!userId || !data.id || isNaN(Number(userId))) {
-            return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
-        }
-
-        if (Object.keys(data).length === 0) {
-            return NextResponse.json({ error: "No data provided for update" }, { status: 400 });
+        if (!user_id || !payload) {
+            return NextResponse.json({ error: "All fields are required." }, { status: 400 });
         }
 
         const existingUser = await prisma.user.findUnique({
-            where: { id: data.id ?? Number(userId) },
+            where: { id: user_id },
         });
 
         if (!existingUser) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+            return NextResponse.json({ error: "User record was not found." }, { status: 404 });
         }
 
         const {
@@ -31,7 +26,7 @@ export async function POST(request: NextRequest) {
             password,
             confirm_password,
             ...otherUpdates
-        } = data;
+        } = payload;
 
         Object.keys(otherUpdates).forEach((key) => {
             if (otherUpdates[key] === "" || otherUpdates[key] === undefined) {
@@ -58,12 +53,12 @@ export async function POST(request: NextRequest) {
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: data.id ?? Number(userId) },
+            where: { id: user_id },
             data: otherUpdates,
         });
 
         return NextResponse.json({
-            message: "User updated successfully",
+            message: "User record updated successfully.",
             data: updatedUser,
         });
     } catch (err: any) {
