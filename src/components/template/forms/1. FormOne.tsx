@@ -1,4 +1,4 @@
-import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
+import { Thesis } from "@/interface/thesis.interface";
 
 interface FormOneProps {
   thesisData: Thesis | null;

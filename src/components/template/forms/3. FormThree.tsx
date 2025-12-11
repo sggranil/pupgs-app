@@ -1,19 +1,14 @@
-import { Thesis } from "@/interface/thesis.interface";
-import { EnrolledSubject } from "@prisma/client";
+import { Thesis, ThesisReceipt } from "@/interface/thesis.interface";
 
 interface FormThreeProps {
   thesisData: Thesis | null;
-  enrolledSubject: EnrolledSubject | null;
+  thesisReceipt: ThesisReceipt | null;
 }
 
-const FormThree: React.FC<FormThreeProps> = ({
-  thesisData,
-  enrolledSubject,
-}) => {
-  const isProposalChecked = enrolledSubject?.subject_name === "Thesis Proposal";
-  const isPreFinalChecked =
-    enrolledSubject?.subject_name === "Pre-Oral Defense";
-  const isFinalChecked = enrolledSubject?.subject_name === "Final Defense";
+const FormThree: React.FC<FormThreeProps> = ({ thesisData, thesisReceipt }) => {
+  const isProposalChecked = thesisReceipt?.receipt_name === "thesis_proposal";
+  const isPreFinalChecked = thesisReceipt?.receipt_name === "pre_oral_defense";
+  const isFinalChecked = thesisReceipt?.receipt_name === "final_defense";
 
   return (
     <div className="p-8 font-inter bg-white shadow-lg rounded-lg w-[1344px] mx-auto">
