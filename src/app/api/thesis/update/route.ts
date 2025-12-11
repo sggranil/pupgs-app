@@ -3,21 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
     try {
-        const { user_id, thesis_id, payload } = await request.json();
-        const parseId = parseInt(user_id)
-
-        const user = await prisma.thesis.findFirst({
-            where: {
-                OR: [
-                    { student_id: parseId },
-                    { adviser_id: parseId }
-                ]
-            },
-        })
-
-        if (!user) {
-            return NextResponse.json({ message: "User record not found." }, { status: 404 });
-        }
+        const { thesis_id, payload } = await request.json();
 
         const thesis = await prisma.thesis.findUnique({ where: { id: thesis_id } });
 
@@ -27,10 +13,7 @@ export async function POST(request: NextRequest) {
 
         await prisma.thesis.update({
             where: {
-                id: thesis_id, OR: [
-                    { student_id: parseId },
-                    { adviser_id: parseId }
-                ]
+                id: thesis_id
             },
             data: {
                 ...payload
@@ -42,6 +25,7 @@ export async function POST(request: NextRequest) {
             { status: 200 }
         );
     } catch (err: any) {
+        console.error(err.message)
         return NextResponse.json(
             { message: "An error occurred while updating the thesis" + err.message },
             { status: 500 }
