@@ -20,19 +20,28 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ roles, children }) => {
   const router = useRouter();
 
   useEffect(() => {
+    const userData = getUserInfoFromCookies();
+    const userRole = userData?.role;
+    console.log(userRole);
+
     const checkAuthorization = () => {
       if (!isClientAuthorized()) {
-        router.push(`/login`);
+        if (userRole === "student") {
+          router.push("/login");
+        } else {
+          router.push("/d033e22ae/login");
+        }
         return;
       }
-
-      const userData = getUserInfoFromCookies();
-      const userRole = userData?.role;
 
       if (roles.includes(userRole)) {
         setIsAuthorized(true);
       } else {
-        router.push(`/profile`);
+        if (userRole === "student") {
+          router.push(`/thesis`);
+        } else {
+          router.push("/d033e22ae/dashboard");
+        }
       }
     };
 
