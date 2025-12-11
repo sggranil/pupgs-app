@@ -13,9 +13,9 @@ const USER_KEYS = {
 };
 
 export const useAllUsers = () => {
-    return useQuery<User[], Error>({
+    return useQuery<ResponsePayloadResult, Error>({
         queryKey: USER_KEYS.lists(),
-        queryFn: () => handleGetRequest<User[]>(USER_API.GET_ALL_USER_URL),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(USER_API.GET_ALL_USER_URL),
     });
 };
 
