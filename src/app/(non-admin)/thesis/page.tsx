@@ -15,14 +15,13 @@ import { useUserContext } from "@/providers/UserProvider";
 
 export default function StudentDashboard() {
   const { user, isLoading: isUserContextLoading } = useUserContext();
-  const userId = user?.id ?? Number(user?.id);
 
   const {
     data: thesisData,
     isLoading: isThesisLoading,
     error,
     refetch,
-  } = useUserThesis(userId);
+  } = useUserThesis(user?.id);
 
   const [thesisProposalModal, setThesisProposalModal] =
     useState<boolean>(false);
@@ -87,7 +86,7 @@ export default function StudentDashboard() {
         <ManageThesisModal
           setIsModalOpen={setThesisProposalModal}
           setIsUpdated={handleThesisUpdated}
-          userId={userId}
+          userId={user?.id}
         />
       </Modal>
     </>

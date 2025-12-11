@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { AuthGuard } from "@/providers/AuthGuard";
 import Navbar from "@/components/template/Navbar";
@@ -12,7 +12,7 @@ function ThesisPageLayout({
 }>) {
   return (
     <UserProvider>
-      <AuthGuard roles={["student", "adviser"]}>
+      <AuthGuard roles={["student", "adviser, chairperson, dean, admin"]}>
         <Navbar>{children}</Navbar>
       </AuthGuard>
       <Toaster />
