@@ -1,238 +1,208 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { User } from "@/interface/user.interface";
-import { z } from "zod";
-import useUserRequest from "@/hooks/user";
+import { useUpdateUser } from "@/hooks/user";
 import { useForm } from "react-hook-form";
 
-import { updateUserSchema } from "@/types/api/auth.types";
+import { updateUserSchema, UpdateUserSchemaType } from "@/types/api/auth.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useRouter } from "next/navigation";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { DEPARTMENTS } from "@/constants/departments";
 import { COURSES } from "@/constants/course";
 import { POSITIONS } from "@/constants/positions";
 
-import { showToast, removeToasts } from "@/components/template/Toaster";
+import { showToast } from "@/components/template/Toaster";
+import { useUserContext } from "@/providers/UserProvider";
 
 interface ManageUserProps {
   userData: User | null;
   fromUserProfile?: boolean | null;
   isShowEdit: (showEdit: boolean) => void;
-  isUpdated: (showUpdate: boolean) => void;
+  setIsModalOpen: (isOpen: boolean) => void;
+  setIsUpdated: (isUpdated: boolean) => void;
 }
-
-type UpdateSchemaType = z.infer<typeof updateUserSchema>;
 
 const ManageUserModal: React.FC<ManageUserProps> = ({
   userData,
   isShowEdit,
-  isUpdated,
+  setIsUpdated,
+  setIsModalOpen,
   fromUserProfile,
 }) => {
+  const { user } = useUserContext();
   const [loading, setLoading] = useState<boolean>(false);
-  const { updateUser } = useUserRequest();
-  const router = useRouter();
+  const { mutateAsync: updateUser } = useUpdateUser();
 
-  const userInfo = getUserInfoFromCookies();
+  const isoDateTime = (dateOnly: string | undefined) =>
+    dateOnly + "T00:00:00.000Z";
+  const splitIsoDateTime = (dateOnly: string | undefined) =>
+    dateOnly?.split("T")[0];
 
   const {
     register,
-    getValues,
+    handleSubmit,
     formState: { errors },
-  } = useForm<UpdateSchemaType>({
+  } = useForm<UpdateUserSchemaType>({
     resolver: zodResolver(updateUserSchema),
+    defaultValues: {
+      first_name: userData?.first_name ?? "",
+      middle_name: userData?.middle_name ?? "",
+      last_name: userData?.last_name ?? "",
+      ext_name: userData?.ext_name ?? "",
+      prefix: userData?.prefix ?? "",
+      standing: userData?.standing ?? "",
+      position: userData?.position ?? "",
+      start_date: splitIsoDateTime(userData?.start_date) ?? "",
+      pass_date: splitIsoDateTime(userData?.pass_date) ?? "",
+      role: userData?.role ?? "",
+      is_archived: userData?.is_archived,
+      program: userData?.program ?? "",
+      department: userData?.department ?? "",
+      tel_number: userData?.tel_number ?? "",
+    },
   });
 
-  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    removeToasts();
-    isUpdated(false);
-    setLoading(true);
-
+  async function handleFormSubmit(values: UpdateUserSchemaType) {
     try {
-      const formData = getValues();
-
-      const targetUserId = fromUserProfile ? userInfo?.userId : userData?.id;
-
-      if (!targetUserId) {
-        throw new Error("User ID is missing.");
-      }
-
-      const payload: any = {
-        ...formData,
-        id: targetUserId,
-      };
-
-      if (payload.start_date === "") {
-        payload.start_date = null;
-      } else if (typeof payload.start_date === "string") {
-        const parsedStartDate = new Date(payload.start_date);
-        payload.start_date = !isNaN(parsedStartDate.getTime())
-          ? parsedStartDate
-          : null;
-      }
-
-      if (payload.pass_date === "") {
-        payload.pass_date = null;
-      } else if (typeof payload.pass_date === "string") {
-        const parsedPassDate = new Date(payload.pass_date);
-        payload.pass_date = !isNaN(parsedPassDate.getTime())
-          ? parsedPassDate
-          : null;
-      }
-
-      if (!fromUserProfile && userInfo?.role === "admin") {
-        payload.role = formData.role ? "admin" : "adviser";
-      }
-
-      const responseData = await updateUser(payload);
-
-      if (!responseData) {
-        throw new Error("No response received from the server.");
-      }
-
-      if (responseData.error) {
-        throw new Error(responseData.error);
-      }
-
-      showToast(responseData.message || "Updated Successfully", "success");
-      isShowEdit(false);
+      updateUser(
+        {
+          user_id: userData?.id,
+          payload: {
+            ...values,
+            start_date: values?.start_date
+              ? isoDateTime(values?.start_date)
+              : "",
+            pass_date: values?.pass_date ? isoDateTime(values?.pass_date) : "",
+          },
+        },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            setIsUpdated(true);
+            showToast(
+              "You updated your profile.",
+              "success",
+              "Profile Updated"
+            );
+          },
+          onError: (error) => {
+            setIsModalOpen(false);
+            showToast(error.message, "error");
+          },
+        }
+      );
     } catch (error) {
-      if (error instanceof Error) {
-        showToast(error.message, "error");
-      } else {
-        showToast(
-          "An unexpected error occurred. Please try again later.",
-          "error"
-        );
-      }
+      const errorMessage =
+        (error as any)?.message ||
+        "An error occurred during updated. Please try again.";
+      showToast(errorMessage, "error");
     } finally {
-      isShowEdit(false);
-      isUpdated(true);
       setLoading(false);
     }
   }
-
   return (
-    <form onSubmit={handleFormSubmit}>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="w-full py-4">
         <div className="grid grid-cols-1 mb-3 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-textPrimary font-semibold mb-1">
+            <label className="text-sm text-context-primary font-semibold mb-1">
               First Name *
             </label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+              className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               placeholder="First Name"
               {...register("first_name")}
-              defaultValue={userData?.first_name}
             />
           </div>
           <div>
-            <label className="block text-textPrimary font-semibold mb-1">
+            <label className="text-sm text-context-primary font-semibold mb-1">
               Last Name *
             </label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+              className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               placeholder="Last Name"
               {...register("last_name")}
-              defaultValue={userData?.last_name}
             />
           </div>
         </div>
         <div className="grid grid-cols-2 mb-3 gap-3">
           <div>
-            <label className="block text-textPrimary font-semibold mb-1">
+            <label className="text-sm text-context-primary font-semibold mb-1">
               Middle Name
             </label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+              className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               placeholder="Middle Name"
               {...register("middle_name")}
-              defaultValue={userData?.middle_name}
             />
           </div>
           <div className="flex justify-between align-center gap-2">
             <div>
-              <label className="block text-textPrimary font-semibold mb-1">
+              <label className="text-sm text-context-primary font-semibold mb-1">
                 Prefix
               </label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
                 placeholder="Dr., Asst. Prof., etc."
                 {...register("prefix")}
-                defaultValue={userData?.prefix}
               />
             </div>
             <div>
-              <label className="block text-textPrimary font-semibold mb-1">
+              <label className="text-sm text-context-primary font-semibold mb-1">
                 Extension
               </label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+                className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
                 placeholder="Jr., Sr., or such titles (MSIT, MSCS, MBA, etc.)"
                 {...register("ext_name")}
-                defaultValue={userData?.ext_name}
               />
             </div>
           </div>
           <div>
-            <label className="block text-textPrimary font-semibold mb-1">
+            <label className="text-sm text-context-primary font-semibold mb-1">
               Date Started
             </label>
             <input
               type="date"
-              placeholder="YYYY-MM-DD"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+              placeholder="YYYY-MM-DD (ISO-8601)"
+              className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               {...register("start_date")}
-              defaultValue={
-                userData?.start_date
-                  ? new Date(userData.start_date).toISOString().split("T")[0]
-                  : ""
-              }
             />
           </div>
           <div>
-            <label className="block text-textPrimary font-semibold mb-1">
+            <label className="text-sm text-context-primary font-semibold mb-1">
               Comprehensive Exam
             </label>
             <input
               type="date"
-              placeholder="Passing Date"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+              placeholder="YYYY-MM-DD (ISO-8601)"
+              className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               {...register("pass_date")}
-              defaultValue={
-                userData?.pass_date
-                  ? new Date(userData.pass_date).toISOString().split("T")[0]
-                  : ""
-              }
             />
           </div>
         </div>
         <div className="grid grid-cols-2 mb-3 gap-3">
           {userData?.standing && (
             <div>
-              <label className="block text-textPrimary font-semibold mb-1">
+              <label className="text-sm text-context-primary font-semibold mb-1">
                 Standing
               </label>
               <input
                 disabled={userData?.role === "student"}
                 type="text"
-                className={`w-full p-2 border border-gray-300 rounded-md bg-white ${
+                className={`w-full p-2 border text-sm border-gray-300 rounded-md bg-white ${
                   userData?.role === "student"
                     ? "text-gray-400"
-                    : "text-textPrimary"
+                    : "text-context-primary"
                 }`}
                 placeholder="Position"
                 {...register("standing")}
-                defaultValue={userData?.standing}
               />
             </div>
           )}
@@ -240,14 +210,13 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
           <div>
             <label
               htmlFor="program"
-              className="block text-textPrimary font-semibold mb-1">
+              className="text-sm text-context-primary font-semibold mb-1">
               Program
             </label>
             <select
               id="program"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
-              {...register("program")}
-              defaultValue={userData?.program || ""}>
+              className="w-full p-2 border text-sm border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+              {...register("program")}>
               <option value="" disabled>
                 Select a Program
               </option>
@@ -261,14 +230,13 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
           <div>
             <label
               htmlFor="department"
-              className="block text-textPrimary font-semibold mb-1">
+              className="text-sm text-context-primary font-semibold mb-1">
               Department
             </label>
             <select
               id="department"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
-              {...register("department")}
-              defaultValue={userData?.department || ""}>
+              className="w-full p-2 border text-sm border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500"
+              {...register("department")}>
               <option value="" disabled>
                 Select a Department
               </option>
@@ -283,14 +251,13 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             <div>
               <label
                 htmlFor="position"
-                className="block text-textPrimary font-semibold mb-1">
+                className="block text-context-primary font-semibold mb-1">
                 Position
               </label>
               <select
                 id="position"
-                className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
-                {...register("position")}
-                defaultValue={userData?.position}>
+                className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+                {...register("position")}>
                 <option value="" disabled>
                   Position
                 </option>
@@ -303,37 +270,36 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             </div>
           )}
           <div>
-            <label className="block text-textPrimary font-semibold mb-1">
+            <label className="text-sm text-context-primary font-semibold mb-1">
               Phone Number
             </label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
+              className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               placeholder="Phone Number"
               {...register("tel_number")}
-              defaultValue={userData?.tel_number}
             />
           </div>
-          {userInfo?.role === "admin" && (
+          {user?.role === "admin" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mb-4">
               {/* Archive User */}
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="is_deleted"
-                  {...register("is_deleted")}
-                  defaultChecked={userData?.is_deleted}
+                  {...register("is_archived")}
+                  defaultChecked={userData?.is_archived}
                   className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                 />
                 <label
                   htmlFor="is_deleted"
-                  className="text-textPrimary font-medium">
+                  className="text-context-primary font-medium">
                   Archive User
                 </label>
               </div>
 
               {/* Make Admin */}
-              {userData?.id != userInfo?.userId && (
+              {userData?.id != user?.id && (
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -344,7 +310,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
                   />
                   <label
                     htmlFor="is_admin"
-                    className="text-textPrimary font-medium">
+                    className="text-context-primary font-medium">
                     Make Admin
                   </label>
                 </div>
@@ -353,18 +319,20 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
           )}
         </div>
       </div>
-      <button
-        type="button"
-        onClick={() => router.push("/profile/change-password")}
-        className="w-full mt-6 py-2 bg-white border border-red-700 text-textPrimary font-bold rounded-lg">
-        Change Password
-      </button>
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50">
-        {loading ? "Updating..." : "Update"}
-      </button>
+      <div className="flex flex-row gap-2">
+        <button
+          type="button"
+          // onClick={() => router.push("/profile/change-password")}
+          className="w-full py-2 bg-white border border-red-700 text-context-primary font-bold rounded-md">
+          Change Password
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 bg-brand-primary text-white font-bold rounded-md hover:bg-brand-primary-hover disabled:opacity-75">
+          {loading ? "Updating..." : "Update"}
+        </button>
+      </div>
     </form>
   );
 };
