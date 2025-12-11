@@ -68,9 +68,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
     <>
       <div className="w-full">
         <div className="flex items-center justify-between pt-4">
-          <h3 className="text-content-primary text-md font-bold">
-            Information
-          </h3>
+          <h3 className="text-content-primary text-md font-bold">Documents</h3>
           {/* {userData?.role === "admin" && ( */}
           <ActionButton
             icon="add_link"
