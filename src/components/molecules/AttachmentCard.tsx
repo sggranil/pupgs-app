@@ -44,7 +44,7 @@ const AttachmentCard: React.FC<AttachmentCardProps> = ({
 
   return (
     <div
-      className="w-full ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm"
+      className="w-[250] flex-shrink-0 md:flex-shrink md:w-full ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm"
       key={index}>
       <div className="flex items-center justify-between py-2 px-3 bg-white rounded-md">
         <div>
