@@ -11,7 +11,7 @@ interface ManageThesisProps {
   setIsModalOpen: (modalOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
   thesisData?: Thesis;
-  userId: number;
+  userId: number | undefined;
 }
 
 const ManageThesisModal: React.FC<ManageThesisProps> = ({
