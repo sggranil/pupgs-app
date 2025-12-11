@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import MenuDropdown from "@/components/organisms/MenuDropdown";
 
-interface NavbarLinksProps {}
+interface NavbarLinksProps {
+  userId: number;
+}
 
-const NavbarLinks: React.FC<NavbarLinksProps> = ({}) => {
+const NavbarLinks: React.FC<NavbarLinksProps> = ({ userId }) => {
   const pathname = usePathname();
 
   const BASE_CLASS = "text-content-secondary";
@@ -35,12 +38,8 @@ const NavbarLinks: React.FC<NavbarLinksProps> = ({}) => {
           <span className="hidden md:block text-xs">{item.label}</span>
         </Link>
       ))}
-      <button className="flex flex-row items-center justify-center text-content-primary border-l-2 border-gray-200 pl-4">
-        <span className="material-symbols-outlined">account_circle</span>
-        <span className="material-symbols-rounded text-content-secondary">
-          arrow_drop_down
-        </span>
-      </button>
+
+      <MenuDropdown userId={userId} />
     </div>
   );
 };
