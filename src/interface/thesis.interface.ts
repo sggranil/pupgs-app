@@ -11,12 +11,12 @@ export interface Thesis {
   status: string | null;
   message?: string;
   attachments: Attachment[];
-  panelists: Adviser[];
+  panelists: string[];
   secretary?: Adviser;
   secretary_id?: number;
-  defense_schedule?: Date;
+  defense_schedule?: string;
   room?: Room;
-  room_id?: number;
+  room_id?: string;
   thesis_receipts?: ThesisReceipt[];
   created_at: string;
   updated_at: Date;

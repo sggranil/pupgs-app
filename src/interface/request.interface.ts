@@ -1,5 +1,3 @@
-import { Thesis } from "@/interface/thesis.interface";
-
 export interface ApiResponse<T> {
   success: boolean;
   data: T | null;
@@ -7,7 +5,7 @@ export interface ApiResponse<T> {
 }
 
 export interface ResponsePayloadResult {
-    status: number;
-    data?: any;
-    message?: string | null;
+  status: number;
+  data?: any;
+  message?: string | null;
 }
