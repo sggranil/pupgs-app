@@ -21,13 +21,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             },
         });
 
-        if (!thesis || thesis.length === 0) {
-            return NextResponse.json(
-                { message: "No thesis records were found." },
-                { status: 404 }
-            );
-        }
-
         return NextResponse.json({
             data: thesis,
             status: 200
