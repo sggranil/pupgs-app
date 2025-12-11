@@ -12,7 +12,7 @@ function ThesisPageLayout({
 }>) {
   return (
     <UserProvider>
-      <AuthGuard roles={["student", "adviser"]}>
+      <AuthGuard roles={["student"]}>
         <Navbar>{children}</Navbar>
       </AuthGuard>
       <Toaster />
