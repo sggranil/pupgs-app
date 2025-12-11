@@ -1,39 +1,39 @@
 import React from "react";
+import { Thesis, ThesisReceipt } from "@/interface/thesis.interface";
 
-import FormOne from "@/components/templates/Forms/1. FormOne";
-import FormTwo from "@/components/templates/Forms/2. FormTwo";
-import FormThree from "@/components/templates/Forms/3. FormThree";
-import FormFour from "@/components/templates/Forms/4. FormFour";
-import FormHeader from "@/components/templates/Forms/component/FormHeader";
-import FormFive from "@/components/templates/Forms/5. FormFive";
-import FormSix from "@/components/templates/Forms/6. FormSix";
-import FormSeven from "@/components/templates/Forms/7. FormSeven";
-import FormEight from "@/components/templates/Forms/8. FormEight";
-import FormNine from "@/components/templates/Forms/9. FormNine";
-import FormTen from "@/components/templates/Forms/10. FormTen";
-import FormEleven from "@/components/templates/Forms/11. FormEleven";
-import FormTwelve from "@/components/templates/Forms/12. FormTwelve";
-import FormThirteen from "@/components/templates/Forms/13. FormThirteen";
-import FormDownloadableCard from "@/components/templates/Thesis/FormDownloadableCard";
-import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
+import FormOne from "@/components/template/forms/1. FormOne";
+import FormTwo from "@/components/template/forms/2. FormTwo";
+import FormThree from "@/components/template/forms/3. FormThree";
+import FormFour from "@/components/template/forms/4. FormFour";
+import FormHeader from "@/components/template/forms/component/FormHeader";
+import FormFive from "@/components/template/forms/5. FormFive";
+import FormSix from "@/components/template/forms/6. FormSix";
+import FormSeven from "@/components/template/forms/7. FormSeven";
+import FormEight from "@/components/template/forms/8. FormEight";
+import FormNine from "@/components/template/forms/9. FormNine";
+import FormTen from "@/components/template/forms/10. FormTen";
+import FormEleven from "@/components/template/forms/11. FormEleven";
+import FormTwelve from "@/components/template/forms/12. FormTwelve";
+import FormThirteen from "@/components/template/forms/13. FormThirteen";
+import FormDownloadableCard from "@/components/template/FormDownloadableCard";
 
 interface ThesisFilesProps {
   thesisData: Thesis | null;
-  subjectData: EnrolledSubject | null;
+  thesisReceipt: ThesisReceipt | null;
   programChair: string | null;
   dean: string | null;
 }
 
 const ThesisFiles: React.FC<ThesisFilesProps> = ({
   thesisData,
-  subjectData,
+  thesisReceipt,
   programChair,
   dean,
 }) => {
   return (
-    <div className="border border-gray-200 rounded-md p-2 px-4">
-      <h1 className="border-b border-gray-300 py-2 font-bold">Thesis Files</h1>
-      <div className="py-2 flex overflow-x-auto md:overflow-visible md:flex-col">
+    <div className="w-full">
+      <h1 className="font-bold mt-4">TWD Forms</h1>
+      <div className="py-2 px-1 flex overflow-x-auto flex-row gap-2">
         <FormDownloadableCard
           itemNo={1}
           title="Concept Paper Adviser Endorsement Form"
@@ -52,7 +52,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
           itemNo={3}
           title="Thesis Dissertation Consultation and Monitoring Form"
           document={
-            <FormThree thesisData={thesisData} enrolledSubject={subjectData} />
+            <FormThree thesisData={thesisData} thesisReceipt={thesisReceipt} />
           }
           header={<FormHeader title="TDW Form No. 3" />}
           isLandscape={true}
@@ -81,7 +81,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
           }
           header={<FormHeader title="TDW Form No. 6" />}
         />
-        {thesisData?.defense_date && thesisData.defense_time && (
+        {thesisData?.defense_schedule && (
           <>
             <FormDownloadableCard
               itemNo={7}
@@ -101,7 +101,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
               document={<FormEight thesisData={thesisData} />}
               header={<FormHeader title="TDW Form No. 8" />}
             />
-            {subjectData?.subject_name === "Pre-Oral Defense" ? (
+            {thesisReceipt?.receipt_name === "pre_oral_defense" ? (
               <>
                 <FormDownloadableCard
                   itemNo={9}
@@ -134,7 +134,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
                   header={<FormHeader title="TDW Form No. 11" />}
                 />
               </>
-            ) : subjectData?.subject_name === "Final Defense" ? (
+            ) : thesisReceipt?.receipt_name === "final_defense" ? (
               <>
                 <FormDownloadableCard
                   itemNo={12}
@@ -164,7 +164,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
             ) : (
               //{" "}
               <span className="text-sm text-center text-gray-400">
-                // Forms will appear below on Pre-Final and Final Defense //{" "}
+                // forms will appear below on Pre-Final and Final Defense //{" "}
               </span>
             )}
           </>
