@@ -32,6 +32,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
 }) => {
   const { user } = useUserContext();
   const [loading, setLoading] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState(userData?.role === "admin");
   const { mutateAsync: updateUser } = useUpdateUser();
 
   const isoDateTime = (dateOnly: string | undefined) =>
@@ -55,7 +56,6 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
       position: userData?.position ?? "",
       start_date: splitIsoDateTime(userData?.start_date) ?? "",
       pass_date: splitIsoDateTime(userData?.pass_date) ?? "",
-      role: userData?.role ?? "",
       is_archived: userData?.is_archived,
       program: userData?.program ?? "",
       department: userData?.department ?? "",
@@ -65,11 +65,17 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
 
   async function handleFormSubmit(values: UpdateUserSchemaType) {
     try {
+      const newRole = isAdmin
+        ? "admin"
+        : userData?.role === "admin"
+        ? "user"
+        : userData?.role;
       updateUser(
         {
           user_id: userData?.id,
           payload: {
             ...values,
+            role: newRole,
             start_date: values?.start_date
               ? isoDateTime(values?.start_date)
               : "",
@@ -251,12 +257,12 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             <div>
               <label
                 htmlFor="position"
-                className="block text-context-primary font-semibold mb-1">
+                className="block text-sma text-context-primary font-semibold mb-1">
                 Position
               </label>
               <select
                 id="position"
-                className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+                className="w-full text-sm p-2 border border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
                 {...register("position")}>
                 <option value="" disabled>
                   Position
@@ -298,14 +304,14 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
                 </label>
               </div>
 
-              {/* Make Admin */}
+              {/* Make Admin FIX */}
               {userData?.id != user?.id && (
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     id="is_admin"
-                    {...register("role")}
-                    defaultChecked={userData?.role === "admin"}
+                    checked={isAdmin}
+                    onChange={(e) => setIsAdmin(e.target.checked)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <label
