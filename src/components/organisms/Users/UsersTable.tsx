@@ -1,48 +1,30 @@
 "use client";
+import { useState } from "react";
 
-import { useEffect, useState } from "react";
-import useUserRequest from "@/hooks/user";
-import Modal from "@/components/organisms/Modal";
 import { User } from "@/interface/user.interface";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
-import ManageUserModal from "@/components/organisms/Modals/ManageUserModal";
+import Modal from "../Modal";
+import ManageUserModal from "../Modals/ManageUserModal";
 import AddUserModal from "./AddUserModal";
 
-const UsersTable = () => {
-  const [usersData, setUsersData] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddAdviserModalOpen, setIsAddAdviserModalOpen] = useState(false);
-  const [isRefresh, setIsRefresh] = useState(false);
-  const [updateCount, setUpdateCount] = useState(0);
-  const { getAllUser } = useUserRequest();
-  const userData = getUserInfoFromCookies();
+interface UserTableProps {
+  userData: User[];
+  setIsUpdated: (isUpdated: boolean) => void;
+}
+
+const UserTable: React.FC<UserTableProps> = ({ userData, setIsUpdated }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [isAdviserModalOpen, setIsAdviserModalOpen] = useState(false);
+
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [updateCount, setUpdateCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
 
   const itemsPerPage = 10;
 
-  const fetchUsersData = async () => {
-    const response = await getAllUser();
-
-    if (response.data) {
-      const filtered = response.data.filter((user: User) =>
-        userData?.role === "admin"
-          ? user?.role != "student" && !user?.is_deleted
-          : user?.role === "student" && !user?.is_deleted
-      );
-      setUsersData(filtered);
-    } else {
-      console.error(response.message || "Failed to fetch users.");
-    }
-  };
-
-  useEffect(() => {
-    fetchUsersData();
-  }, [updateCount, isRefresh]);
-
-  const filteredUsers = usersData.filter((user) =>
+  const filteredUsers = userData?.filter((user) =>
     `${user.first_name} ${user.last_name} ${user.email}`
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
@@ -58,13 +40,14 @@ const UsersTable = () => {
   const handleNext = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
+  const handleEdit = (user: User) => {
+    setUserToEdit(user);
+    setIsEditModalOpen(true);
+  };
+
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between py-4 border-b border-gray-200">
-        <h1 className="text-textPrimary text-xl font-bold">
-          {userData?.role === "admin" ? "Adviser" : "Student"} Management
-        </h1>
-
+      <div className="flex items-center justify-end py-4 border-b border-gray-200">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <input
             type="text"
@@ -76,13 +59,6 @@ const UsersTable = () => {
               setCurrentPage(1);
             }}
           />
-          {userData?.role === "admin" && (
-            <button
-              onClick={() => setIsAddAdviserModalOpen(true)}
-              className="h-9 px-4 py-2 text-sm font-medium rounded-md bg-bgPrimary text-white hover:opacity-90">
-              Add Adviser
-            </button>
-          )}
         </div>
       </div>
 
@@ -104,11 +80,9 @@ const UsersTable = () => {
             <th className="p-3 text-left text-sm font-semibold text-gray-700">
               Department
             </th>
-            {userData?.role === "admin" && (
-              <th className="p-3 text-left text-sm font-semibold text-gray-700">
-                Admin
-              </th>
-            )}
+            <th className="p-3 text-left text-sm font-semibold text-gray-700">
+              Admin
+            </th>
             <th className="p-3 text-left text-sm font-semibold text-gray-700">
               Action
             </th>
@@ -116,7 +90,7 @@ const UsersTable = () => {
         </thead>
         <tbody>
           {paginatedData.length > 0 ? (
-            paginatedData.map((user) => (
+            paginatedData.map((user: User) => (
               <tr key={user.id} className="border-b hover:bg-gray-50">
                 <td className="p-3 text-sm text-gray-900">
                   {user.first_name} {user.last_name}
@@ -131,28 +105,21 @@ const UsersTable = () => {
                 <td className="p-3 text-sm text-gray-900">
                   {user.department ?? "No Department"}
                 </td>
-                {userData?.role === "admin" && (
-                  <td className="p-3 text-sm text-gray-900">
-                    {user.role === "admin" ? "Yes" : "No"}
-                  </td>
-                )}
-                {userData?.userId != user?.id && (
-                  <td className="p-3 text-sm">
-                    <button
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setIsModalOpen(true);
-                      }}
-                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:opacity-80">
-                      Edit
-                    </button>
-                  </td>
-                )}
+                <td className="p-3 text-sm text-gray-900">
+                  {user.role === "admin" ? "Yes" : "No"}
+                </td>
+                <td className="p-3 text-sm">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:opacity-80">
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="p-3 text-center text-sm text-gray-500">
+              <td colSpan={7} className="p-3 text-center text-sm text-gray-500">
                 No users found.
               </td>
             </tr>
@@ -164,7 +131,7 @@ const UsersTable = () => {
         <button
           onClick={handlePrev}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
+          className="px-4 py-2 bg-gray-200 text-sm rounded disabled:opacity-50">
           Previous
         </button>
         <span className="text-sm text-gray-600">
@@ -173,33 +140,26 @@ const UsersTable = () => {
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
+          className="px-4 py-2 bg-gray-200 text-sm rounded disabled:opacity-50">
           Next
         </button>
       </div>
 
-      <Modal
-        title="Edit User"
-        isModalOpen={isModalOpen}
-        setModalOpen={setIsModalOpen}>
-        <ManageUserModal
-          userData={selectedUser}
-          isShowEdit={setIsModalOpen}
-          isUpdated={setIsRefresh}
-        />
-      </Modal>
-
-      <Modal
-        title="Add Adviser"
-        isModalOpen={isAddAdviserModalOpen}
-        setModalOpen={setIsAddAdviserModalOpen}>
-        <AddUserModal
-          setIsModalOpen={setIsAddAdviserModalOpen}
-          setUpdateCounter={setUpdateCount}
-        />
-      </Modal>
+      {userToEdit && (
+        <Modal
+          title={`Edit User: ${userToEdit.first_name}`}
+          isModalOpen={isEditModalOpen}
+          setModalOpen={setIsEditModalOpen}>
+          <ManageUserModal
+            userData={userToEdit}
+            isShowEdit={setIsEditModalOpen}
+            setIsUpdated={setIsUpdated}
+            setIsModalOpen={setIsEditModalOpen}
+          />
+        </Modal>
+      )}
     </div>
   );
 };
 
-export default UsersTable;
+export default UserTable;
