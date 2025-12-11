@@ -1,27 +1,25 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from "next/server";
 import fs from 'fs';
 
-const prisma = new PrismaClient();
-
-export async function POST(request: NextRequest, 
+export async function POST(request: NextRequest,
     { params }: { params: { id: string } }
 ) {
     try {
-        const subject = await prisma.enrolledSubject.findUnique({
+        const receipt = await prisma.thesisReceipt.findUnique({
             where: { id: parseInt(params.id) },
             select: { attachment: true },
         });
 
-        if (!subject) {
+        if (!receipt) {
             return NextResponse.json(
-                { message: "Subject not found." },
+                { message: "Thesis receipt not found." },
                 { status: 404 }
             );
         }
 
-        if (subject.attachment) {
-            const filePath = subject.attachment;
+        if (receipt.attachment) {
+            const filePath = receipt.attachment;
 
             if (filePath.startsWith('/uploads/')) {
                 const fullFilePath = `./public${filePath}`;
@@ -32,7 +30,7 @@ export async function POST(request: NextRequest,
             }
         }
 
-        await prisma.enrolledSubject.delete({
+        await prisma.thesisReceipt.delete({
             where: { id: parseInt(params.id) },
         });
 
