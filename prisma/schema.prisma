@@ -54,7 +54,7 @@ enum ThesisReceiptStatus {
 
 enum ReceiptName {
   thesis_proposal
-  pre_oral
+  pre_oral_defense
   final_defense
 }
 
