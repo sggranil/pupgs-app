@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { THESIS_API } from "@/constants/urls";
 import { Thesis } from "@/interface/thesis.interface";
 
-import { handleGetRequest, handlePostRequest } from "@/hooks/request"; 
+import { handleGetRequest, handlePostRequest } from "@/hooks/request";
 import { ResponsePayloadResult } from '@/interface/request.interface';
 
 const THESIS_KEYS = {
@@ -23,7 +23,7 @@ export const useUserThesis = (userId: number | undefined | null) => {
     const isEnabled = !!userId;
 
     return useQuery<ResponsePayloadResult, Error>({
-        queryKey: THESIS_KEYS.user(userId as number), 
+        queryKey: THESIS_KEYS.user(userId as number),
         queryFn: () => handleGetRequest<ResponsePayloadResult>(THESIS_API.GET_USER_THESIS(userId as number)),
         enabled: isEnabled,
     });
@@ -51,7 +51,7 @@ export const useGetThesis = (id: number | undefined | null) => {
 
 
 export const useAddThesis = () => {
-    return useMutation<Thesis, Error, object>({ 
+    return useMutation<Thesis, Error, object>({
         mutationFn: (body: any) => handlePostRequest<Thesis>(THESIS_API.ADD_THESIS_URL, body),
     });
 };
@@ -68,14 +68,8 @@ export const useConfirmedThesis = () => {
     });
 };
 
-export const useScheduleThesis = () => {
-    return useMutation<Thesis, Error, object>({
-        mutationFn: (body: any) => handlePostRequest<Thesis>(THESIS_API.SCHEDULE_THESIS_URL, body),
-    });
-};
-
 export const useDeleteThesis = () => {
-    return useMutation<{ message: string }, Error, number>({ 
+    return useMutation<{ message: string }, Error, number>({
         mutationFn: (id: number) => handlePostRequest<{ message: string }>(THESIS_API.DELETE_THESIS_URL(id)),
     });
 };
@@ -88,7 +82,6 @@ const ThesisService = {
     useAddThesis,
     useUpdateThesis,
     useConfirmedThesis,
-    useScheduleThesis,
     useDeleteThesis
 }
 
