@@ -80,7 +80,7 @@ export const ThesisTitle: React.FC<ThesisTitleProps> = ({
         </div>
       ) : (
         <div className="flex flex-row items-center text-wrap">
-          <h1 className="text-content-primary text-lg md:text-xl font-bold break-all">
+          <h1 className="text-content-primary text-lg md:text-xl font-bold">
             "{thesisTitle}"
           </h1>
           <ActionButton icon="edit" onClick={() => setIsEditTitle(true)} />
