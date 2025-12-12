@@ -1,4 +1,4 @@
-export const formatStatus = (status: string | undefined): string => {
+export const formatStatus = (status: string | null | undefined): string => {
   if (!status) {
     return "Pending Review";
   }
