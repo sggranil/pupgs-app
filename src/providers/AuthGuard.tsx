@@ -40,7 +40,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ roles, children }) => {
         if (userRole === "student") {
           router.push(`/thesis`);
         } else {
-          router.push("/d033e22ae/dashboard");
+          router.push("/d033e22ae/thesis");
         }
       }
     };

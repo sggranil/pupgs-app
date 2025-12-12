@@ -2,17 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
-
-interface UserData {
-  id: number;
-  role: string;
-  email: string;
-}
-
-interface UserContextType {
-  user: UserData | null;
-  isLoading: boolean;
-}
+import { UserContextType, UserData } from "@/interface/user.interface";
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
