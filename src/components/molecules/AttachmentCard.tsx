@@ -7,7 +7,7 @@ import Link from "next/link";
 import { UserData } from "@/interface/user.interface";
 
 interface AttachmentCardProps {
-  user: UserData | null;
+  user?: UserData | null;
   index: number;
   title?: string;
   attachment: Attachment;
