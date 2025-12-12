@@ -9,7 +9,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             where: {
                 OR: [
                     { student_id: parseInt(id) },
-                    { adviser_id: parseInt(id) }
+                    {
+                        adviser: {
+                            user_id: parseInt(id)
+                        }
+                    }
                 ]
             },
             select: {
