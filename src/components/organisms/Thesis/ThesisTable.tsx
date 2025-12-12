@@ -4,18 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Modal from "@/components/organisms/Modal";
-import ThesisConfirmationModal from "./ThesisConfirmationModal";
+import ThesisConfirmationModal from "../Modals/ThesisConfirmationModal";
 import { Thesis } from "@/interface/thesis.interface";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { CONFIRMATION_STATUSES } from "@/constants/filters";
 import { formatStatus } from "@/utilities/StringFormatter";
+import { UserData } from "@/interface/user.interface";
+import Link from "next/link";
 
 interface Subject {
   setIsUpdated: (isUpdated: boolean) => void;
   thesisData: Thesis[];
+  user: UserData | null;
 }
 
-const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
+const ThesisTable: React.FC<Subject> = ({ user, thesisData, setIsUpdated }) => {
   const [selectedThesis, setSelectedThesis] = useState<Thesis | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>("All");
@@ -24,9 +26,6 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
-
-  const userInfo = getUserInfoFromCookies();
-  const router = useRouter();
 
   const filteredData = thesisData.filter((thesis) => {
     const matchesThesis =
@@ -37,7 +36,9 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
       thesis.status?.toLowerCase().includes(statusFilter.toLowerCase());
     const matchesName =
       searchQuery === "" ||
-      `${thesis.user?.first_name ?? ""} ${thesis.user?.last_name ?? ""}`
+      `${thesis.student?.user?.first_name ?? ""} ${
+        thesis.student?.user?.last_name ?? ""
+      }`
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
@@ -118,7 +119,8 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
           {paginatedData.map((thesis, index) => (
             <tr key={index} className="border-b">
               <td className="p-3 text-sm text-gray-900">
-                {thesis.user?.first_name} {thesis.user?.last_name}
+                {thesis.student?.user?.first_name}{" "}
+                {thesis.student?.user?.last_name}
               </td>
               <td className="p-3 text-sm text-gray-900">
                 {thesis.thesis_title}
@@ -133,12 +135,12 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
                 </a>
               </td>
               <td className="p-3 text-sm text-gray-500">
-                {formatStatus(thesis.status)}
+                {formatStatus(thesis?.status)}
               </td>
-              {userInfo?.role != "adviser" || userInfo?.role == "student" ? (
+              {user?.role != "adviser" ? (
                 <td className="p-3 text-sm text-gray-500">
                   <button
-                    className="bg-bgPrimary text-sm font-medium p-2 text-white rounded-md"
+                    className="bg-brand-primary text-sm font-medium p-2 text-white rounded-md"
                     onClick={() => {
                       setSelectedThesis(thesis);
                       setIsModalOpen(true);
@@ -146,13 +148,11 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
                     Change Status
                   </button>
                   {thesis?.status?.includes("approve") && (
-                    <button
+                    <Link
                       className="ml-2 bg-green-800 text-sm font-medium p-2 text-white rounded-md"
-                      onClick={() => {
-                        router.push(`/thesis/info/?id=${thesis.id}`);
-                      }}>
-                      Modify
-                    </button>
+                      href={`/thesis/${thesis.id}`}>
+                      Go
+                    </Link>
                   )}
                 </td>
               ) : (
@@ -183,10 +183,9 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
           Next
         </button>
       </div>
-
-      {/* Modal */}
       <Modal
         title="Confirm Thesis"
+        modalType="info"
         isModalOpen={isModalOpen}
         setModalOpen={setIsModalOpen}>
         <ThesisConfirmationModal

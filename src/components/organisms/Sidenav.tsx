@@ -83,21 +83,17 @@ const Sidenav = ({
         </div>
         <nav className="mt-4 p-3 flex flex-col justify-between">
           <div className="flex flex-col text-sm">
-            {user?.role === "adviser" && (
-              <Link
-                href={`/d033e22ae/thesis`}
-                className={`flex flex-row items-center block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-85 hover:bg-brand-primary hover:text-white active:bg-brand-primary active:text-white ${
-                  pathname === `/d033e22ae/thesis` ||
-                  pathname.includes("/d033e22ae/thesis/[id]")
-                    ? "bg-brand-primary text-white"
-                    : ""
-                }`}>
-                <span className="material-symbols-rounded mr-2">
-                  assignment
-                </span>
-                Thesis Management
-              </Link>
-            )}
+            <Link
+              href={`/d033e22ae/thesis`}
+              className={`flex flex-row items-center block my-1 px-4 py-2 rounded-md hover:cursor-pointer hover:opacity-85 hover:bg-brand-primary hover:text-white active:bg-brand-primary active:text-white ${
+                pathname === `/d033e22ae/thesis` ||
+                pathname.includes("/d033e22ae/thesis/")
+                  ? "bg-brand-primary text-white"
+                  : ""
+              }`}>
+              <span className="material-symbols-rounded mr-2">assignment</span>
+              Thesis Management
+            </Link>
             {user?.role != "adviser" && (
               <>
                 <Link

@@ -13,16 +13,17 @@ import Modal from "@/components/organisms/Modal";
 import ActionButton from "@/components/molecules/ActionButton";
 import ThesisReceiptsCard from "@/components/molecules/ThesisReceiptsCard";
 import ManageThesisReceiptModal from "@/components/organisms/Modals/ManageThesisReceiptModal";
+import { UserData } from "@/interface/user.interface";
 
 interface ThesisReceiptCardListProps {
-  userId: number;
+  user?: UserData | null;
   thesisId: number;
   receipts?: ThesisReceipt[];
   setIsUpdated: (isUpdated: boolean) => void;
 }
 
 const ThesisReceiptCardList: React.FC<ThesisReceiptCardListProps> = ({
-  userId,
+  user,
   receipts,
   thesisId,
   setIsUpdated,
@@ -36,18 +37,19 @@ const ThesisReceiptCardList: React.FC<ThesisReceiptCardListProps> = ({
           <h3 className="text-content-primary text-md font-bold">
             Thesis Receipts
           </h3>
-          {/* {userData?.role === "admin" && ( */}
-          <ActionButton
-            icon="upload"
-            label="Upload"
-            onClick={() => setModalOpen(true)}
-          />
+          {user?.role === "student" && (
+            <ActionButton
+              icon="upload"
+              label="Upload"
+              onClick={() => setModalOpen(true)}
+            />
+          )}
         </div>
         {receipts!.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2">
             {receipts?.map((receipt, index) => (
               <ThesisReceiptsCard
-                userId={userId}
+                user={user}
                 thesisId={thesisId}
                 key={index}
                 receipts={receipt}
@@ -67,7 +69,7 @@ const ThesisReceiptCardList: React.FC<ThesisReceiptCardListProps> = ({
         setModalOpen={setModalOpen}
         modalType="info">
         <ManageThesisReceiptModal
-          userId={userId}
+          userId={user?.id}
           thesisId={thesisId}
           setIsModalOpen={setModalOpen}
           setIsUpdated={setIsUpdated}

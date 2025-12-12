@@ -19,7 +19,7 @@ import {
 import { formatSnakeCase } from "@/utilities/StringFormatter";
 
 interface ManageThesisReceiptProps {
-  userId: number;
+  userId: number | undefined;
   thesisId?: number;
   receiptData?: ThesisReceipt | null;
   setIsModalOpen: (modalOpen: boolean) => void;
@@ -34,7 +34,6 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
   setIsModalOpen,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [deleteSubjectData, setDeleteSubjectData] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { mutateAsync: addReceipt } = useAddReceipt();

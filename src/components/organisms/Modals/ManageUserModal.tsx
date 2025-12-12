@@ -35,6 +35,8 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
   const [isAdmin, setIsAdmin] = useState(userData?.role === "admin");
   const { mutateAsync: updateUser } = useUpdateUser();
 
+  let newRole;
+
   const isoDateTime = (dateOnly: string | undefined) =>
     dateOnly + "T00:00:00.000Z";
   const splitIsoDateTime = (dateOnly: string | undefined) =>
@@ -42,6 +44,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
 
   const {
     register,
+    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<UpdateUserSchemaType>({
@@ -57,6 +60,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
       start_date: splitIsoDateTime(userData?.start_date) ?? "",
       pass_date: splitIsoDateTime(userData?.pass_date) ?? "",
       is_archived: userData?.is_archived,
+      role: userData?.role ?? "",
       program: userData?.program ?? "",
       department: userData?.department ?? "",
       tel_number: userData?.tel_number ?? "",
@@ -65,11 +69,27 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
 
   async function handleFormSubmit(values: UpdateUserSchemaType) {
     try {
-      const newRole = isAdmin
-        ? "admin"
-        : userData?.role === "admin"
-        ? "user"
-        : userData?.role;
+      let finalRole: string;
+      const currentPosition = getValues("position");
+
+      if (isAdmin) {
+        finalRole = "admin";
+      } else if (currentPosition) {
+        if (
+          currentPosition === "Program Coordinator" ||
+          currentPosition === "Academic Program Head" ||
+          currentPosition === "Program Chair"
+        ) {
+          finalRole = "chairperson";
+        } else if (currentPosition === "Dean") {
+          finalRole = "dean";
+        } else {
+          finalRole = "adviser";
+        }
+      } else {
+        finalRole = userData?.role || "student";
+      }
+
       updateUser(
         {
           user_id: userData?.id,
@@ -305,22 +325,23 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
               </div>
 
               {/* Make Admin FIX */}
-              {userData?.id != user?.id && (
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="is_admin"
-                    checked={isAdmin}
-                    onChange={(e) => setIsAdmin(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <label
-                    htmlFor="is_admin"
-                    className="text-context-primary font-medium">
-                    Make Admin
-                  </label>
-                </div>
-              )}
+              {userData?.id != user?.id ||
+                (userData?.role != "student" && (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_admin"
+                      checked={isAdmin}
+                      onChange={(e) => setIsAdmin(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label
+                      htmlFor="is_admin"
+                      className="text-context-primary font-medium">
+                      Make Admin
+                    </label>
+                  </div>
+                ))}
             </div>
           )}
         </div>

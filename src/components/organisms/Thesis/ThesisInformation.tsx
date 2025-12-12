@@ -8,13 +8,20 @@ import Modal from "@/components/organisms/Modal";
 import ScheduleThesisModal from "@/components/organisms/Modals/ScheduleThesisModal";
 
 import ActionButton from "@/components/molecules/ActionButton";
+import { UserData } from "@/interface/user.interface";
+import {
+  getLocalDateString,
+  getLocalTimeString,
+} from "@/utilities/DateUtilities";
 
 interface ThesisInformationProps {
+  user?: UserData | null;
   thesisData: Thesis;
   setIsUpdated: (isUpdated: boolean) => void;
 }
 
 const ThesisInformation: React.FC<ThesisInformationProps> = ({
+  user,
   thesisData,
   setIsUpdated,
 }) => {
@@ -24,13 +31,13 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
     <>
       <div className="flex items-center justify-between pt-4">
         <h3 className="text-content-primary text-md font-bold">Information</h3>
-        {/* {userData?.role === "admin" && ( */}
-        <ActionButton
-          icon="edit_square"
-          label="Edit"
-          onClick={() => setModalOpen(true)}
-        />
-        {/* // )} */}
+        {user?.role != "student" && (
+          <ActionButton
+            icon="edit_square"
+            label="Edit"
+            onClick={() => setModalOpen(true)}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-2 pt-2 pb-3">
@@ -50,7 +57,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
             Defense Date
           </span>
           <p className="text-sm font-bold text-content-primary">
-            {thesisData?.defense_schedule?.toLocaleDateString() ??
+            {getLocalDateString(thesisData?.defense_schedule) ??
               "To be Announced"}
           </p>
         </div>
@@ -60,7 +67,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
             Defense Time
           </span>
           <p className="text-sm font-bold text-content-primary">
-            {thesisData?.defense_schedule?.toLocaleDateString() ??
+            {getLocalTimeString(thesisData?.defense_schedule) ??
               "To be Announced"}
           </p>
         </div>
@@ -87,7 +94,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
           {thesisData?.panelists && thesisData.panelists.length > 0 ? (
             thesisData.panelists.map((panelist, idx) => (
               <p key={idx} className="text-sm font-bold text-content-primary">
-                {panelist.user?.first_name} {panelist.user?.last_name}
+                {panelist.user?.first_name} {panelist?.user?.last_name}
               </p>
             ))
           ) : (
@@ -111,7 +118,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
 
       <Modal
         title="Update Information"
-        modalType="info"
+        modalType="form"
         isModalOpen={isModalOpen}
         setModalOpen={setModalOpen}>
         <ScheduleThesisModal

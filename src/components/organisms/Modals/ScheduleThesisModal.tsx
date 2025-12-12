@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react"; // Added React import
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { useAllRooms } from "@/hooks/room";
+import { useAllAdvisers } from "@/hooks/adviser";
+import { useUpdateThesis } from "@/hooks/thesis";
 
 import { Room, Thesis } from "@/interface/thesis.interface";
+import { Adviser } from "@/interface/user.interface";
 import { showToast } from "@/components/template/Toaster";
 
 import {
@@ -20,9 +23,6 @@ import {
   makeIsoUTCDateTime,
 } from "@/utilities/DateUtilities";
 import { TIME_BLOCK } from "@/constants/filters";
-import { useUpdateThesis } from "@/hooks/thesis";
-import { useAllAdvisers } from "@/hooks/adviser";
-import { Adviser } from "@/interface/user.interface";
 
 interface ThesisScheduleProps {
   thesisData: Thesis;
@@ -35,7 +35,14 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
   setIsModalOpen,
   setIsUpdated,
 }) => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); // For form submission
+
+  const { data: roomData, isLoading: isRoomLoading } = useAllRooms();
+  const { data: adviserData, isLoading: isAdviserLoading } = useAllAdvisers();
+  const { mutateAsync: updateThesis } = useUpdateThesis();
+
+  const listRoomData = roomData?.data || ([] as Room[]);
+  const listAdviserData = adviserData?.data || ([] as Adviser[]);
 
   const {
     register,
@@ -47,16 +54,10 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
       defense_date: getLocalDateString(thesisData?.defense_schedule),
       defense_time: getLocalTimeStringFormatted(thesisData?.defense_schedule),
       room_id: thesisData?.room_id,
-      panelists: thesisData?.panelists,
+      panelists: thesisData?.panelists?.map((p) => p.id.toString()),
+      secretary_id: thesisData?.secretary_id,
     },
   });
-
-  const { data: roomData } = useAllRooms();
-  const { data: adviserData } = useAllAdvisers();
-  const { mutateAsync: updateThesis } = useUpdateThesis();
-
-  const listRoomData = roomData?.data || ([] as Room[]);
-  const listAdviserData = adviserData?.data || ([] as Adviser[]);
 
   async function handleFormSubmit(values: UpdateThesisScheduleSchemaType) {
     setLoading(true);
@@ -69,50 +70,48 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         ),
         room_id: Number(values.room_id),
         secretary_id: Number(values.secretary_id),
-        panelists: values.panelists,
+        panelists: (values.panelists || []).map(Number),
       };
 
-      updateThesis(
-        { thesis_id: thesisData?.id, payload: payload },
-        {
-          onSuccess: () => {
-            setIsModalOpen(false);
-            setIsUpdated(true);
-            showToast(
-              "You set a schedule for this Proposal.",
-              "success",
-              "Schedule Updated"
-            );
-          },
-          onError: (error) => {
-            setIsModalOpen(false);
-            showToast(error.message, "error");
-          },
-        }
+      await updateThesis({ thesis_id: thesisData?.id, payload: payload });
+
+      setIsModalOpen(false);
+      setIsUpdated(true);
+      showToast(
+        "You set a schedule for this Proposal.",
+        "success",
+        "Schedule Updated"
       );
-    } catch (error) {
+    } catch (error: any) {
+      setIsModalOpen(false);
       const errorMessage =
-        (error as any)?.message ||
-        "An error occurred during update. Please try again.";
+        error.message || "An error occurred during update. Please try again.";
       showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }
-
-    setLoading(false);
   }
+
+  const secretaryPlaceholder = isAdviserLoading
+    ? "-- Loading Secretaries --"
+    : "-- Select Thesis Secretary --";
+  const panelistsPlaceholder = isAdviserLoading
+    ? "-- Loading Panelists --"
+    : "-- Select Thesis Panelists --";
 
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
       className="flex flex-col gap-4 py-2">
+      {/* Room Selection */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Room</label>
         <select
-          className="w-full p-2 border rounded-md bg-white text-sm"
-          {...register("room_id")}>
+          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100"
+          {...register("room_id")}
+          disabled={isRoomLoading}>
           <option value={""} disabled>
-            -- Select Room --
+            {isRoomLoading ? "-- Loading Rooms --" : "-- Select Room --"}
           </option>
           {listRoomData?.map((room: any) => (
             <option key={room.id} value={room.id}>
@@ -127,6 +126,7 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         )}
       </div>
 
+      {/* Date and Time (omitted for brevity, they remain unchanged) */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Defense Date</label>
         <input
@@ -163,38 +163,46 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         )}
       </div>
 
+      {/* Thesis Secretary Selection */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Thesis Secretary</label>
         <select
-          className="w-full p-2 border rounded-md bg-white text-sm"
-          {...register("secretary_id")}>
+          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100"
+          {...register("secretary_id")}
+          disabled={isAdviserLoading}>
+          {" "}
+          {/* Disable while loading */}
           <option value={""} disabled>
-            -- Select Thesis Secretary --
+            {secretaryPlaceholder}
           </option>
-          {listAdviserData?.map((adviser: any) => (
+          {listAdviserData?.map((adviser: Adviser) => (
             <option key={adviser.id} value={adviser.id}>
               {adviser?.user?.first_name} {adviser?.user?.last_name}
             </option>
           ))}
         </select>
 
-        {errors.panelists && (
+        {errors.secretary_id && (
           <p className="text-state-danger text-sm mt-1">
-            {errors.panelists.message}
+            {errors.secretary_id.message}
           </p>
         )}
       </div>
 
+      {/* Panelist Selection */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Panelist</label>
         <select
           multiple
-          className="w-full p-2 border rounded-md bg-white text-sm"
-          {...register("panelists")}>
+          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100"
+          {...register("panelists")}
+          disabled={isAdviserLoading}>
+          {" "}
+          {/* Disable while loading */}
           <option value={0} disabled>
-            -- Select Thesis Panelists --
+            {panelistsPlaceholder}
           </option>
-          {listAdviserData?.map((adviser: any) => (
+          {listAdviserData?.map((adviser: Adviser) => (
             <option key={adviser.id} value={adviser.id}>
               {adviser?.user?.first_name} {adviser?.user?.last_name}
             </option>
@@ -212,7 +220,10 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
 
       <button
         type="submit"
-        className="w-full mt-2 py-2 bg-brand-primary text-sm text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75">
+        className="w-full mt-2 py-2 bg-brand-primary text-sm text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75"
+        disabled={loading || isAdviserLoading || isRoomLoading}>
+        {" "}
+        {/* Disable if anything is loading */}
         {loading ? "Updating..." : "Update Information"}
       </button>
     </form>

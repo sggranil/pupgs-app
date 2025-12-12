@@ -7,16 +7,17 @@ import { formatStatus } from "@/utilities/StringFormatter";
 
 import Modal from "@/components/organisms/Modal";
 import ManageThesisReceiptModal from "@/components/organisms/Modals/ManageThesisReceiptModal";
+import { UserData } from "@/interface/user.interface";
 
 interface ThesisReceiptsCardProps {
-  userId: number;
-  thesisId: number;
+  user?: UserData | null;
+  thesisId?: number;
   receipts: ThesisReceipt;
   setIsUpdated: (isUpdated: boolean) => void;
 }
 
 const ThesisReceiptsCard: React.FC<ThesisReceiptsCardProps> = ({
-  userId,
+  user,
   thesisId,
   receipts,
   setIsUpdated,
@@ -31,7 +32,7 @@ const ThesisReceiptsCard: React.FC<ThesisReceiptsCardProps> = ({
         setModalOpen={setModalOpen}
         modalType="info">
         <ManageThesisReceiptModal
-          userId={userId}
+          userId={user?.id}
           thesisId={thesisId}
           receiptData={receipts}
           setIsModalOpen={setModalOpen}
@@ -41,11 +42,14 @@ const ThesisReceiptsCard: React.FC<ThesisReceiptsCardProps> = ({
     );
   }
 
+  const handleReceiptClick =
+    user?.role === "student" ? () => setModalOpen(true) : undefined;
+
   return (
     <>
       <div className="w-full ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm cursor-pointer">
         <div
-          onClick={() => setModalOpen(true)}
+          onClick={() => handleReceiptClick}
           className="flex items-center justify-between py-2 px-3">
           <div>
             <h2 className="text-sm font-bold text-content-primary">

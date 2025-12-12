@@ -5,14 +5,17 @@ import { useUpdateThesis } from "@/hooks/thesis";
 
 import { showToast } from "@/components/template/Toaster";
 import ActionButton from "@/components/molecules/ActionButton";
+import { UserData } from "@/interface/user.interface";
 
 interface ThesisTitleProps {
+  user?: UserData | null;
   thesisId: number;
   thesisTitle: string;
   setIsUpdated: (isUpdated: boolean) => void;
 }
 
 export const ThesisTitle: React.FC<ThesisTitleProps> = ({
+  user,
   thesisId,
   thesisTitle,
   setIsUpdated,
@@ -62,28 +65,34 @@ export const ThesisTitle: React.FC<ThesisTitleProps> = ({
             className="text-content-primary w-full text-lg md:text-xl font-bold border-b border-gray-400 focus:outline-none"
             disabled={isPending}
           />
-          <button
-            onClick={handleUpdateThesisTitle}
-            className="pl-3 text-green-600 hover:text-green-500 flex flex-row items-center"
-            disabled={isPending}>
-            <span className="material-symbols-rounded">check</span>
-          </button>
-          <button
-            onClick={() => {
-              setEditedTitle(thesisTitle);
-              setIsEditTitle(false);
-            }}
-            className="pl-3 text-content-primary hover:text-content-secondary flex flex-row items-center"
-            disabled={isPending}>
-            <span className="material-symbols-rounded">close</span>
-          </button>
+          {user?.role === "student" && (
+            <>
+              <button
+                onClick={handleUpdateThesisTitle}
+                className="pl-3 text-green-600 hover:text-green-500 flex flex-row items-center"
+                disabled={isPending}>
+                <span className="material-symbols-rounded">check</span>
+              </button>
+              <button
+                onClick={() => {
+                  setEditedTitle(thesisTitle);
+                  setIsEditTitle(false);
+                }}
+                className="pl-3 text-content-primary hover:text-content-secondary flex flex-row items-center"
+                disabled={isPending}>
+                <span className="material-symbols-rounded">close</span>
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="flex flex-row items-center text-wrap">
           <h1 className="text-content-primary text-lg md:text-xl font-bold">
             "{thesisTitle}"
           </h1>
-          <ActionButton icon="edit" onClick={() => setIsEditTitle(true)} />
+          {user?.role === "student" && (
+            <ActionButton icon="edit" onClick={() => setIsEditTitle(true)} />
+          )}
         </div>
       )}
     </div>

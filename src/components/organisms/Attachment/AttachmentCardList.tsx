@@ -10,8 +10,10 @@ import Modal from "@/components/organisms/Modal";
 import ManageAttachmentModal from "@/components/organisms/Modals/ManageAttachmentModal";
 
 import ActionButton from "@/components/molecules/ActionButton";
+import { UserData } from "@/interface/user.interface";
 
 interface AttachmentCardList {
+  user?: UserData | null;
   thesisId: number;
   attachments: Attachment[];
   status?: string;
@@ -19,6 +21,7 @@ interface AttachmentCardList {
 }
 
 const AttachmentCardList: React.FC<AttachmentCardList> = ({
+  user,
   thesisId,
   attachments,
   status,
@@ -69,13 +72,13 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
       <div className="w-full">
         <div className="flex items-center justify-between pt-4">
           <h3 className="text-content-primary text-md font-bold">Documents</h3>
-          {/* {userData?.role === "admin" && ( */}
-          <ActionButton
-            icon="add_link"
-            label="Add Link"
-            onClick={() => setModalOpen(true)}
-          />
-          {/* // )} */}
+          {user?.role === "student" && (
+            <ActionButton
+              icon="add_link"
+              label="Add Link"
+              onClick={() => setModalOpen(true)}
+            />
+          )}
         </div>
         {["proposal", "urec", "twd", "grammarian", "statistician"].map(
           (type) => {
@@ -116,6 +119,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
                     <AttachmentCard
                       key={attachment.id}
                       index={index}
+                      user={user}
                       title={getCardTitle(
                         type,
                         index,

@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -8,10 +8,10 @@ import {
 } from "@/types/api/thesis.types";
 import { showToast, removeToasts } from "@/components/template/Toaster";
 
-import useThesisRequest from "@/hooks/thesis";
-import useAdviserRequest from "@/hooks/adviser";
+import { useAllAdvisers } from "@/hooks/adviser";
 import { Adviser } from "@/interface/user.interface";
 import { CONFIRMATION_STATUSES, THESIS_MESSAGES } from "@/constants/filters";
+import { useUpdateThesis } from "@/hooks/thesis";
 
 interface ThesisConfirmationProps {
   setIsModalOpen: (modalOpen: boolean) => void;
@@ -30,8 +30,9 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { confirmedThesis } = useThesisRequest();
-  const { getAllAdviser } = useAdviserRequest();
+  const { data: advisersResponse, isLoading: isAdviserLoading } =
+    useAllAdvisers();
+  const { mutateAsync: updateThesis } = useUpdateThesis();
 
   const {
     register,
@@ -51,21 +52,10 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
   const isConfirmed = watch("status");
 
   useEffect(() => {
-    fetchAdvisers();
-  }, []);
-
-  const fetchAdvisers = async () => {
-    try {
-      const response = await getAllAdviser();
-      const advisers = response?.data || [];
-      setAdviserData(advisers);
-      setFilteredAdvisers(advisers);
-    } catch (error) {
-      console.error("Error fetching advisers:", error);
-      setAdviserData([]);
-      setFilteredAdvisers([]);
+    if (advisersResponse && advisersResponse.data) {
+      setAdviserData(advisersResponse.data);
     }
-  };
+  }, [advisersResponse]);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -107,21 +97,21 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
     setLoading(true);
 
     try {
-      await confirmedThesis({
-        id: thesisData?.id,
+      const payload = {
         status: data.status,
-        user_id: thesisData?.student?.user_id,
         adviser_id: data.adviser_id,
         message: data.message,
-      });
-      showToast("Thesis updated successfully!", "success");
-      setIsUpdated(true);
+      };
+
+      await updateThesis({ thesis_id: thesisData?.id, payload: payload });
+
+      showToast("You updated the receipt.", "success", "Receipt Updated");
       setIsModalOpen(false);
+      setIsUpdated(true);
     } catch (error: any) {
-      showToast(
-        `An error occurred. Please try again. ${error.message}`,
-        "error"
-      );
+      // Assuming the error object from mutateAsync contains a message property
+      const errorMessage = error.message || "An unknown error occurred.";
+      showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -130,6 +120,7 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
   return (
     <form onSubmit={handleSubmit(onThesisConfirmation)}>
       <div className="w-full py-4">
+        {/* Confirmation Status Dropdown */}
         <div className="mb-4">
           <label className="block text-textPrimary font-semibold mb-1">
             Confirmation
@@ -148,6 +139,7 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
           </select>
         </div>
 
+        {/* Message Dropdown */}
         <div className="mb-4">
           <label className="block text-textPrimary font-semibold mb-1">
             Message *
@@ -170,19 +162,28 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
           </select>
         </div>
 
+        {/* Adviser Selection (Conditional) */}
         {isConfirmed !== "pending_review" && (
           <div className="mb-4 relative adviser-dropdown">
             <label className="block text-textPrimary font-semibold mb-1">
               Select Thesis Adviser *
+              {isAdviserLoading && (
+                <span className="ml-2 text-sm text-blue-500">
+                  (Loading advisers...)
+                </span>
+              )}
             </label>
 
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white"
-              placeholder="Search adviser..."
+              className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white disabled:bg-gray-100"
+              placeholder={
+                isAdviserLoading ? "Loading advisers..." : "Search adviser..."
+              }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setDropdownOpen(true)}
+              disabled={isAdviserLoading}
             />
             {errors.adviser_id && (
               <p className="text-red-500 text-sm mt-1">
@@ -190,7 +191,7 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
               </p>
             )}
 
-            {dropdownOpen && (
+            {dropdownOpen && !isAdviserLoading && (
               <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto shadow-md">
                 {filteredAdvisers.length > 0 ? (
                   filteredAdvisers.map((adviser) => (
@@ -214,6 +215,11 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
                 )}
               </ul>
             )}
+            {dropdownOpen && isAdviserLoading && (
+              <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-md px-4 py-2 text-gray-500">
+                Loading advisers...
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -221,8 +227,8 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
       <div className="flex flex-row gap-2">
         <button
           type="submit"
-          className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
-          disabled={loading}>
+          className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
+          disabled={loading || isAdviserLoading}>
           {loading ? "Uploading..." : "Update"}
         </button>
       </div>

@@ -4,8 +4,10 @@ import { useDeleteAttachment } from "@/hooks/attachment";
 
 import { showToast } from "@/components/template/Toaster";
 import Link from "next/link";
+import { UserData } from "@/interface/user.interface";
 
 interface AttachmentCardProps {
+  user: UserData | null;
   index: number;
   title?: string;
   attachment: Attachment;
@@ -14,6 +16,7 @@ interface AttachmentCardProps {
 }
 
 const AttachmentCard: React.FC<AttachmentCardProps> = ({
+  user,
   index,
   title,
   attachment,
@@ -61,13 +64,15 @@ const AttachmentCard: React.FC<AttachmentCardProps> = ({
             rel="noopener noreferrer">
             Open
           </Link>
-          {index >= 0 && !title?.includes("Initial") && (
-            <button
-              onClick={() => handleDeleteProposal(attachment.id)}
-              className="ml-2 text-red-500 underline text-xs">
-              Delete
-            </button>
-          )}
+          {index >= 0 &&
+            !title?.includes("Initial") &&
+            user?.role === "student" && (
+              <button
+                onClick={() => handleDeleteProposal(attachment.id)}
+                className="ml-2 text-red-500 underline text-xs">
+                Delete
+              </button>
+            )}
         </div>
       </div>
     </div>
