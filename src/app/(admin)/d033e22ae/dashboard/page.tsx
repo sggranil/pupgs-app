@@ -2,24 +2,16 @@
 
 import React, { useState } from "react";
 
-import Modal from "@/components/organisms/Modal";
-import EnrolledSubjectModal from "@/components/organisms/Modals/ManageThesisReceiptModal";
-import SubjectCardList from "@/components/organisms/ThesisReceipt/ThesisReceiptCardList";
 import RoomTable from "@/components/organisms/Room/RoomTable";
-
-import { ThesisReceipt } from "@/interface/thesis.interface";
-// import ThesisCardList from "@/components/template/Thesis/ThesisCardList";
+import { useAllReceipts } from "@/hooks/receipts";
+import { ThesisReceipt } from "@prisma/client";
 
 export default function Dashboard() {
-  const [enrolledSubjectModal, setEnrolledSubjectModal] =
-    useState<boolean>(false);
-  const [thesisAttachmentsModal, setThesisAttachmentsModal] =
-    useState<boolean>(false);
-  const [isSubjectUpdated, setIsSubjectUpdated] = useState<boolean>(false);
-  const [isThesisUpdated, setIsThesisUpdated] = useState<boolean>(false);
-  const [isRoomUpdated, setIsRoomUpdated] = useState<boolean>(false);
-  const [subjectData, setSubjectData] = useState<ThesisReceipt[] | null>([]);
   const [activeTab, setActiveTab] = useState<"receipts" | "room">("receipts");
+
+  const { data: receiptData } = useAllReceipts();
+
+  const listReceipt = receiptData?.data || ([] as ThesisReceipt[]);
 
   return (
     <div className="h-full">
@@ -38,8 +30,8 @@ export default function Dashboard() {
               Pre-Oral Defense Enrolled
             </h2>
             <p className="text-2xl font-bold text-bgPrimary">
-              {subjectData?.filter(
-                (subject) => subject.receipt_name === "pre_oral_defense"
+              {listReceipt?.filter(
+                (receipt: any) => receipt.receipt_name === "pre_oral_defense"
               ).length || 0}
             </p>
           </div>
@@ -48,8 +40,8 @@ export default function Dashboard() {
               Thesis Proposal Enrolled
             </h2>
             <p className="text-2xl font-bold text-bgPrimary">
-              {subjectData?.filter(
-                (subject) => subject.receipt_name === "thesis_proposal"
+              {listReceipt?.filter(
+                (receipt: any) => receipt.receipt_name === "thesis_proposal"
               ).length || 0}
             </p>
           </div>
@@ -58,8 +50,8 @@ export default function Dashboard() {
               Final Defense Enrolled
             </h2>
             <p className="text-2xl font-bold text-bgPrimary">
-              {subjectData?.filter(
-                (subject) => subject.receipt_name === "final_defense"
+              {listReceipt?.filter(
+                (receipt: any) => receipt.receipt_name === "final_defense"
               ).length || 0}
             </p>
           </div>
@@ -68,7 +60,8 @@ export default function Dashboard() {
               Confirmed Submissions
             </h2>
             <p className="text-2xl font-bold text-green-600">
-              {subjectData?.filter((subject) => subject.status).length || 0}
+              {listReceipt?.filter((receipt: any) => receipt.status).length ||
+                0}
             </p>
           </div>
           <div className="bg-white shadow-md rounded-lg p-4">
@@ -76,9 +69,9 @@ export default function Dashboard() {
               Pending Reviews
             </h2>
             <p className="text-2xl font-bold text-yellow-500">
-              {subjectData?.filter(
-                (subject) =>
-                  subject.status === "pending_review" && !subject.message
+              {listReceipt?.filter(
+                (receipt: any) =>
+                  receipt.status === "pending_review" && !receipt.message
               ).length || 0}
             </p>
           </div>
@@ -87,10 +80,10 @@ export default function Dashboard() {
               Denied Submissions
             </h2>
             <p className="text-2xl font-bold text-red-600">
-              {subjectData?.filter(
-                (subject) =>
-                  !subject.status?.includes("approve") === false &&
-                  subject.message
+              {listReceipt?.filter(
+                (receipt: any) =>
+                  !receipt.status?.includes("approve") === false &&
+                  receipt.message
               ).length || 0}
             </p>
           </div>
@@ -99,15 +92,6 @@ export default function Dashboard() {
 
       <div className="w-full px-2">
         <div className="flex space-x-4 border-b border-gray-200 mb-4">
-          <button
-            onClick={() => setActiveTab("receipts")}
-            className={`px-4 py-2 font-semibold ${
-              activeTab === "receipts"
-                ? "text-bgPrimary border-b-2 border-bgPrimary"
-                : "text-gray-500 hover:text-bgPrimary"
-            }`}>
-            Check Enrollees
-          </button>
           <button
             onClick={() => setActiveTab("room")}
             className={`px-4 py-2 font-semibold ${
@@ -121,7 +105,6 @@ export default function Dashboard() {
       </div>
 
       <div className="w-full px-2 pb-12">
-        {/* {activeTab === "receipts" && <Thesis thesisData={[]} />} */}
         {activeTab === "room" && <RoomTable />}
       </div>
     </div>
