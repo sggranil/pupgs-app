@@ -13,9 +13,9 @@ const THESIS_KEYS = {
 };
 
 export const useAllThesis = () => {
-    return useQuery<Thesis[], Error>({
+    return useQuery<ResponsePayloadResult, Error>({
         queryKey: THESIS_KEYS.lists(),
-        queryFn: () => handleGetRequest<Thesis[]>(THESIS_API.GET_ALL_THESIS_URL),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(THESIS_API.GET_ALL_THESIS_URL),
     });
 };
 
