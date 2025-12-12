@@ -116,7 +116,7 @@ const AddRoomModal: React.FC<AddRoomModalProps> = ({
       <div className="flex flex-row gap-2">
         <button
           type="submit"
-          className="w-full mt-6 py-2 bg-bgPrimary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
+          className="w-full mt-4 py-2 bg-brand-primary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
           disabled={loading}>
           {loading ? "Adding..." : "Add Room"}
         </button>

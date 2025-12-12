@@ -6,8 +6,10 @@ export async function POST(request: NextRequest,
     { params }: { params: { id: string } }
 ) {
     try {
+        const { id } = await params
+
         const receipt = await prisma.thesisReceipt.findUnique({
-            where: { id: parseInt(params.id) },
+            where: { id: parseInt(id) },
             select: { attachment: true },
         });
 

@@ -22,7 +22,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ roles, children }) => {
   useEffect(() => {
     const userData = getUserInfoFromCookies();
     const userRole = userData?.role;
-    console.log(userRole);
 
     const checkAuthorization = () => {
       if (!isClientAuthorized()) {

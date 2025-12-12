@@ -19,11 +19,42 @@ export const getLocalDateString = (isoString: string | undefined): string => {
     return `${year}-${month}-${day}`;
 };
 
+export const getFormattedDate = (isoString: string | undefined): string => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    };
+
+    return date.toLocaleDateString('en-US', options);
+};
+
+export const getOneHourTimeRange = (isoString: string | undefined): string => {
+    if (!isoString) return "";
+
+    const startDate = new Date(isoString);
+    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+
+    const timeOptions: Intl.DateTimeFormatOptions = {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    };
+
+    const startTime = startDate.toLocaleTimeString('en-US', timeOptions);
+    const endTime = endDate.toLocaleTimeString('en-US', timeOptions);
+
+    return `${startTime} - ${endTime}`;
+};
+
 export const getLocalTimeString = (isoString: string | undefined): string => {
     if (!isoString) return "";
     const date = new Date(isoString);
 
-    return date.toTimeString().split(" ")[0];
+    return date.toLocaleTimeString().split(" ")[0]; // it should be like 4:00 PM - 5:00 PM, add 1 hour
 };
 
 export const getLocalTimeStringFormatted = (isoString: string | undefined): string => {

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
     try {
-        const subject = await prisma.enrolledSubject.findMany({
+        const receipt = await prisma.thesisReceipt.findMany({
             include: {
                 student: {
                     include: {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         });
 
         return NextResponse.json({
-            data: subject,
+            data: receipt,
             status: 200
         });
 

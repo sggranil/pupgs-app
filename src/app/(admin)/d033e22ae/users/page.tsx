@@ -6,11 +6,9 @@ import { User } from "@/interface/user.interface";
 import { useAllUsers } from "@/hooks/user";
 
 export default function UserPage() {
-  const [users, setUsers] = useState<User[]>([]);
-
   const {
     data: userData,
-    isLoading: isThesisLoading,
+    isLoading: isUserLoading,
     error,
     refetch,
   } = useAllUsers();
@@ -19,11 +17,7 @@ export default function UserPage() {
     refetch();
   };
 
-  useEffect(() => {
-    if (userData?.data) {
-      setUsers(userData.data);
-    }
-  }, [userData]);
+  const listData = userData?.data || ([] as User[]);
 
   return (
     <div>
@@ -36,7 +30,11 @@ export default function UserPage() {
           </h1>
         </div>
       </div>
-      <UsersTable userData={users} setIsUpdated={handleThesisUpdated} />
+      <UsersTable
+        isUserLoading={isUserLoading}
+        userData={listData}
+        setIsUpdated={handleThesisUpdated}
+      />
     </div>
   );
 }

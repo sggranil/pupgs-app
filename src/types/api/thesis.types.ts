@@ -18,7 +18,7 @@ export const updateThesisScheduleSchema = z.object({
     defense_date: z.string().optional(),
     defense_time: z.string().optional(),
     room_id: z.string().optional(),
-    secretary_id: z.number().optional(),
+    secretary_id: z.string().optional(),
     panelists: z.array(z.string()).min(3, "At least three panelist must be selected.").optional()
 })
 
@@ -27,6 +27,7 @@ export const updateThesisSchema = z.object({
     message: z.string(),
     adviser_id: z.number().optional(),
     student_id: z.number().optional(),
+    panelists: z.array(z.number()).optional()
 }).refine(
     (data) => {
         if (data.status !== 'pending_review' && !data.adviser_id) {
@@ -61,8 +62,10 @@ export const addAttachmentSchema = z.object({
 
 export const manageThesisReceiptSchema = z.object({
     receipt_name: z.string().optional(),
-    or_number: z.string(),
-    attachment: z.string()
+    or_number: z.string().optional(),
+    attachment: z.string().optional(),
+    status: z.string().optional(),
+    message: z.string().optional()
 });
 
 export type AddRoomSchemaType = z.infer<typeof addRoomSchema>;

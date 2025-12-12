@@ -53,9 +53,9 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
     defaultValues: {
       defense_date: getLocalDateString(thesisData?.defense_schedule),
       defense_time: getLocalTimeStringFormatted(thesisData?.defense_schedule),
-      room_id: thesisData?.room_id,
-      panelists: thesisData?.panelists?.map((p) => p.id.toString()),
-      secretary_id: thesisData?.secretary_id,
+      room_id: thesisData?.room_id?.toString() ?? "",
+      panelists: thesisData?.panelists?.map((p) => p.id.toString()) ?? [],
+      secretary_id: thesisData?.secretary_id?.toString() ?? "",
     },
   });
 
@@ -170,16 +170,15 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
           className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100"
           {...register("secretary_id")}
           disabled={isAdviserLoading}>
-          {" "}
-          {/* Disable while loading */}
           <option value={""} disabled>
             {secretaryPlaceholder}
           </option>
-          {listAdviserData?.map((adviser: Adviser) => (
-            <option key={adviser.id} value={adviser.id}>
-              {adviser?.user?.first_name} {adviser?.user?.last_name}
-            </option>
-          ))}
+          {!isAdviserLoading && // <-- Add this check
+            listAdviserData?.map((adviser: Adviser) => (
+              <option key={adviser.id} value={adviser.id}>
+                {adviser?.user?.first_name} {adviser?.user?.last_name}
+              </option>
+            ))}
         </select>
 
         {errors.secretary_id && (
@@ -197,16 +196,15 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
           className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100"
           {...register("panelists")}
           disabled={isAdviserLoading}>
-          {" "}
-          {/* Disable while loading */}
           <option value={0} disabled>
             {panelistsPlaceholder}
           </option>
-          {listAdviserData?.map((adviser: Adviser) => (
-            <option key={adviser.id} value={adviser.id}>
-              {adviser?.user?.first_name} {adviser?.user?.last_name}
-            </option>
-          ))}
+          {!isAdviserLoading && // <-- Add this check
+            listAdviserData?.map((adviser: Adviser) => (
+              <option key={adviser.id} value={adviser.id}>
+                {adviser?.user?.first_name} {adviser?.user?.last_name}
+              </option>
+            ))}
         </select>
         <span className="text-xs text-gray-500">
           Hold Ctrl (Win) or Cmd (Mac) to select multiple advisers

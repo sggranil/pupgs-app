@@ -5,6 +5,17 @@ export async function POST(request: NextRequest) {
     try {
         const { thesis_id, payload } = await request.json();
 
+        const { panelists, ...restOfPayload } = payload;
+
+        let panelistsUpdate: any;
+        if (panelists) {
+            panelistsUpdate = {
+                set: panelists.map((id: number) => ({ id: id }))
+            };
+        } else {
+            panelistsUpdate = { set: [] };
+        }
+
         const thesis = await prisma.thesis.findUnique({ where: { id: thesis_id } });
 
         if (!thesis) {
@@ -16,7 +27,8 @@ export async function POST(request: NextRequest) {
                 id: thesis_id
             },
             data: {
-                ...payload
+                ...restOfPayload,
+                panelists: panelistsUpdate
             }
         });
 
@@ -25,9 +37,9 @@ export async function POST(request: NextRequest) {
             { status: 200 }
         );
     } catch (err: any) {
-        console.error(err.message)
+        console.error("POST Request Error: /thesis/update", err.message);
         return NextResponse.json(
-            { message: "An error occurred while updating the thesis" + err.message },
+            { message: "An error occurred while updating the thesis: " + err.message },
             { status: 500 }
         );
     }

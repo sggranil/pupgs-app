@@ -68,6 +68,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
   });
 
   async function handleFormSubmit(values: UpdateUserSchemaType) {
+    setLoading(true);
     try {
       let finalRole: string;
       const currentPosition = getValues("position");
@@ -95,7 +96,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
           user_id: userData?.id,
           payload: {
             ...values,
-            role: newRole,
+            role: finalRole,
             start_date: values?.start_date
               ? isoDateTime(values?.start_date)
               : "",
@@ -325,7 +326,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
               </div>
 
               {/* Make Admin FIX */}
-              {userData?.id != user?.id ||
+              {userData?.id == user?.id ||
                 (userData?.role != "student" && (
                   <div className="flex items-center space-x-2">
                     <input

@@ -1,51 +1,48 @@
 "use client";
 
 import { useState } from "react";
+import { ThesisReceipt } from "@/interface/thesis.interface";
+
+import { CONFIRMATION_OPTIONS } from "@/constants/filters";
+import { UserData } from "@/interface/user.interface";
 
 import Modal from "@/components/organisms/Modal";
-import ThesisConfirmationModal from "../Modals/ThesisConfirmationModal";
-import { Thesis } from "@/interface/thesis.interface";
-import { CONFIRMATION_STATUSES } from "@/constants/filters";
-import { formatStatus } from "@/utilities/StringFormatter";
-import { UserData } from "@/interface/user.interface";
-import Link from "next/link";
+import ReceiptConfirmationModal from "@/components/organisms/Modals/ReceiptConfirmationModal";
 
-interface ThesisTableProps {
+import { formatStatus } from "@/utilities/StringFormatter";
+
+interface ThesisReceiptTableProps {
+  user: UserData | null;
+  receiptData: ThesisReceipt[];
   setIsUpdated: (isUpdated: boolean) => void;
-  thesisData: Thesis[];
-  user?: UserData | null;
 }
 
-const ThesisTable: React.FC<ThesisTableProps> = ({
+const ThesisReceiptsTable: React.FC<ThesisReceiptTableProps> = ({
   user,
-  thesisData,
+  receiptData,
   setIsUpdated,
 }) => {
-  const [selectedThesis, setSelectedThesis] = useState<Thesis | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<ThesisReceipt | null>(
+    null
+  );
+  const [receiptsFilter, setreceiptsFilter] = useState<string>("All");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [thesisFilter, setThesisFilter] = useState<string>("");
-
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
-  const filteredData = thesisData.filter((thesis) => {
-    const matchesThesis =
-      thesisFilter === "" ||
-      thesis.thesis_title.toLowerCase().includes(thesisFilter.toLowerCase());
+  const filteredData = receiptData.filter((receipts) => {
+    const matchesreceipt =
+      receiptsFilter === "All" || receipts.receipt_name === receiptsFilter;
     const matchesStatus =
-      statusFilter === "All" ||
-      thesis.status?.toLowerCase().includes(statusFilter.toLowerCase());
+      statusFilter === "All" || receipts.status === statusFilter;
     const matchesName =
-      searchQuery === "" ||
-      `${thesis.student?.user?.first_name ?? ""} ${
-        thesis.student?.user?.last_name ?? ""
-      }`
+      `${receipts.student?.user?.first_name} ${receipts.student?.user?.last_name}`
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
-    return matchesThesis && matchesStatus && matchesName;
+    return matchesreceipt && matchesStatus && matchesName;
   });
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -54,16 +51,42 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
     currentPage * itemsPerPage
   );
 
-  const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNext = () =>
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
-  // Check if the filtered data is empty
+  const handleOpenModal = (receipt: ThesisReceipt) => {
+    setSelectedReceipt(receipt);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedReceipt(null);
+    setIsModalOpen(false);
+  };
+
+  // Check for the total filtered data count to determine if an empty state is needed
   const isDataEmpty = filteredData.length === 0;
 
   return (
     <div className="w-full overflow-x-auto">
+      {/* Filters */}
       <div className="mb-4 flex justify-end space-x-2">
+        <select
+          className="p-2 border rounded-md"
+          value={receiptsFilter}
+          onChange={(e) => {
+            setreceiptsFilter(e.target.value);
+            setCurrentPage(1);
+          }}>
+          <option value="All">All</option>
+          <option value="Thesis Proposal">Thesis Proposal</option>
+          <option value="Pre-Oral Defense">Pre-Oral Defense</option>
+          <option value="Final Defense">Final Defense</option>
+        </select>
+
         <select
           className="p-2 border rounded-md"
           value={statusFilter}
@@ -72,22 +95,13 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
             setCurrentPage(1);
           }}>
           <option value="All">All</option>
-          {CONFIRMATION_STATUSES.map((status) => (
+          {CONFIRMATION_OPTIONS.map((status) => (
             <option key={status.value} value={status.value}>
               {status.label}
             </option>
           ))}
         </select>
-        <input
-          type="text"
-          className="p-2 border rounded-md"
-          placeholder="Search by thesis title"
-          value={thesisFilter}
-          onChange={(e) => {
-            setThesisFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
+
         <input
           type="text"
           className="p-2 border rounded-md"
@@ -117,12 +131,12 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
             />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No Thesis Submissions Found
+            No Receipts Found
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {thesisData.length > 0
+            {receiptData.length > 0
               ? "Try adjusting your filters or search query."
-              : "There are currently no thesis submissions to display."}
+              : "There are currently no thesis receipts to display."}
           </p>
         </div>
       ) : (
@@ -135,7 +149,10 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
                   Student
                 </th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-700">
-                  Thesis Title
+                  Defense Phase
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                  OR Number
                 </th>
                 <th className="p-3 text-left text-sm font-semibold text-gray-700">
                   File
@@ -149,48 +166,37 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((thesis, index) => (
+              {paginatedData.map((receipt, index) => (
                 <tr key={index} className="border-b">
                   <td className="p-3 text-sm text-gray-900">
-                    {thesis.student?.user?.first_name}{" "}
-                    {thesis.student?.user?.last_name}
+                    {receipt.student?.user?.first_name}{" "}
+                    {receipt.student?.user?.last_name}
                   </td>
                   <td className="p-3 text-sm text-gray-900">
-                    {thesis.thesis_title}
+                    {receipt.receipt_name}
+                  </td>
+                  <td className="p-3 text-sm text-gray-900">
+                    {receipt.or_number}
                   </td>
                   <td className="p-3 text-sm text-gray-900">
                     <a
                       className="text-blue-500 underline"
-                      href={thesis.attachments[0]?.file_url}
+                      href={receipt.attachment}
                       target="_blank"
                       rel="noopener noreferrer">
                       View File
                     </a>
                   </td>
                   <td className="p-3 text-sm text-gray-500">
-                    {formatStatus(thesis?.status)}
+                    {formatStatus(receipt.status)}
                   </td>
-                  {user?.role != "adviser" ? (
+                  {user?.role !== "adviser" ? (
                     <td className="p-3 text-sm text-gray-500">
                       <button
-                        className="bg-brand-primary text-sm font-medium p-2 text-white rounded-md"
-                        onClick={() => {
-                          setSelectedThesis(thesis);
-                          setIsModalOpen(true);
-                        }}>
+                        className="bg-bgPrimary text-sm font-medium p-2 text-white rounded-md"
+                        onClick={() => handleOpenModal(receipt)}>
                         Change Status
                       </button>
-                      {thesis?.status?.includes("approve") && (
-                        <Link
-                          className="ml-2 bg-green-800 text-sm font-medium p-2 text-white rounded-md"
-                          href={
-                            user?.role === "student"
-                              ? `/thesis/${thesis.id}`
-                              : `/d033e22ae/thesis/${thesis.id}`
-                          }>
-                          Go
-                        </Link>
-                      )}
                     </td>
                   ) : (
                     <td className="p-3 text-sm text-gray-500">
@@ -202,10 +208,10 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
             </tbody>
           </table>
 
-          {/* Pagination Controls */}
+          {/* Pagination */}
           <div className="flex justify-between items-center mt-4">
             <button
-              onClick={handlePrev}
+              onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
               className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
               Previous
@@ -214,7 +220,7 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={handleNext}
+              onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
               className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
               Next
@@ -224,19 +230,20 @@ const ThesisTable: React.FC<ThesisTableProps> = ({
       )}
 
       {/* Modal */}
-      <Modal
-        title="Confirm Thesis"
-        modalType="info"
-        isModalOpen={isModalOpen}
-        setModalOpen={setIsModalOpen}>
-        <ThesisConfirmationModal
-          thesisData={selectedThesis}
-          setIsModalOpen={setIsModalOpen}
-          setIsUpdated={setIsUpdated}
-        />
-      </Modal>
+      {isModalOpen && selectedReceipt && (
+        <Modal
+          title="Update Status"
+          isModalOpen={isModalOpen}
+          setModalOpen={handleCloseModal}>
+          <ReceiptConfirmationModal
+            setIsUpdated={setIsUpdated}
+            setIsModalOpen={handleCloseModal}
+            receiptData={selectedReceipt}
+          />
+        </Modal>
+      )}
     </div>
   );
 };
 
-export default ThesisTable;
+export default ThesisReceiptsTable;

@@ -6,16 +6,16 @@ import { handleGetRequest, handlePostRequest } from "@/hooks/request";
 import { ResponsePayloadResult } from '@/interface/request.interface';
 
 const RECEIPTS_KEYS = {
-    all: ['thesis'] as const,
+    all: ['receipts'] as const,
     lists: () => [...RECEIPTS_KEYS.all, 'list'] as const,
     detail: (id: number) => [...RECEIPTS_KEYS.all, 'detail', id] as const,
     user: (id: number) => [...RECEIPTS_KEYS.all, 'user', id] as const,
 };
 
 export const useAllReceipts = () => {
-    return useQuery<ThesisReceipt[], Error>({
+    return useQuery<ResponsePayloadResult, Error>({
         queryKey: RECEIPTS_KEYS.lists(),
-        queryFn: () => handleGetRequest<ThesisReceipt[]>(RECEIPTS_API.GET_ALL_RECEIPTS_URL),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(RECEIPTS_API.GET_ALL_RECEIPTS_URL),
     });
 };
 

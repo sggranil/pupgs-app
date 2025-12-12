@@ -6,7 +6,7 @@ import { ResponsePayloadResult } from '@/interface/request.interface';
 import { User } from '@/interface/user.interface';
 
 const USER_KEYS = {
-    all: ['thesis'] as const,
+    all: ['user'] as const,
     lists: () => [...USER_KEYS.all, 'list'] as const,
     detail: (id: number) => [...USER_KEYS.all, 'detail', id] as const,
     user: (id: number) => [...USER_KEYS.all, 'user', id] as const,

@@ -10,8 +10,10 @@ import ScheduleThesisModal from "@/components/organisms/Modals/ScheduleThesisMod
 import ActionButton from "@/components/molecules/ActionButton";
 import { UserData } from "@/interface/user.interface";
 import {
+  getFormattedDate,
   getLocalDateString,
   getLocalTimeString,
+  getOneHourTimeRange,
 } from "@/utilities/DateUtilities";
 
 interface ThesisInformationProps {
@@ -57,7 +59,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
             Defense Date
           </span>
           <p className="text-sm font-bold text-content-primary">
-            {getLocalDateString(thesisData?.defense_schedule) ??
+            {getFormattedDate(thesisData?.defense_schedule) ||
               "To be Announced"}
           </p>
         </div>
@@ -67,7 +69,7 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
             Defense Time
           </span>
           <p className="text-sm font-bold text-content-primary">
-            {getLocalTimeString(thesisData?.defense_schedule) ??
+            {getOneHourTimeRange(thesisData?.defense_schedule) ||
               "To be Announced"}
           </p>
         </div>

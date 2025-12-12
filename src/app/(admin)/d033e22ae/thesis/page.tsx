@@ -13,45 +13,36 @@ import ThesisCardContainerSkeleton from "@/components/template/SkeletonContainer
 import { useUserContext } from "@/providers/UserProvider";
 import ThesisTable from "@/components/organisms/Thesis/ThesisTable";
 
-// Renamed the export for better clarity if used by faculty/admin
 export default function ThesisDashboard() {
   const { user, isLoading: isUserContextLoading } = useUserContext();
 
-  // Fetches theses where the current user is an advisor (listData)
   const {
     data: thesisData,
     isLoading: isThesisLoading,
     error,
-    refetch: refetchUserThesis,
   } = useUserThesis(user?.id);
 
-  // Fetches all theses (listAllData)
   const {
     data: allThesisData,
     isLoading: isAllThesisLoading,
+    error: allThesisError,
     refetch: refetchAllThesis,
   } = useAllThesis();
-
-  const handleThesisUpdated = () => {
-    refetchUserThesis(); // Refetch the user's specific theses
-  };
 
   const handleAllThesisUpdated = () => {
     refetchAllThesis();
   };
 
-  // Combine loading states
   const isOverallLoading =
     isUserContextLoading || isThesisLoading || isAllThesisLoading;
 
-  // Use data, defaulting to empty array
   const listData = thesisData?.data || ([] as Thesis[]);
   const listAllData = allThesisData?.data || ([] as Thesis[]);
 
   const [activeTab, setActiveTab] = useState<"advisee" | "thesis">("advisee");
 
-  // Conditional Rendering Logic
-  const hasData = listData.length > 0 || listAllData.length > 0; // 💡 CRITICAL FIX: Check .length for listAllData
+  const activeList = activeTab === "advisee" ? listData : listAllData;
+  const hasActiveData = activeList.length > 0;
 
   return (
     <>
@@ -92,14 +83,13 @@ export default function ThesisDashboard() {
             </div>
           </div>
 
-          {/* Conditional Content Rendering */}
           {isOverallLoading ? (
             <ThesisCardContainerSkeleton />
-          ) : error ? (
+          ) : error || allThesisError ? (
             <p className="text-red-600 text-center py-8">
-              Error fetching your thesis data: {error.message}
+              Error fetching thesis data.
             </p>
-          ) : hasData ? (
+          ) : hasActiveData ? (
             <div className="w-full px-2">
               {activeTab === "advisee" && (
                 <ThesisCardList users={user} thesisData={listData} />
@@ -114,7 +104,7 @@ export default function ThesisDashboard() {
             </div>
           ) : (
             <p className="text-gray-500 text-center py-24">
-              No thesis proposals found.
+              No thesis proposals found for the selected view.
             </p>
           )}
         </div>

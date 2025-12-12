@@ -11,7 +11,7 @@ import { useGetUser } from "@/hooks/user";
 import { User } from "@/interface/user.interface";
 
 interface MenuDropdownProps {
-  userId: number;
+  userId: number | undefined;
 }
 
 const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId }) => {
