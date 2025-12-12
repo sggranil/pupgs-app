@@ -19,7 +19,7 @@ export const getLocalDateString = (isoString: string | undefined): string => {
     return `${year}-${month}-${day}`;
 };
 
-export const getLocalTimeString = (isoString: string): string => {
+export const getLocalTimeString = (isoString: string | undefined): string => {
     if (!isoString) return "";
     const date = new Date(isoString);
 
