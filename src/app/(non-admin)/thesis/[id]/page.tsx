@@ -22,7 +22,6 @@ export default function ThesisInfoPage({
 }) {
   const { id } = use(params);
   const { user } = useUserContext();
-  const userId = user?.id ?? Number(user?.id);
 
   const {
     data: thesisData,
@@ -48,6 +47,7 @@ export default function ThesisInfoPage({
           <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-2 pb-2 rounded-md">
             <h1 className="text-content-primary text-lg font-bold pb-1 pt-2">
               <ThesisTitle
+                user={user}
                 thesisId={thesisInfo.id}
                 thesisTitle={thesisInfo.thesis_title}
                 setIsUpdated={handleThesisUpdated}
@@ -65,6 +65,7 @@ export default function ThesisInfoPage({
           </div>
           <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pb-2 rounded-md">
             <ThesisInformation
+              user={user}
               thesisData={thesisInfo}
               setIsUpdated={handleThesisUpdated}
             />
@@ -74,7 +75,7 @@ export default function ThesisInfoPage({
         <div className="flex flex-col w-full md:w-1/2 gap-4">
           <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pb-2 rounded-md">
             <ThesisReceiptCardList
-              userId={userId}
+              user={user}
               thesisId={id}
               receipts={thesisInfo?.thesis_receipts}
               setIsUpdated={handleThesisUpdated}
@@ -83,6 +84,7 @@ export default function ThesisInfoPage({
 
           <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity px-4 pb-2 rounded-md">
             <AttachmentCardList
+              user={user}
               thesisId={thesisInfo.id}
               attachments={thesisInfo.attachments}
               setIsUpdated={handleThesisUpdated}

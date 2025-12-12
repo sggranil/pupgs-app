@@ -8,7 +8,7 @@ import { Thesis } from "@/interface/thesis.interface";
 import Modal from "@/components/organisms/Modal";
 import ManageThesisModal from "@/components/organisms/Modals/ManageThesisModal";
 
-import ThesisCardList from "@/components/template/Thesis/ThesisCardList";
+import ThesisCardList from "@/components/organisms/Thesis/ThesisCardList";
 import ThesisCardContainerSkeleton from "@/components/template/SkeletonContainer/ThesisCardSkeleton";
 
 import { useUserContext } from "@/providers/UserProvider";
