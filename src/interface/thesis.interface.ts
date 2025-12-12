@@ -11,7 +11,7 @@ export interface Thesis {
   status: string | null;
   message?: string;
   attachments: Attachment[];
-  panelists: string[];
+  panelists: Adviser[];
   secretary?: Adviser;
   secretary_id?: number;
   defense_schedule?: string;

@@ -74,3 +74,13 @@ export interface AuditLog {
     ip_address?: string;
     timestamp: Date;
 }
+
+export interface UserData {
+    id: number;
+    role: string;
+    email: string;
+}
+export interface UserContextType {
+    user: UserData | null;
+    isLoading: boolean;
+}
