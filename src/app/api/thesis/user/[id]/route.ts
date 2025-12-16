@@ -8,7 +8,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         const thesis = await prisma.thesis.findMany({
             where: {
                 OR: [
-                    { student_id: parseInt(id) },
+                    {
+                        student: {
+                            user_id: parseInt(id)
+                        }
+                    },
                     {
                         adviser: {
                             user_id: parseInt(id)
