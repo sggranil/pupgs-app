@@ -163,9 +163,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
               </>
             ) : (
               //{" "}
-              <span className="text-sm text-center text-gray-400">
-                // forms will appear below on Pre-Final and Final Defense //{" "}
-              </span>
+              <span className="text-sm text-center text-gray-400"></span>
             )}
           </>
         )}

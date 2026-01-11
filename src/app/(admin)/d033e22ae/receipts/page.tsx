@@ -33,11 +33,13 @@ export default function ReceiptsPage() {
         </div>
       </div>
 
-      <ThesisReceiptsTable
-        user={user}
-        receiptData={listData}
-        setIsUpdated={handleReceiptsUpdated}
-      />
+      <div className="mt-4">
+        <ThesisReceiptsTable
+          user={user}
+          receiptData={listData}
+          setIsUpdated={handleReceiptsUpdated}
+        />
+      </div>
 
       {/* <UsersTable
         isUserLoading={isUserLoading}

@@ -7,14 +7,14 @@ import { useAllReceipts } from "@/hooks/receipts";
 import { ThesisReceipt } from "@prisma/client";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<"receipts" | "room">("receipts");
+  const [activeTab, setActiveTab] = useState<"receipts" | "room">("room");
 
   const { data: receiptData } = useAllReceipts();
 
   const listReceipt = receiptData?.data || ([] as ThesisReceipt[]);
 
   return (
-    <div className="h-full">
+    <div>
       <div
         className="w-full h-24 rounded-md"
         style={{ backgroundImage: "url('/maroon-bg.jpg')" }}>
@@ -23,8 +23,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="w-full px-2 pt-6 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-2">
+      <div className="w-full px-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-2 mt-2">
           <div className="bg-white shadow-md rounded-lg p-4">
             <h2 className="text-gray-700 text-md font-semibold">
               Pre-Oral Defense Enrolled
