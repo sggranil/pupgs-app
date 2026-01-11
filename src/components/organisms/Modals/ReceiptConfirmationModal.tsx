@@ -44,7 +44,8 @@ const ReceiptConfirmationModal: React.FC<SubjectConfirmationProps> = ({
 
       updateReceipt(
         {
-          id: receiptData?.id,
+          receipt_id: receiptData?.id,
+          user_id: receiptData.student_id,
           payload: payload,
         },
         {
