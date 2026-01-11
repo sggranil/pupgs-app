@@ -4,7 +4,7 @@ import React from "react";
 interface ModalProps {
   title: string;
   isModalOpen: boolean;
-  modalType?: "form" | "pdf" | "info";
+  modalType?: "form" | "pdf" | "info" | "doc";
   isWide?: boolean;
   setModalOpen: (modalOpen: boolean) => void;
   children: React.ReactNode;
@@ -26,6 +26,10 @@ const Modal = ({
 
     case "info":
       modalStyle = { width: "600px" };
+      break;
+
+    case "doc":
+      modalStyle = { width: "900px" };
       break;
 
     case "form":
