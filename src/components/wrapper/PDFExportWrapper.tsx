@@ -139,7 +139,7 @@ const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({
       </Modal>
 
       <button
-        className="underline text-brand-primary text-xs"
+        className="bg-brand-primary text-white px-3 py-2 rounded-md text-brand-primary text-sm"
         onClick={() => setModalOpen(true)}>
         {buttonLabel}
       </button>
