@@ -3,7 +3,7 @@
 import PDFDownloadWrapper from "@/components/wrapper/PDFExportWrapper";
 
 interface FormCardProps {
-  itemNo: number;
+  itemNo?: number;
   title: string;
   isLandscape?: boolean | false;
   document: React.ReactNode;
