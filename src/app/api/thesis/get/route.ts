@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
             include: {
                 attachments: true,
                 room: true,
+                thesis_receipts: true,
                 student: {
                     include: {
                         user: {
