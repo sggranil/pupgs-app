@@ -6,9 +6,9 @@ interface FormThreeProps {
 }
 
 const FormThree: React.FC<FormThreeProps> = ({ thesisData, thesisReceipt }) => {
-  const isProposalChecked = thesisReceipt?.receipt_name === "thesis_proposal";
-  const isPreFinalChecked = thesisReceipt?.receipt_name === "pre_oral_defense";
-  const isFinalChecked = thesisReceipt?.receipt_name === "final_defense";
+  const isProposalChecked = thesisData?.defense_phase === "thesis_proposal";
+  const isPreFinalChecked = thesisData?.defense_phase === "pre_oral_defense";
+  const isFinalChecked = thesisData?.defense_phase === "final_defense";
 
   return (
     <div className="p-8 font-inter bg-white shadow-lg rounded-lg w-[1344px] mx-auto">

@@ -13,15 +13,18 @@ const FormTwelve: React.FC<FormTwelveProps> = ({
   dean,
 }) => {
   const defenseSchedule =
-    thesisData?.defense_date && thesisData?.defense_time
-      ? `${new Date(thesisData.defense_date).toLocaleDateString("en-US", {
+    thesisData?.defense_schedule && thesisData?.defense_schedule
+      ? `${new Date(thesisData.defense_schedule).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",
-        })} | ${new Date(`${thesisData.defense_time}`).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}`
+        })} | ${new Date(`${thesisData.defense_schedule}`).toLocaleTimeString(
+          [],
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        )}`
       : "_____________________________";
 
   const getFullUserName = (user: User | undefined) => {

@@ -77,12 +77,15 @@ const FormEleven: React.FC<FormElevenProps> = ({
             Date of Passing the Comprehensive Examination:
           </p>
           <span className="border-b border-black flex-grow px-2 pb-3">
-            {thesisData?.defense_date
-              ? new Date(thesisData.defense_date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+            {thesisData?.defense_schedule
+              ? new Date(thesisData.defense_schedule).toLocaleDateString(
+                  "en-US",
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  }
+                )
               : "____________________"}
           </span>
         </div>
