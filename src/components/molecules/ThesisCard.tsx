@@ -39,15 +39,15 @@ const ThesisCard: React.FC<ThesisProp> = ({ thesisData }) => {
   return (
     <div className="w-full">
       <div className="bg-white ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm overflow-hidden">
-        <div className="relative w-full h-32 rounded-sm bg-gray-50">
+        <div className="w-full h-32 rounded-sm bg-gray-50">
           <div
-            className={`absolute inset-0 ${randomColorClass} opacity-50 rounded-md`}></div>
+            className={`inset-0 ${randomColorClass} opacity-50 rounded-md`}></div>
           <Image
             alt="A sample descriptive alt text"
             width={500}
             height={300}
             src="/pup-bg.png"
-            className="w-full h-32 rounded-sm"
+            className="w-full h-32 rounded-sm z-50"
           />
         </div>
         <div className="items-center py-4 px-3">

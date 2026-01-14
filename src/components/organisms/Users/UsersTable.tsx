@@ -51,7 +51,7 @@ const UserTable: React.FC<UserTableProps> = ({
   };
 
   // Check for the empty state
-  const isDataEmpty = filteredUsers.length === 0 && !isUserLoading;
+  const isDataEmpty = filteredUsers.length === 0;
 
   return (
     <div className="w-full">
@@ -70,19 +70,8 @@ const UserTable: React.FC<UserTableProps> = ({
         </div>
       </div>
 
-      {/* --- Empty State / Table Rendering --- */}
-      {isUserLoading ? (
-        <table className="min-w-full mt-2 bg-white border border-gray-200 rounded-md shadow-md">
-          <tbody>
-            <tr>
-              <td colSpan={7} className="p-3 text-center text-sm text-gray-500">
-                Loading user data...
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      ) : isDataEmpty ? (
-        <div className="text-center py-12 border border-gray-200 rounded-md bg-white shadow-md mt-2">
+      {isDataEmpty ? (
+        <div className="text-center py-12 border border-gray-200 rounded-md bg-white shadow-md">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="mx-auto h-10 w-10 text-gray-400"
@@ -93,16 +82,16 @@ const UserTable: React.FC<UserTableProps> = ({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2a3 3 0 00-5.356-1.857M9 20V8m3-2v12m-3-4h6m-6 4h6m-3-4V8m0 12V8"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No Users Found
+            No User Found
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {userData.length > 0
-              ? "Try adjusting your search query to find users."
-              : "There are currently no users in the system."}
+              ? "Try adjusting your filters or search query."
+              : "There are currently no thesis receipts to display."}
           </p>
         </div>
       ) : (

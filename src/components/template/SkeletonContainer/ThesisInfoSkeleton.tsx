@@ -2,7 +2,7 @@ import AttachmentCardSkeleton from "@/components/molecules/Skeleton/AttachmentCa
 
 const ThesisInfoLoadingState: React.FC = () => {
   return (
-    <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full lg:px-32 py-4 px-8">
+    <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full py-4 px-8">
       <div className="flex flex-col w-full md:w-1/3 gap-4">
         <div className="bg-white px-4 pt-2 pb-3 rounded-md">
           <div className="pb-1 pt-2">
