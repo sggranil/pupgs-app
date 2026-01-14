@@ -4,9 +4,10 @@ import MenuDropdown from "@/components/organisms/MenuDropdown";
 
 interface NavbarLinksProps {
   userId: number;
+  department?: (setDepartment: string | undefined) => void;
 }
 
-const NavbarLinks: React.FC<NavbarLinksProps> = ({ userId }) => {
+const NavbarLinks: React.FC<NavbarLinksProps> = ({ userId, department }) => {
   const pathname = usePathname();
 
   const BASE_CLASS = "text-content-secondary";
@@ -22,7 +23,7 @@ const NavbarLinks: React.FC<NavbarLinksProps> = ({ userId }) => {
 
   const navItems = [
     { href: "/thesis", label: "Thesis", icon: "library_books" },
-    { href: "/notification", label: "Notification", icon: "notifications" },
+    // { href: "/notification", label: "Notification", icon: "notifications" },
   ];
 
   return (
@@ -39,7 +40,7 @@ const NavbarLinks: React.FC<NavbarLinksProps> = ({ userId }) => {
         </Link>
       ))}
 
-      <MenuDropdown userId={userId} />
+      <MenuDropdown department={department} userId={userId} />
     </div>
   );
 };
