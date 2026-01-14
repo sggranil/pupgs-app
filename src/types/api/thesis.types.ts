@@ -19,11 +19,13 @@ export const updateThesisScheduleSchema = z.object({
     defense_time: z.string().optional(),
     room_id: z.string().optional(),
     secretary_id: z.string().optional(),
+    link: z.string().optional(),
     panelists: z.array(z.string()).min(3, "At least three panelist must be selected.").optional()
 })
 
 export const updateThesisSchema = z.object({
     status: z.string(),
+    defense_phase: z.string(),
     message: z.string(),
     adviser_id: z.number().optional(),
     student_id: z.number().optional(),
