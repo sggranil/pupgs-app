@@ -7,8 +7,6 @@ import AddRoomModal from "./AddRoomModal";
 import { Room } from "@/interface/thesis.interface";
 import { showToast } from "@/components/template/Toaster";
 
-// Renamed for clarity: component prop types are usually not passed to stateless components
-// like this, but if it were to receive props, you'd use React.FC<Props>
 const RoomTable: React.FC = () => {
   const [roomSelected, setRoomSelected] = useState<Room | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -55,7 +53,6 @@ const RoomTable: React.FC = () => {
   const handleNext = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  // Loading spinner row component for DRY principle
   const LoadingRow = () => (
     <tr>
       <td colSpan={4} className="p-3 text-center text-sm text-gray-500">
@@ -64,8 +61,7 @@ const RoomTable: React.FC = () => {
     </tr>
   );
 
-  // New variable for clarity in conditional rendering
-  const isDataEmpty = filteredRooms.length === 0 && !isAllRoomLoading;
+  const isDataEmpty = filteredRooms.length === 0;
 
   return (
     <div className="w-full overflow-x-auto">
@@ -114,16 +110,16 @@ const RoomTable: React.FC = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No Rooms Found
+            No Room Found
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {listRoom.length > 0
               ? "Try adjusting your filters or search query."
-              : "There are currently no rooms available to display."}
+              : "There are currently no thesis receipts to display."}
           </p>
         </div>
       ) : (
