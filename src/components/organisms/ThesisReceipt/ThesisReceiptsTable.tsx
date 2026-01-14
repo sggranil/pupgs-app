@@ -67,12 +67,10 @@ const ThesisReceiptsTable: React.FC<ThesisReceiptTableProps> = ({
     setIsModalOpen(false);
   };
 
-  // Check for the total filtered data count to determine if an empty state is needed
   const isDataEmpty = filteredData.length === 0;
 
   return (
     <div className="w-full overflow-x-auto">
-      {/* Filters */}
       <div className="mb-4 flex justify-end space-x-2">
         <select
           className="p-2 border rounded-md"
@@ -114,7 +112,6 @@ const ThesisReceiptsTable: React.FC<ThesisReceiptTableProps> = ({
         />
       </div>
 
-      {/* --- Empty State / Table Rendering --- */}
       {isDataEmpty ? (
         <div className="text-center py-12 border border-gray-200 rounded-md bg-white shadow-md">
           <svg
@@ -173,7 +170,7 @@ const ThesisReceiptsTable: React.FC<ThesisReceiptTableProps> = ({
                     {receipt.student?.user?.last_name}
                   </td>
                   <td className="p-3 text-sm text-gray-900">
-                    {receipt.receipt_name}
+                    {formatStatus(receipt.receipt_name)}
                   </td>
                   <td className="p-3 text-sm text-gray-900">
                     {receipt.or_number}
@@ -193,15 +190,13 @@ const ThesisReceiptsTable: React.FC<ThesisReceiptTableProps> = ({
                   {user?.role !== "adviser" ? (
                     <td className="p-3 text-sm text-gray-500">
                       <button
-                        className="bg-bgPrimary text-sm font-medium p-2 text-white rounded-md"
+                        className="bg-brand-primary text-sm font-medium p-2 text-white rounded-md"
                         onClick={() => handleOpenModal(receipt)}>
                         Change Status
                       </button>
                     </td>
                   ) : (
-                    <td className="p-3 text-sm text-gray-500">
-                      Approval is restricted to the Program Head.
-                    </td>
+                    <td className="p-3 text-sm text-gray-500">Unauthorized</td>
                   )}
                 </tr>
               ))}
@@ -234,6 +229,7 @@ const ThesisReceiptsTable: React.FC<ThesisReceiptTableProps> = ({
         <Modal
           title="Update Status"
           isModalOpen={isModalOpen}
+          modalType="info"
           setModalOpen={handleCloseModal}>
           <ReceiptConfirmationModal
             setIsUpdated={setIsUpdated}
