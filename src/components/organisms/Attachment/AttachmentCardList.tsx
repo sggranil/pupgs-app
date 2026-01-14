@@ -114,7 +114,7 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
                 <h2 className="text-content-secondary text-xs font-bold pt-2">
                   {sectionTitle}
                 </h2>
-                <div className="px-1 pt-2 pb-1 md:pt-2 md:px-0 flex overflow-x-auto md:overflow-visible md:flex-col-2 gap-2">
+                <div className="px-1 pt-2 pb-1 md:pt-2 md:px-0 grid grid-cols-1 sm:grid-cols-2 gap-2grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2">
                   {attachmentsByType.map((attachment, index) => (
                     <AttachmentCard
                       key={attachment.id}
