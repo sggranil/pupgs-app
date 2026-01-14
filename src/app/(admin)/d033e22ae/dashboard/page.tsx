@@ -90,7 +90,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="w-full px-2">
+      <div className="w-full px-2 pt-4">
         <div className="flex space-x-4 border-b border-gray-200 mb-4">
           <button
             onClick={() => setActiveTab("room")}
@@ -99,7 +99,7 @@ export default function Dashboard() {
                 ? "text-bgPrimary border-b-2 border-bgPrimary"
                 : "text-gray-500 hover:text-bgPrimary"
             }`}>
-            Room
+            Room Management
           </button>
         </div>
       </div>
