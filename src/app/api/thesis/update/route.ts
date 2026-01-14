@@ -1,81 +1,45 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from "next/server";
-
-import { getUserId } from '@/utilities/AuthUtilities';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { id, thesis_title, file_type, file_url, status } = await request.json();
-        const userIdCookie = await getUserId();
+        const { thesis_id, payload } = await request.json();
 
-        if (!userIdCookie) {
-            return NextResponse.json(
-                { message: "User ID is missing in cookies" },
-                { status: 401 }
-            );
-        }
+        const { panelists, ...restOfPayload } = payload;
 
-        const userId = parseInt(userIdCookie);
-        if (isNaN(userId)) {
-            return NextResponse.json(
-                { message: "Invalid User ID" },
-                { status: 400 }
-            );
-        }
-
-        if (!id || !thesis_title || !file_url) {
-            return NextResponse.json(
-                { message: "All fields are required" },
-                { status: 400 }
-            );
-        }
-
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (!user) {
-            return NextResponse.json(
-                { message: "No user found." },
-                { status: 401 }
-            );
-        }
-
-        const thesis = await prisma.thesis.findUnique({ where: { id } });
-        if (!thesis) {
-            return NextResponse.json(
-                { message: "Thesis not found." },
-                { status: 404 }
-            );
-        }
-
-        const updatedThesis = await prisma.thesis.update({
-            where: { id },
-            data: { thesis_title, status: status },
-        });
-
-        const existingAttachments = await prisma.attachment.findFirst({
-            where: { thesis_id: id },
-        });
-
-        if (existingAttachments) {
-            await prisma.attachment.update({
-                where: { id: existingAttachments.id },
-                data: { file_url, uploaded_at: new Date() },
-            });
+        let panelistsUpdate: any;
+        if (panelists) {
+            panelistsUpdate = {
+                set: panelists.map((id: number) => ({ id: id }))
+            };
         } else {
-            await prisma.attachment.create({
-                data: { thesis_id: id, file_type, file_url },
-            });
+            panelistsUpdate = { set: [] };
         }
+
+        const thesis = await prisma.thesis.findUnique({ where: { id: thesis_id } });
+
+        if (!thesis) {
+            return NextResponse.json({ message: "Thesis record not found." }, { status: 404 });
+        }
+
+        await prisma.thesis.update({
+            where: {
+                id: thesis_id
+            },
+            data: {
+                ...restOfPayload,
+                panelists: panelistsUpdate
+            }
+        });
 
         return NextResponse.json(
-            { message: "Thesis and attachment updated successfully", data: updatedThesis },
+            { message: "Thesis updated successfully!" },
             { status: 200 }
         );
-    } catch (err) {
-        console.error(err);
+    } catch (err: any) {
+        console.error("POST Request Error: /thesis/update", err.message);
         return NextResponse.json(
-            { message: "An error occurred while updating the thesis" },
+            { message: "An error occurred while updating the thesis: " + err.message },
             { status: 500 }
         );
     }

@@ -1,21 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import Modal from "@/components/organisms/Modal";
-import ThesisConfirmationModal from "./ThesisConfirmationModal";
+import ThesisConfirmationModal from "../Modals/ThesisConfirmationModal";
 import { Thesis } from "@/interface/thesis.interface";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { CONFIRMATION_STATUSES } from "@/constants/filters";
 import { formatStatus } from "@/utilities/StringFormatter";
+import { UserData } from "@/interface/user.interface";
+import Link from "next/link";
 
-interface Subject {
+interface ThesisTableProps {
   setIsUpdated: (isUpdated: boolean) => void;
   thesisData: Thesis[];
+  user?: UserData | null;
 }
 
-const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
+const ThesisTable: React.FC<ThesisTableProps> = ({
+  user,
+  thesisData,
+  setIsUpdated,
+}) => {
   const [selectedThesis, setSelectedThesis] = useState<Thesis | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>("All");
@@ -24,9 +29,6 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
-
-  const userInfo = getUserInfoFromCookies();
-  const router = useRouter();
 
   const filteredData = thesisData.filter((thesis) => {
     const matchesThesis =
@@ -37,7 +39,9 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
       thesis.status?.toLowerCase().includes(statusFilter.toLowerCase());
     const matchesName =
       searchQuery === "" ||
-      `${thesis.user?.first_name ?? ""} ${thesis.user?.last_name ?? ""}`
+      `${thesis.student?.user?.first_name ?? ""} ${
+        thesis.student?.user?.last_name ?? ""
+      }`
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
@@ -53,6 +57,9 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
   const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNext = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
+  // Check if the filtered data is empty
+  const isDataEmpty = filteredData.length === 0;
 
   return (
     <div className="w-full overflow-x-auto">
@@ -93,100 +100,133 @@ const ThesisTable: React.FC<Subject> = ({ thesisData, setIsUpdated }) => {
         />
       </div>
 
-      {/* Table */}
-      <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-md">
-        <thead>
-          <tr className="bg-gray-100 border-b">
-            <th className="p-3 text-left text-sm font-semibold text-gray-700">
-              Student
-            </th>
-            <th className="p-3 text-left text-sm font-semibold text-gray-700">
-              Thesis Title
-            </th>
-            <th className="p-3 text-left text-sm font-semibold text-gray-700">
-              File
-            </th>
-            <th className="p-3 text-left text-sm font-semibold text-gray-700">
-              Status
-            </th>
-            <th className="p-3 text-left text-sm font-semibold text-gray-700">
-              Update Status
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedData.map((thesis, index) => (
-            <tr key={index} className="border-b">
-              <td className="p-3 text-sm text-gray-900">
-                {thesis.user?.first_name} {thesis.user?.last_name}
-              </td>
-              <td className="p-3 text-sm text-gray-900">
-                {thesis.thesis_title}
-              </td>
-              <td className="p-3 text-sm text-gray-900">
-                <a
-                  className="text-blue-500 underline"
-                  href={thesis.attachments[0]?.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  View File
-                </a>
-              </td>
-              <td className="p-3 text-sm text-gray-500">
-                {formatStatus(thesis.status)}
-              </td>
-              {userInfo?.role != "adviser" || userInfo?.role == "student" ? (
-                <td className="p-3 text-sm text-gray-500">
-                  <button
-                    className="bg-bgPrimary text-sm font-medium p-2 text-white rounded-md"
-                    onClick={() => {
-                      setSelectedThesis(thesis);
-                      setIsModalOpen(true);
-                    }}>
-                    Change Status
-                  </button>
-                  {thesis?.status?.includes("approve") && (
-                    <button
-                      className="ml-2 bg-green-800 text-sm font-medium p-2 text-white rounded-md"
-                      onClick={() => {
-                        router.push(`/thesis/info/?id=${thesis.id}`);
-                      }}>
-                      Modify
-                    </button>
+      {/* --- Empty State / Table Rendering --- */}
+      {isDataEmpty ? (
+        <div className="text-center py-12 border border-gray-200 rounded-md bg-white shadow-md">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="mx-auto h-10 w-10 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No Thesis Submissions Found
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {thesisData.length > 0
+              ? "Try adjusting your filters or search query."
+              : "There are currently no thesis submissions to display."}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Table */}
+          <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-md">
+            <thead>
+              <tr className="bg-gray-100 border-b">
+                <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                  Student
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                  Thesis Title
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                  File
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                  Status
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                  Update Status
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((thesis, index) => (
+                <tr key={index} className="border-b">
+                  <td className="p-3 text-sm text-gray-900">
+                    {thesis.student?.user?.first_name}{" "}
+                    {thesis.student?.user?.last_name}
+                  </td>
+                  <td className="p-3 text-sm text-gray-900">
+                    {thesis.thesis_title}
+                  </td>
+                  <td className="p-3 text-sm text-gray-900">
+                    <a
+                      className="text-blue-500 underline"
+                      href={thesis.attachments[0]?.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer">
+                      View File
+                    </a>
+                  </td>
+                  <td className="p-3 text-sm text-gray-500">
+                    {formatStatus(thesis?.status)}
+                  </td>
+                  {user?.role != "adviser" ? (
+                    <td className="p-3 text-sm text-gray-500">
+                      <button
+                        className="bg-brand-primary text-sm font-medium p-2 text-white rounded-md"
+                        onClick={() => {
+                          setSelectedThesis(thesis);
+                          setIsModalOpen(true);
+                        }}>
+                        Change Status
+                      </button>
+                      {thesis?.status?.includes("approve") && (
+                        <Link
+                          className="ml-2 bg-green-800 text-sm font-medium p-2 text-white rounded-md"
+                          href={
+                            user?.role === "student"
+                              ? `/thesis/${thesis.id}`
+                              : `/d033e22ae/thesis/${thesis.id}`
+                          }>
+                          Go
+                        </Link>
+                      )}
+                    </td>
+                  ) : (
+                    <td className="p-3 text-sm text-gray-500">
+                      Approval is restricted to the Program Head.
+                    </td>
                   )}
-                </td>
-              ) : (
-                <td className="p-3 text-sm text-gray-500">
-                  Approval is restricted to the Program Head.
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={handlePrev}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
-          Previous
-        </button>
-        <span className="text-sm text-gray-600">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
-          Next
-        </button>
-      </div>
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={handlePrev}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
+              Previous
+            </button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">
+              Next
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Modal */}
       <Modal
         title="Confirm Thesis"
+        modalType="info"
         isModalOpen={isModalOpen}
         setModalOpen={setIsModalOpen}>
         <ThesisConfirmationModal

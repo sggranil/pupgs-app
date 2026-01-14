@@ -1,9 +1,9 @@
 import React from "react";
 
 import PDFDownloadWrapper from "@/components/wrapper/PDFExportWrapper";
-import ThesisHonorarium from "@/components/forms/ThesisHonorarium";
-import PageHeader from "@/components/forms/component/PageHeader";
-import PageFooter from "@/components/forms/component/PageFooter";
+import ThesisHonorarium from "@/components/templates/Forms/ThesisHonorarium";
+import PageHeader from "@/components/templates/Forms/component/PageHeader";
+import PageFooter from "@/components/templates/Forms/component/PageFooter";
 import { Thesis } from "@/interface/thesis.interface";
 import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
 import { formatStatus } from "@/utilities/StringFormatter";

@@ -1,4 +1,4 @@
-import { User, Adviser, Student } from "./user.interface";
+import { Adviser, Student } from "@/interface/user.interface";
 
 export interface Thesis {
   id: number;
@@ -10,18 +10,16 @@ export interface Thesis {
   defense_phase?: string;
   status: string | null;
   message?: string;
-  user?: User;
-  user_id?: number;
   attachments: Attachment[];
   panelists: Adviser[];
   secretary?: Adviser;
   secretary_id?: number;
-  defense_date?: string;
-  defense_time?: string;
-  enrolled_subjects?: EnrolledSubject[];
+  defense_schedule?: string;
   room?: Room;
-  room_id?: number;
+  room_id?: string;
+  thesis_receipts?: ThesisReceipt[];
   created_at: string;
+  updated_at: Date;
 }
 
 export interface Attachment {
@@ -39,18 +37,35 @@ export interface Room {
   location?: string;
   capacity?: number;
   thesis?: Thesis[];
+  created_at: Date;
+  updated_at: Date;
 }
 
-export interface EnrolledSubject {
+export interface Attachment {
+  id: number;
+  title?: string;
+  description?: string;
+  thesis: Thesis;
+  thesis_id: number;
+  file_type: string;
+  file_url: string;
+  is_archived?: boolean;
+  created_at: Date;
+  updated_at: Date
+}
+
+export interface ThesisReceipt {
   id: number;
   student: Student;
   student_id: number;
-  subject_name: string;
+  thesis: Thesis;
+  thesis_id: number;
+  receipt_name: string;
   or_number: string;
   attachment: string;
-  status: string | null;
-  message: string | null;
-  thesis_id: number | null;
-  thesis?: Thesis[];
-  enrolled_at: Date;
+  status?: string;
+  message?: string;
+  is_archived: boolean;
+  created_at: Date;
+  updated_at: Date;
 }

@@ -5,36 +5,34 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        const { thesis_id, file_type, file_url } = await request.json();
+        const { payload } = await request.json();
 
-        if (!thesis_id || !file_type || !file_url || typeof file_url !== 'string') {
+        if (!payload) {
             return NextResponse.json(
-                { message: "Thesis ID or file URL is missing or invalid." },
+                { message: "Fields are required." },
                 { status: 400 }
             );
         }
 
-        const thesisExists = await prisma.thesis.findUnique({
-            where: { id: Number(thesis_id) },
+        const thesis = await prisma.thesis.findUnique({
+            where: { id: Number(payload.thesis_id) },
         });
 
-        if (!thesisExists) {
+        if (!thesis) {
             return NextResponse.json(
-                { message: "Thesis ID does not exist." },
+                { message: "Thesis record does not exist." },
                 { status: 404 }
             );
         }
 
         await prisma.attachment.create({
             data: {
-                thesis_id: Number(thesis_id),
-                file_type: file_type,
-                file_url: file_url,
+                ...payload
             },
         });
 
         return NextResponse.json(
-            { message: "File uploaded successfully" },
+            { message: "Link attachment uploaded successfully." },
             { status: 201 }
         );
     } catch (err) {

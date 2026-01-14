@@ -2,21 +2,6 @@ import { z } from 'zod';
 
 const gDriveOrDocsDomainRegex = /^https:\/\/(?:drive|docs)\.google\.com(?:$|\/)/;
 
-export const enrolledSubjectSchema = z.object({
-    subject_name: z.string(),
-    thesis_id: z.preprocess(
-        (val) => {
-            if (typeof val === "string") return parseInt(val, 10);
-            return val;
-        },
-        z.number().int().min(1, "Please select a thesis")
-    ),
-    or_number: z.string().min(6, "OR Number is required."),
-    attachment: z.string().min(6, "OR Attachment is required."),
-    status: z.string().optional(),
-    message: z.string().optional(),
-});
-
 export const addThesisSchema = z.object({
     thesis_title: z.string().min(6, { message: "Thesis title is required." }),
     file_type: z.string().optional(),
@@ -29,11 +14,22 @@ export const addThesisSchema = z.object({
     status: z.string().optional(),
 });
 
+export const updateThesisScheduleSchema = z.object({
+    defense_date: z.string().optional(),
+    defense_time: z.string().optional(),
+    room_id: z.string().optional(),
+    secretary_id: z.string().optional(),
+    link: z.string().optional(),
+    panelists: z.array(z.string()).min(3, "At least three panelist must be selected.").optional()
+})
+
 export const updateThesisSchema = z.object({
     status: z.string(),
+    defense_phase: z.string(),
     message: z.string(),
     adviser_id: z.number().optional(),
     student_id: z.number().optional(),
+    panelists: z.array(z.number()).optional()
 }).refine(
     (data) => {
         if (data.status !== 'pending_review' && !data.adviser_id) {
@@ -56,6 +52,8 @@ export const addRoomSchema = z.object({
 });
 
 export const addAttachmentSchema = z.object({
+    title: z.string().min(3, "Attachment title is required"),
+    description: z.string().optional(),
     file_type: z.string().optional(),
     file_url: z.string()
         .url("Please enter a valid URL.")
@@ -64,8 +62,17 @@ export const addAttachmentSchema = z.object({
         }),
 });
 
+export const manageThesisReceiptSchema = z.object({
+    receipt_name: z.string().optional(),
+    or_number: z.string().optional(),
+    attachment: z.string().optional(),
+    status: z.string().optional(),
+    message: z.string().optional()
+});
+
 export type AddRoomSchemaType = z.infer<typeof addRoomSchema>;
-export type EnrolledSubjectSchemaType = z.infer<typeof enrolledSubjectSchema>;
 export type AddThesisSchemaType = z.infer<typeof addThesisSchema>;
+export type UpdateThesisScheduleSchemaType = z.infer<typeof updateThesisScheduleSchema>;
 export type UpdateThesisSchemaType = z.infer<typeof updateThesisSchema>;
 export type AddAttachmentSchemaType = z.infer<typeof addAttachmentSchema>;
+export type ManageThesisReceiptSchemaType = z.infer<typeof manageThesisReceiptSchema>;

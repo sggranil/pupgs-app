@@ -1,37 +1,44 @@
-import { requestHandler } from "@/services/RequestServices";
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { USER_API } from "@/constants/urls";
 
-const useUserRequest = () => {
-    const getAllUser = async () => {
-        const response = await requestHandler({
-            method: 'GET',
-            url: USER_API.GET_ALL_USER_URL
-        })
-        return response.json()
-    }
+import { handleGetRequest, handlePostRequest } from "@/hooks/request";
+import { ResponsePayloadResult } from '@/interface/request.interface';
+import { User } from '@/interface/user.interface';
 
-    const getUser = async (id: number) => {
-        const response = await requestHandler({
-            method: 'GET',
-            url: USER_API.GET_USER_URL(id)
-        })
-        return response.json()
-    }
+const USER_KEYS = {
+    all: ['user'] as const,
+    lists: () => [...USER_KEYS.all, 'list'] as const,
+    detail: (id: number) => [...USER_KEYS.all, 'detail', id] as const,
+    user: (id: number) => [...USER_KEYS.all, 'user', id] as const,
+};
 
-    const updateUser = async (body: object) => {
-        const response = await requestHandler({
-            method: 'POST',
-            body: JSON.stringify(body),
-            url: USER_API.UPDATE_USER_URL
-        })
-        return response.json()
-    }
+export const useAllUsers = () => {
+    return useQuery<ResponsePayloadResult, Error>({
+        queryKey: USER_KEYS.lists(),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(USER_API.GET_ALL_USER_URL),
+    });
+};
 
-    return {
-        getAllUser,
-        getUser,
-        updateUser
-    }
+export const useGetUser = (id: number | undefined | null) => {
+    const isEnabled = !!id;
+
+    return useQuery<ResponsePayloadResult, Error>({
+        queryKey: USER_KEYS.detail(id as number),
+        queryFn: () => handleGetRequest<ResponsePayloadResult>(USER_API.GET_USER_URL(id as number)),
+        enabled: isEnabled,
+    });
+};
+
+export const useUpdateUser = () => {
+    return useMutation<User, Error, object>({
+        mutationFn: (body: any) => handlePostRequest<User>(USER_API.UPDATE_USER_URL, body),
+    });
+};
+
+const UserService = {
+    useAllUsers,
+    useGetUser,
+    useUpdateUser
 }
 
-export default useUserRequest;
+export default UserService;

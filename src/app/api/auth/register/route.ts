@@ -7,8 +7,9 @@ import { generateToken } from '@/utilities/TokenUtilities';
 import { registerSchema } from '@/types/api/auth.types';
 import { setCookie } from '@/utilities/AuthUtilities';
 
-const prisma = new PrismaClient();
+import { roleMappings } from '@/utilities/RoleMapping';
 
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
@@ -23,6 +24,15 @@ export async function POST(request: NextRequest) {
         }
 
         const { first_name, middle_name, last_name, email, password, role } = validation.data;
+
+        const roleData = roleMappings[role];
+
+        if (!roleData) {
+            return NextResponse.json(
+                { message: "Invalid user role specified." },
+                { status: 400 }
+            );
+        }
 
         const existingUser = await prisma.user.findUnique({
             where: { email },
@@ -46,8 +56,8 @@ export async function POST(request: NextRequest) {
                 last_name,
                 role,
                 tel_number: "",
-                standing: role === "student" ? "Student" : null,
-                position: role === "adviser" ? "Official" : role === "admin" ? "Admin" : null,
+                standing: roleData.standing,
+                position: roleData.position,
             },
         });
 
@@ -81,7 +91,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!data.is_adviser_created || !data.is_adviser_created == null) {
-            setCookie(res, 'access_token', accessToken, { maxAge: 1800 });
+            setCookie(res, 'access_token', accessToken, { maxAge: 86400 });
             setCookie(res, 'refresh_token', refreshToken, { maxAge: 86400 });
         }
 
@@ -89,7 +99,7 @@ export async function POST(request: NextRequest) {
     } catch (err) {
         console.error(err);
         return NextResponse.json(
-            { message: "An error occurred during registration" },
+            { message: "An unexpected error occurred during registration. Please try again later." },
             { status: 500 }
         );
     }

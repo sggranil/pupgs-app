@@ -1,66 +1,79 @@
 import { Attachment } from "@/interface/thesis.interface";
 import { formatDate } from "@/utilities/DateUtilities";
-import useProposalRequest from "@/hooks/attachment";
-import { showToast } from "../organisms/Toast";
-import { getUserInfoFromCookies } from "@/utilities/AuthUtilities";
+import { useDeleteAttachment } from "@/hooks/attachment";
+
+import { showToast } from "@/components/template/Toaster";
+import Link from "next/link";
+import { UserData } from "@/interface/user.interface";
 
 interface AttachmentCardProps {
+  user?: UserData | null;
   index: number;
-  title: string;
+  title?: string;
   attachment: Attachment;
+  file_type: string;
   setIsUpdated: (value: boolean) => void;
 }
 
 const AttachmentCard: React.FC<AttachmentCardProps> = ({
+  user,
   index,
   title,
   attachment,
+  file_type,
   setIsUpdated,
 }) => {
-  const userData = getUserInfoFromCookies();
+  const { mutateAsync: deleteAttachment } = useDeleteAttachment();
 
-  const { deleteAttachment } = useProposalRequest();
-
-  async function handleDeleteProposal() {
-    setIsUpdated(false);
+  async function handleDeleteProposal(id: number) {
     try {
-      const response = await deleteAttachment(Number(attachment.id));
-      if (response) {
-        showToast("Proposal updated successfully!", "success");
-        setIsUpdated(true);
-      } else {
-        showToast("Unable to delete proposal", "error");
-      }
+      deleteAttachment(id, {
+        onSuccess: () => {
+          setIsUpdated(true);
+          showToast(
+            `You deleted an attachment.`,
+            "success",
+            "Attachment Deleted"
+          );
+        },
+        onError: (error) => {
+          showToast(error.message, "error");
+        },
+      });
     } catch (error) {
       showToast("An error occurred. Please try again.", "error");
     }
   }
 
   return (
-    <div className="w-full" key={index}>
-      <div className="flex items-center justify-between p-3 bg-white rounded-md shadow-md">
+    <div
+      className="w-[250] flex-shrink-0 md:flex-shrink md:w-full ring-1 ring-black ring-opacity-10 transition-opacity rounded-sm"
+      key={index}>
+      <div className="flex items-center justify-between py-2 px-3 bg-white rounded-md">
         <div>
-          <h2 className="text-md font-semibold text-textPrimary capitalize">
+          <h2 className="text-sm font-semibold text-content-primary capitalize">
             {title}
           </h2>
-          <p className="text-gray-500 text-sm">
-            {formatDate(attachment.uploaded_at)}
+          <p className="text-content-secondary text-xs">
+            {formatDate(attachment.created_at)}
           </p>
-          <a
-            className="text-blue-500 underline text-sm"
+          <Link
+            className="text-green-600 underline text-xs"
             href={attachment.file_url}
             target="_blank"
             rel="noopener noreferrer">
-            Read Article
-          </a>
+            Open
+          </Link>
+          {index >= 0 &&
+            !title?.includes("Initial") &&
+            user?.role === "student" && (
+              <button
+                onClick={() => handleDeleteProposal(attachment.id)}
+                className="ml-2 text-red-500 underline text-xs">
+                Delete
+              </button>
+            )}
         </div>
-        {index != 0 && userData?.role === "student" && (
-          <button
-            onClick={handleDeleteProposal}
-            className="h-9 px-3 py-2 text-sm font-normal rounded-md whitespace-nowrap bg-bgPrimary text-white">
-            Delete
-          </button>
-        )}
       </div>
     </div>
   );

@@ -10,24 +10,24 @@ export const USER_API = {
     UPDATE_USER_URL: "/user/update",
 }
 
-export const SUBJECT_API = {
-    GET_ALL_SUBJECT_URL: "/subject/get",
-    GET_SUBJECT_URL: (id: number) => `/subject/get/${id}`,
-    ADD_SUBJECT_URL: "/subject/add",
-    UPDATE_SUBJECT_URL: "/subject/update",
-    CONFIRMED_SUBJECT_URL: "/subject/confirmed",
-    DELETE_SUBJECT_URL: (id: number) => `/subject/delete/${id}`,
+export const RECEIPTS_API = {
+    GET_ALL_RECEIPTS_URL: "/receipts/get",
+    GET_RECEIPTS_URL: (id: number) => `/receipts/get/${id}`,
+    ADD_RECEIPTS_URL: "/receipts/add",
+    UPDATE_RECEIPTS_URL: "/receipts/update",
+    DELETE_RECEIPTS_URL: (id: number) => `/receipts/delete/${id}`,
 }
 
 export const THESIS_API = {
-    FETCH_THESIS_URL: (id: number) => `/thesis/fetch/${id}`,
     GET_ALL_THESIS_URL: "/thesis/get",
     GET_THESIS_URL: (id: number) => `/thesis/get/${id}`,
+    GET_USER_THESIS: (id: number) => `/thesis/user/${id}`,
+
+    FETCH_THESIS_URL: (id: number) => `/thesis/fetch/${id}`,
     ADD_THESIS_URL: "/thesis/add",
     UPDATE_THESIS_URL: "/thesis/update",
     UPDATE_THESIS_INFO_URL: "/thesis/update/info",
     CONFIRM_THESIS_URL: "/thesis/confirmed",
-    SCHEDULE_THESIS_URL: "/thesis/update/schedule",
     DELETE_THESIS_URL: (id: number) => `/thesis/delete/${id}`,
 }
 
@@ -41,7 +41,7 @@ export const ROOM_API = {
     GET_ALL_ROOM_URL: "/room/get",
     ADD_ROOM_URL: "/room/add",
     DELETE_ROOM_URL: (id: number) => `/room/delete/${id}`,
-    AVAILABLE_ROOM_URL: (id: number, date: string) => `/room/availability/${id}/${date}`,
+    AVAILABLE_ROOM_URL: (date: Date) => `/room/availability/${date}`,
 }
 
 export const ADVISER_API = {

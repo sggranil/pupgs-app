@@ -5,14 +5,21 @@ import Modal from "../organisms/Modal";
 
 interface PDFExportWrapperProps {
   fileName: string;
-  buttonLabel: string
+  buttonLabel: string;
   content: React.ReactNode;
   header?: React.ReactNode;
   footer?: React.ReactNode;
   isLandscape?: boolean;
 }
 
-const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLabel, content, header, footer, isLandscape }) => {
+const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({
+  fileName,
+  buttonLabel,
+  content,
+  header,
+  footer,
+  isLandscape,
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -21,102 +28,143 @@ const PDFExportWrapper: React.FC<PDFExportWrapperProps> = ({ fileName, buttonLab
   const handleGeneratePdf = async () => {
     if (!printRef.current) return;
 
-    const [mainCanvas, headerImg, footerImg] = await Promise.all([
-      html2canvas(printRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      }),
-      headerRef.current
-        ? html2canvas(headerRef.current, {
+    const originalStyle = printRef.current.style.height;
+    printRef.current.style.height = "auto";
+
+    try {
+      const [mainCanvas, headerCanvas, footerCanvas] = await Promise.all([
+        html2canvas(printRef.current, {
           scale: 2,
           useCORS: true,
           backgroundColor: "#ffffff",
-        }).then((c) => c.toDataURL("image/png"))
-        : Promise.resolve(null),
-      footerRef.current
-        ? html2canvas(footerRef.current, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-        }).then((c) => c.toDataURL("image/png"))
-        : Promise.resolve(null),
-    ]);
+          windowHeight: printRef.current.scrollHeight,
+        }),
+        headerRef.current
+          ? html2canvas(headerRef.current, {
+              scale: 2,
+              useCORS: true,
+              backgroundColor: "#ffffff",
+            })
+          : Promise.resolve(null),
+        footerRef.current
+          ? html2canvas(footerRef.current, {
+              scale: 2,
+              useCORS: true,
+              backgroundColor: "#ffffff",
+            })
+          : Promise.resolve(null),
+      ]);
 
-    const imgWidth = mainCanvas.width;
-    const imgHeight = mainCanvas.height;
+      const pdf = new jsPDF({
+        orientation: isLandscape ? "landscape" : "portrait",
+        unit: "px",
+        format: "a4",
+      });
 
-    const pdf = new jsPDF({ orientation: isLandscape ? "landscape" : "portrait", unit: "px", format: "legal" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+      // DYNAMIC HEIGHT CALCULATION (Prevents Stretching)
+      const headerHeight = headerCanvas
+        ? (headerCanvas.height * pageWidth) / headerCanvas.width
+        : 0;
+      const footerHeight = footerCanvas
+        ? (footerCanvas.height * pageWidth) / footerCanvas.width
+        : 20; // Default padding if no footer
 
-    const headerHeight = headerImg ? isLandscape ? 85 : 80 : 0;
-    const footerHeight = footerImg ? 85 : 20;
-    const usableHeight = pageHeight - headerHeight - footerHeight;
+      const usableHeight = pageHeight - headerHeight - footerHeight;
 
-    const ratio = pageWidth / imgWidth;
-    const scaledTotalHeight = imgHeight * ratio;
-    const totalPages = Math.ceil(scaledTotalHeight / usableHeight);
+      const imgWidth = mainCanvas.width;
+      const imgHeight = mainCanvas.height;
+      const ratio = pageWidth / imgWidth;
+      const scaledTotalHeight = imgHeight * ratio;
+      const totalPages = Math.ceil(scaledTotalHeight / usableHeight);
 
-    for (let i = 0; i < totalPages; i++) {
-      const sourceY = (i * usableHeight) / ratio;
-      const sliceHeight = usableHeight / ratio;
+      for (let i = 0; i < totalPages; i++) {
+        if (i > 0) pdf.addPage();
 
-      const pageCanvas = document.createElement("canvas");
-      const ctx = pageCanvas.getContext("2d");
+        const sourceY = (i * usableHeight) / ratio;
+        const sliceHeight = usableHeight / ratio;
 
-      pageCanvas.width = imgWidth;
-      pageCanvas.height = sliceHeight;
+        const pageCanvas = document.createElement("canvas");
+        const ctx = pageCanvas.getContext("2d");
 
-      ctx!.fillStyle = "#ffffff";
-      ctx!.fillRect(0, 0, imgWidth, sliceHeight);
-      ctx!.drawImage(mainCanvas, 0, sourceY, imgWidth, sliceHeight, 0, 0, imgWidth, sliceHeight);
+        pageCanvas.width = imgWidth;
+        pageCanvas.height = sliceHeight;
 
-      const pageImg = pageCanvas.toDataURL("image/jpeg", 1.0);
-      if (i > 0) pdf.addPage();
+        ctx!.fillStyle = "#ffffff";
+        ctx!.fillRect(0, 0, imgWidth, sliceHeight);
+        ctx!.drawImage(
+          mainCanvas,
+          0,
+          sourceY,
+          imgWidth,
+          sliceHeight,
+          0,
+          0,
+          imgWidth,
+          sliceHeight
+        );
 
-      if (headerImg) {
-        pdf.addImage(headerImg, "PNG", 0, 0, pageWidth, headerHeight);
+        const pageImg = pageCanvas.toDataURL("image/jpeg", 1.0);
+
+        // Add Header
+        if (headerCanvas) {
+          const headerData = headerCanvas.toDataURL("image/png");
+          pdf.addImage(headerData, "PNG", 0, 0, pageWidth, headerHeight);
+        }
+
+        // Add Content
+        pdf.addImage(pageImg, "JPEG", 0, headerHeight, pageWidth, usableHeight);
+
+        // Add Footer
+        if (footerCanvas) {
+          const footerData = footerCanvas.toDataURL("image/png");
+          pdf.addImage(
+            footerData,
+            "PNG",
+            0,
+            pageHeight - footerHeight,
+            pageWidth,
+            footerHeight
+          );
+        }
       }
 
-      pdf.addImage(pageImg, "JPEG", 0, headerHeight, pageWidth, usableHeight);
-
-      if (footerImg) {
-        pdf.addImage(footerImg, "PNG", 0, pageHeight - footerHeight, pageWidth, footerHeight);
-      }
+      pdf.save(`${fileName}`);
+    } finally {
+      printRef.current.style.height = originalStyle;
     }
-
-    pdf.save(`${fileName}`);
   };
-
-
 
   return (
     <div className="">
-      <Modal title="Export Document" ifLandscape={isLandscape} isModalOpen={isModalOpen} setModalOpen={setModalOpen}>
+      <Modal
+        title="Export Document"
+        modalType={isLandscape ? "pdf" : "form"}
+        isModalOpen={isModalOpen}
+        setModalOpen={setModalOpen}>
         <div className="w-full h-[400px] overflow-y-auto border border-gray-200 rounded-md bg-white">
-          {header && <div ref={headerRef}>{header}</div>}
-          <div ref={printRef}>{content}</div>
-          {footer && <div ref={footerRef}>{footer}</div>}
+          <div className="bg-white">
+            {header && <div ref={headerRef}>{header}</div>}
+            <div ref={printRef}>{content}</div>
+            {footer && <div ref={footerRef}>{footer}</div>}
+          </div>
         </div>
 
         <button
-          className="bg-bgPrimary text-white text-sm p-2 rounded-md mt-4"
-          onClick={handleGeneratePdf}
-        >
+          className="bg-brand-primary p-2 mt-2 text-white text-sm rounded-md"
+          onClick={handleGeneratePdf}>
           {buttonLabel}
         </button>
       </Modal>
 
       <button
-        className="bg-bgPrimary text-white text-sm p-2 rounded-md"
-        onClick={() => setModalOpen(true)}
-      >
+        className="bg-brand-primary text-white px-3 py-2 rounded-md text-sm"
+        onClick={() => setModalOpen(true)}>
         {buttonLabel}
       </button>
     </div>
-
   );
 };
 

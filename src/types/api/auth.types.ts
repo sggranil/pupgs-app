@@ -5,8 +5,10 @@ export const registerSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   middle_name: z.string().optional(),
   ext_name: z.string().optional(),
+  position: z.string().optional(),
   email: z.string().email("Invalid email format").min(1, "Email is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  terms_accepted: z.boolean(),
   confirm_password: z
     .string()
     .min(6, "Confirm password must be at least 6 characters").optional(),
@@ -21,6 +23,29 @@ export const loginSchema = z.object({
   password: z.string().min(6, { message: "Password is required" }),
 });
 
+export const updatePasswordSchema = z.object({
+  old_password: z.string().optional(),
+  password: z.string().optional(),
+  confirm_password: z.string().optional(),
+}).refine((data) => {
+  if (data.password || data.confirm_password || data.old_password) {
+    return !!data.old_password && !!data.password && !!data.confirm_password;
+  }
+  return true;
+}, {
+  message: "All password fields are required.",
+  path: ["old_password"],
+})
+  .refine((data) => {
+    if (data.password || data.confirm_password) {
+      return data.password === data.confirm_password;
+    }
+    return true;
+  }, {
+    message: "Passwords do not match.",
+    path: ["confirm_password"],
+  });
+
 export const updateUserSchema = z
   .object({
     first_name: z.string().optional(),
@@ -33,35 +58,15 @@ export const updateUserSchema = z
     start_date: z.string().optional(),
     pass_date: z.string().optional(),
     role: z.string().optional(),
-    is_deleted: z.string().optional(),
+    is_archived: z.boolean().optional(),
     program: z.string().optional(),
     department: z.string().optional(),
     tel_number: z.string().optional(),
-    old_password: z.string().optional(),
-    password: z.string().optional(),
-    confirm_password: z.string().optional(),
-  })
-  .refine((data) => {
-    if (data.password || data.confirm_password || data.old_password) {
-      return !!data.old_password && !!data.password && !!data.confirm_password;
-    }
-    return true;
-  }, {
-    message: "All password fields are required.",
-    path: ["old_password"],
-  })
-  .refine((data) => {
-    if (data.password || data.confirm_password) {
-      return data.password === data.confirm_password;
-    }
-    return true;
-  }, {
-    message: "Passwords do not match.",
-    path: ["confirm_password"],
   });
 
 
 export type RegisterSchemaType = z.infer<typeof registerSchema>;
 export type LoginSchemaType = z.infer<typeof loginSchema>;
-export type UpdateSchemaType = z.infer<typeof updateUserSchema>;
+export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>;
+export type UpdatePasswordSchemaType = z.infer<typeof updatePasswordSchema>;
 

@@ -1,4 +1,4 @@
-import { EnrolledSubject, Thesis } from "./thesis.interface";
+import { ThesisReceipt, Thesis } from "@/interface/thesis.interface";
 
 export interface User {
     id: number;
@@ -11,16 +11,20 @@ export interface User {
     prefix?: string;
     role: string;
     tel_number?: string;
-    standing?: string;
     start_date?: string;
     pass_date?: string;
-    position?: string;
+    standing?: string;
     program?: string;
     department?: string;
-    thesis: Thesis[];
+    position?: string;
     adviser?: Adviser;
     student?: Student;
-    is_deleted?: boolean;
+    audit_log: AuditLog;
+    is_archived?: boolean;
+    notifications_received: Notification[];
+    notifications_sent: Notification[];
+    created_at: Date;
+    updated_at: Date;
 }
 
 export interface Student {
@@ -28,14 +32,55 @@ export interface Student {
     user: User;
     user_id: number;
     thesis: Thesis[];
-    enrolled_subject: EnrolledSubject[];
+    thesis_receipts: ThesisReceipt[];
 }
 
 export interface Adviser {
     id: number;
     user: User;
     user_id: number;
-    thesis: Thesis[];
+    advised_theses: Thesis[];
     panelists: Thesis[];
-    secretary: Thesis;
+    secretary: Thesis[];
+}
+
+export interface Notification {
+    id: number;
+    type: string;
+    read: boolean;
+    recipient_id: number;
+    recipient: User;
+    sender_id?: number;
+    sender?: User;
+    title: string;
+    message?: string;
+    link?: string;
+    created_at: Date;
+    updated_at: Date;
+}
+
+export interface AuditLog {
+    id: number;
+    operation: string;
+    message: string;
+    table_name?: string;
+    record_id?: number;
+    old_data?: JSON;
+    new_data?: JSON;
+    changed_by?: User;
+    user_id?: number
+    device_type?: string;
+    device_id?: string;
+    ip_address?: string;
+    timestamp: Date;
+}
+
+export interface UserData {
+    id: number;
+    role: string;
+    email: string;
+}
+export interface UserContextType {
+    user: UserData | null;
+    isLoading: boolean;
 }
