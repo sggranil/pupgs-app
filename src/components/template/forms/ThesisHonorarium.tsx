@@ -1,17 +1,137 @@
-import { EnrolledSubject, Thesis } from "@/interface/thesis.interface";
+import React from "react";
+import { Thesis } from "@/interface/thesis.interface";
+import { formatStatus } from "@/utilities/StringFormatter";
 
-interface ThesisHonorariumProps {
-  thesisData: Thesis | null;
-  enrolledSubject: EnrolledSubject | null;
+interface HonorariumRates {
+  ADVISER: {
+    PROPOSAL: number;
+    FINAL: number;
+  };
+  PANELIST: {
+    PROPOSAL: number;
+    FINAL: number;
+  };
+  SECRETARY: {
+    PROPOSAL: number;
+    FINAL: number;
+  };
 }
 
+interface ThesisHonorariumProps {
+  thesesData: Thesis[] | null;
+  honorariumRates: HonorariumRates;
+}
+
+const formatCurrency = (amount: number): string => {
+  if (typeof amount !== "number" || isNaN(amount)) {
+    return "Php 0.00";
+  }
+  // Added Intl.NumberFormat for comma separators
+  return `Php ${amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
 const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
-  thesisData,
-  enrolledSubject,
+  thesesData,
+  honorariumRates: rates,
 }) => {
+  if (!thesesData || thesesData.length === 0) {
+    return (
+      <div className="w-full h-full px-16 py-8 text-center text-xl font-semibold">
+        No Thesis data available for Honorarium Request.
+      </div>
+    );
+  }
+
+  // 1. DATE RANGE LOGIC
+  const getDefenseDateRange = () => {
+    const dates = thesesData
+      .map((t) =>
+        t.defense_schedule ? new Date(t.defense_schedule).getTime() : null
+      )
+      .filter((d): d is number => d !== null)
+      .sort((a, b) => a - b);
+
+    if (dates.length === 0) return "No date set";
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const firstDate = new Date(dates[0]);
+    const lastDate = new Date(dates[dates.length - 1]);
+
+    if (firstDate.toDateString() === lastDate.toDateString()) {
+      return firstDate.toLocaleDateString("en-US", options);
+    }
+
+    // Format: January 31 - February 10, 2026
+    return `${firstDate.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+    })} - ${lastDate.toLocaleDateString("en-US", options)}`;
+  };
+
+  // 2. OVERALL SUMMARY LOGIC (Multiplies based on occurrences)
+  const overallSummaryMap = new Map<
+    number,
+    { faculty: any; roles: Map<string, number>; total: number }
+  >();
+
+  thesesData.forEach((thesis) => {
+    // Determine rate based on specific thesis phase
+    const isFinal = thesis.defense_phase === "final_defense";
+    const currentRateKey = isFinal ? "FINAL" : "PROPOSAL";
+
+    const processRole = (faculty: any, roleName: string, rateValue: number) => {
+      if (!faculty) return;
+      const existing = overallSummaryMap.get(faculty.id) || {
+        faculty,
+        roles: new Map<string, number>(),
+        total: 0,
+      };
+
+      // Increment count for this role and add to total
+      const currentRoleCount = existing.roles.get(roleName) || 0;
+      existing.roles.set(roleName, currentRoleCount + 1);
+      existing.total += rateValue;
+
+      overallSummaryMap.set(faculty.id, existing);
+    };
+
+    processRole(thesis.adviser, "Adviser", rates.ADVISER[currentRateKey]);
+    thesis.panelists?.forEach((p) =>
+      processRole(p, "Panelist", rates.PANELIST[currentRateKey])
+    );
+    processRole(thesis.secretary, "Secretary", rates.SECRETARY[currentRateKey]);
+  });
+
+  const overallSummaryList = Array.from(overallSummaryMap.values());
+  const uniqueFacultyMembers = overallSummaryList.map((item) => item.faculty);
+
   return (
     <div className="w-full h-full px-16">
-      <div className="px-10 py-2 leading-relaxed">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @media print {
+          @page {
+            size: A4;
+            margin: 20mm;
+          }
+          body {
+            -webkit-print-color-adjust: exact;
+          }
+        }
+      `,
+        }}
+      />
+
+      {/* 1. OFFICIAL REQUEST LETTER */}
+      <div className="px-10 py-2 leading-relaxed print:break-after-page">
         <p className="mb-8 text-base">
           {new Date().toLocaleDateString("en-US", {
             year: "numeric",
@@ -58,51 +178,30 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
             May I respectfully request the release of payment for the following
             faculty members who served as panelists during the oral defense
             activities held on{" "}
-            <span className="font-bold">
-              {thesisData?.defense_date
-                ? new Date(thesisData.defense_date).toLocaleDateString(
-                    "en-US",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    }
-                  )
-                : "No date set"}
-            </span>{" "}
-            at{" "}
-            <span className="font-bold">
-              {thesisData?.room?.name}, {thesisData?.room?.location}
-            </span>
-            , outside of their official time:
+            <span className="font-bold">{getDefenseDateRange()}</span>.
           </p>
 
           <div className="w-full flex justify-center">
             <table className="border border-gray-400 w-[400px]">
               <thead className="bg-green-100">
                 <tr>
-                  <th className="border border-gray-400 px-4 py-2 pt-0 text-center align-middle">
+                  <th className="border border-gray-400 px-4 py-2 text-center align-middle">
                     List of Faculty Members
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {[
-                  ...(thesisData?.adviser ? [thesisData.adviser] : []),
-                  ...(thesisData?.panelists || []),
-                  ...(thesisData?.secretary ? [thesisData.secretary] : []),
-                ].map((member, index) => (
+                {uniqueFacultyMembers?.map((member, index) => (
                   <tr key={`faculty-${index}`}>
                     <td className="border border-gray-400 px-4 py-2 pt-0 align-middle">
-                      {index + 1}. {member.user?.first_name}{" "}
-                      {member.user?.last_name}
+                      {index + 1}. {member?.user?.first_name}{" "}
+                      {member?.user?.last_name}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
           <p className="text-justify leading-tight py-2">
             The dedication and effort of these faculty members in supporting our
             students’ academic progress are highly commendable. I certify that
@@ -115,13 +214,12 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
             any further information or documentation, please do not hesitate to
             contact us through local 203.
           </p>
-
           <p className="text-justify leading-tight py-2">Respectfully yours,</p>
-
           <div className="text-base space-y-0 py-6">
             <p className="m-0 py-[3px] leading-none font-bold">
               DR. BENILDA ELEONOR V. COMENDADOR
             </p>
+
             <p className="m-0 py-[3px] leading-none">Chairperson</p>
           </div>
 
@@ -131,6 +229,7 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
             <p className="m-0 py-[3px] leading-none font-bold">
               ASSOC. MARIANNE C. ORTIZ
             </p>
+
             <p className="m-0 py-[3px] leading-none">IODE Director</p>
           </div>
 
@@ -138,164 +237,233 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
             <p className="m-0 py-[3px] leading-none font-bold">
               DR. RUDOLF ANTHONY A. LACERNA
             </p>
+
             <p className="m-0 py-[3px] leading-none">Executive Director</p>
           </div>
         </div>
       </div>
-      <div className="block">
-        <div className="w-full flex justify-center">
-          <h3 className="underline uppercase font-semibold mb-4">
-            {enrolledSubject?.subject_name}
-          </h3>
-        </div>
-        <div className="overflow-x-auto w-full">
-          <table className="w-full table-auto border border-gray-300">
-            <tbody>
-              <tr className="border-b border-gray-300">
-                <td className="px-4 py-2 pt-0 font-semibold text-right w-1/3">
-                  Program:
-                </td>
-                <td className="px-4 py-2 pt-0">
-                  {thesisData?.student?.user.program}
-                </td>
-              </tr>
-              <tr className="border-b border-gray-300">
-                <td className="px-4 py-2 pt-0 font-semibold text-right">
-                  Name of Proponent:
-                </td>
-                <td className="px-4 py-2 pt-0">
-                  {thesisData?.student?.user.first_name}{" "}
-                  {thesisData?.student?.user.middle_name}{" "}
-                  {thesisData?.student?.user.last_name}
-                </td>
-              </tr>
-              <tr className="border-b border-gray-300">
-                <td className="px-4 py-2 pt-0 font-semibold text-right">
-                  Title of Thesis:
-                </td>
-                <td className="px-4 py-2 pt-0">{thesisData?.thesis_title}</td>
-              </tr>
-              <tr className="border-b border-gray-300">
-                <td className="px-4 py-2 pt-0 font-semibold text-right">
-                  Date and Time:
-                </td>
-                <td className="px-4 py-2 pt-0">
-                  {thesisData?.defense_date && thesisData?.defense_time
-                    ? (() => {
-                        const date = new Date(
-                          new Date(thesisData.defense_date).toLocaleString(
+
+      {/* 2. INDIVIDUAL PROPONENT REPORTS */}
+      {thesesData?.map((thesis, index) => {
+        const relevantPhase = thesis.defense_phase || "final_defense";
+        const currentRateKey =
+          relevantPhase === "final_defense" ? "FINAL" : "PROPOSAL";
+
+        const latestReceipt = thesis.thesis_receipts
+          ? [...thesis.thesis_receipts]
+              .filter((r) => r.receipt_name.includes(relevantPhase))
+              .sort(
+                (a, b) =>
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+              )[0]
+          : null;
+
+        const roleEntries: { role: string; faculty: any; rate: number }[] = [];
+        if (thesis.adviser)
+          roleEntries.push({
+            role: "Adviser",
+            faculty: thesis.adviser,
+            rate: rates.ADVISER[currentRateKey],
+          });
+        thesis.panelists?.forEach((p) =>
+          roleEntries.push({
+            role: "Panelist",
+            faculty: p,
+            rate: rates.PANELIST[currentRateKey],
+          })
+        );
+        if (thesis.secretary)
+          roleEntries.push({
+            role: "Secretary",
+            faculty: thesis.secretary,
+            rate: rates.SECRETARY[currentRateKey],
+          });
+
+        return (
+          <div
+            key={index}
+            className="block mb-12 last:mb-0 break-inside-avoid print:break-before-page">
+            <div className="w-full flex justify-center">
+              <h3 className="underline uppercase font-semibold mb-4 text-center">
+                {formatStatus(relevantPhase)} - Proponent {index + 1}
+              </h3>
+            </div>
+            <div className="overflow-x-auto w-full mb-4">
+              <table className="w-full table-auto border border-gray-300">
+                <thead>
+                  <tr className="border-b border-gray-300 bg-gray-100">
+                    <th className="px-4 py-2 pt-0 text-left w-1/4">Program</th>
+                    <th className="px-4 py-2 pt-0 text-left w-1/4">
+                      Name of Proponent
+                    </th>
+                    <th className="px-4 py-2 pt-0 text-left w-1/2">
+                      Title of Thesis
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-300">
+                    <td className="px-4 py-2 pt-0">
+                      {thesis.student?.user?.program}
+                    </td>
+                    <td className="px-4 py-2 pt-0">
+                      {thesis.student?.user?.first_name}{" "}
+                      {thesis.student?.user?.last_name}
+                    </td>
+                    <td className="px-4 py-2 pt-0">{thesis.thesis_title}</td>
+                  </tr>
+                  <tr>
+                    <td
+                      colSpan={2}
+                      className="px-4 py-2 pt-0 font-semibold text-right">
+                      Date and Time:
+                    </td>
+                    <td className="px-4 py-2 pt-0">
+                      {thesis.defense_schedule
+                        ? new Date(thesis.defense_schedule).toLocaleString(
                             "en-US",
-                            { timeZone: "Asia/Manila" }
+                            {
+                              timeZone: "Asia/Manila",
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }
                           )
-                        );
-                        const start = new Date(
-                          new Date(thesisData.defense_time).toLocaleString(
-                            "en-US",
-                            { timeZone: "Asia/Manila" }
-                          )
-                        );
-                        const end = new Date(start.getTime() + 60 * 60 * 1000);
-                        return `${date.toDateString()} | ${start.toLocaleTimeString(
-                          [],
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )} - ${end.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}`;
-                      })()
-                    : "To be Announced"}
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 pt-0 font-semibold text-right">
-                  Proof of Payment:
-                </td>
-                <td className="px-4 py-2 pt-0">
-                  OR #{enrolledSubject?.or_number}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="flex justify-center items-center my-2">
-          <div className="w-full border p-4 flex items-center justify-center">
-            {enrolledSubject?.attachment &&
-            enrolledSubject.attachment.endsWith(".pdf") ? (
-              <p className="text-center text-gray-500">
-                PDF preview not supported in capture. Please download or view
-                separately.
-              </p>
-            ) : (
-              <img
-                src={enrolledSubject?.attachment}
-                alt="Attachment"
-                className="w-1/2"
-                crossOrigin="anonymous"
-              />
-            )}
+                        : "To be Announced"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      colSpan={2}
+                      className="px-4 py-2 pt-0 font-semibold text-right">
+                      Proof of Payment:
+                    </td>
+                    <td className="px-4 py-2 pt-0">
+                      {latestReceipt
+                        ? `OR #${latestReceipt.or_number}`
+                        : "No Receipt Found"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-center items-center mb-4">
+              <div className="w-full border p-4 flex items-center justify-center">
+                {latestReceipt?.attachment ? (
+                  latestReceipt.attachment.endsWith(".pdf") ? (
+                    <p className="text-center text-gray-500">
+                      PDF preview not supported in capture. Please download or
+                      view separately.
+                    </p>
+                  ) : (
+                    <img
+                      src={latestReceipt.attachment}
+                      alt="Proof of Payment Attachment"
+                      className="w-1/2"
+                      crossOrigin="anonymous"
+                    />
+                  )
+                ) : (
+                  <p className="text-center text-red-500 font-medium">
+                    Proof of Payment Attachment is missing or not found for this
+                    phase.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="overflow-x-auto w-full">
+              <table className="min-w-full border border-gray-300 table-auto">
+                <thead>
+                  <tr>
+                    <th
+                      colSpan={4}
+                      className="border border-gray-300 text-center text-base font-semibold bg-gray-200 pt-0 pb-2">
+                      EVALUATION COMMITTEE HONORARIUM (Defense Summary)
+                    </th>
+                  </tr>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                      Role
+                    </th>
+                    <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                      Name
+                    </th>
+                    <th className="border border-gray-300 text-center pt-0 pb-2 px-4">
+                      Rate
+                    </th>
+                    <th className="border border-gray-300 text-right pt-0 pb-2 px-4">
+                      Amount Due
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roleEntries.map((entry, rIndex) => (
+                    <tr key={rIndex}>
+                      <td className="border border-gray-300 pt-0 pb-2 px-4 text-sm font-semibold">
+                        {entry.role}
+                      </td>
+                      <td className="border border-gray-300 pt-0 pb-2 px-4">
+                        {entry.faculty.user?.first_name}{" "}
+                        {entry.faculty.user?.last_name}
+                      </td>
+                      <td className="border border-gray-300 pt-0 pb-2 px-4 text-center text-xs">
+                        {formatCurrency(entry.rate)}
+                      </td>
+                      <td className="border border-gray-300 pt-0 pb-2 px-4 text-right font-bold bg-yellow-50">
+                        {formatCurrency(entry.rate)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        );
+      })}
+
+      {/* 3. OVERALL SUMMARY AT THE BOTTOM */}
+      <div className="pt-6 border-t-2 border-dashed border-gray-400 print:break-before-page">
         <div className="overflow-x-auto w-full">
           <table className="min-w-full border border-gray-300 table-auto">
             <thead>
               <tr>
                 <th
                   colSpan={3}
-                  className="border border-gray-300 text-center text-base font-semibold bg-gray-200 pt-0 pb-2">
-                  EVALUATION COMMITTEE
+                  className="border border-gray-300 text-center text-lg font-bold bg-gray-800 text-white pt-2 pb-2">
+                  OVERALL EVALUATION COMMITTEE HONORARIUM SUMMARY
+                </th>
+              </tr>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                  Faculty Name
+                </th>
+                <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                  Roles & Occurrences
+                </th>
+                <th className="border border-gray-300 text-right pt-0 pb-2 px-4">
+                  Total Amount Due
                 </th>
               </tr>
             </thead>
             <tbody>
-              {/* Adviser */}
-              <tr>
-                <th className="border border-gray-300 text-left pt-0 pb-2">
-                  Adviser
-                </th>
-                <td className="border border-gray-300 pt-0 pb-2">
-                  {thesisData?.adviser?.user.first_name}{" "}
-                  {thesisData?.adviser?.user.last_name}
-                </td>
-                <td className="border border-gray-300 pt-0 pb-2">
-                  {enrolledSubject?.subject_name !== "Final Defense"
-                    ? "Php 3,750.00"
-                    : "Php 5,000.00"}
-                </td>
-              </tr>
-
-              {/* Panelists loop */}
-              {thesisData?.panelists?.map((panel, index) => (
-                <tr key={panel.id || index}>
-                  <th className="border border-gray-300 text-left pt-0 pb-2">
-                    Panelist {index + 1}
-                  </th>
-                  <td className="border border-gray-300 pt-0 pb-2">
-                    {panel.user.first_name} {panel.user.last_name}
+              {overallSummaryList.map((item, idx) => (
+                <tr key={idx}>
+                  <td className="border border-gray-300 pt-0 pb-2 px-4">
+                    {item.faculty.user?.first_name}{" "}
+                    {item.faculty.user?.last_name}
                   </td>
-                  <td className="border border-gray-300 pt-0 pb-2">
-                    Php 2,500.00
+                  <td className="border border-gray-300 pt-0 pb-2 px-4 text-sm italic">
+                    {Array.from(item.roles.entries())
+                      .map(([role, count]) => `${role} (${count}x)`)
+                      .join(", ")}
+                  </td>
+                  <td className="border border-gray-300 pt-0 pb-2 px-4 text-right font-bold bg-yellow-50">
+                    {formatCurrency(item.total)}
                   </td>
                 </tr>
               ))}
-
-              {/* Secretary */}
-              <tr>
-                <th className="border border-gray-300 text-left pt-0 pb-2">
-                  Secretary
-                </th>
-                <td className="border border-gray-300 pt-0 pb-2">
-                  {thesisData?.secretary?.user.first_name}{" "}
-                  {thesisData?.secretary?.user.last_name}
-                </td>
-                <td className="border border-gray-300 pt-0 pb-2">
-                  {enrolledSubject?.subject_name !== "Final Defense"
-                    ? "Php 625.00"
-                    : "Php 1,250.00"}
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
