@@ -12,7 +12,7 @@ function UserPageLayout({
 }>) {
   return (
     <UserProvider>
-      <AuthGuard roles={["chairperson", "dean", "admin"]}>
+      <AuthGuard roles={["chairperson", "dean", "admin", "adviser"]}>
         <Sidenav>{children}</Sidenav>
       </AuthGuard>
       <Toaster />

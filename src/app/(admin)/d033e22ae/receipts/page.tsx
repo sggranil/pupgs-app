@@ -40,12 +40,6 @@ export default function ReceiptsPage() {
           setIsUpdated={handleReceiptsUpdated}
         />
       </div>
-
-      {/* <UsersTable
-        isUserLoading={isUserLoading}
-        userData={listData}
-        setIsUpdated={handleReceiptsUpdated}
-      /> */}
     </div>
   );
 }
