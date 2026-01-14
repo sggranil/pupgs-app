@@ -10,8 +10,13 @@ import { showToast, removeToasts } from "@/components/template/Toaster";
 
 import { useAllAdvisers } from "@/hooks/adviser";
 import { Adviser } from "@/interface/user.interface";
-import { CONFIRMATION_STATUSES, THESIS_MESSAGES } from "@/constants/filters";
+import {
+  CONFIRMATION_STATUSES,
+  DEFENSE_PHASE,
+  THESIS_MESSAGES,
+} from "@/constants/filters";
 import { useUpdateThesis } from "@/hooks/thesis";
+import { formatStatus } from "@/utilities/StringFormatter";
 
 interface ThesisConfirmationProps {
   setIsModalOpen: (modalOpen: boolean) => void;
@@ -99,6 +104,7 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
     try {
       const payload = {
         status: data.status,
+        defense_phase: data.defense_phase,
         adviser_id: data.adviser_id,
         message: data.message,
       };
@@ -109,7 +115,6 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
       setIsModalOpen(false);
       setIsUpdated(true);
     } catch (error: any) {
-      // Assuming the error object from mutateAsync contains a message property
       const errorMessage = error.message || "An unknown error occurred.";
       showToast(errorMessage, "error");
     } finally {
@@ -134,6 +139,30 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
             {Object.entries(CONFIRMATION_STATUSES).map(([key, value]) => (
               <option key={key} value={value.value}>
                 {value.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="defense-phase-select"
+            className="block text-textPrimary font-semibold mb-1">
+            Defense Phase
+          </label>
+
+          <select
+            id="defense-phase-select"
+            defaultValue=""
+            className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-2 focus:ring-brand-primary outline-none transition-all"
+            {...register("defense_phase")}>
+            <option value="" disabled>
+              Select Phase Confirmation
+            </option>
+
+            {Object.values(DEFENSE_PHASE).map((phase) => (
+              <option key={phase} value={phase}>
+                {formatStatus(phase)}
               </option>
             ))}
           </select>
