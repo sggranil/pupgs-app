@@ -78,15 +78,34 @@ const ThesisInformation: React.FC<ThesisInformationProps> = ({
           <span className="font-semibold text-xs text-content-secondary">
             Assigned Room
           </span>
-          <p className="text-sm font-bold text-content-primary">
-            {thesisData?.room
-              ? `${thesisData.room.name}${
-                  thesisData.room.location
-                    ? ` (${thesisData.room.location})`
-                    : ""
-                }`
-              : "To be Announced"}
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-bold text-content-primary">
+              {thesisData?.room ? (
+                <>
+                  {thesisData.room.name}
+                  {thesisData.room.location && (
+                    <>
+                      {" ("}
+                      {thesisData.room.location.startsWith("http") ? (
+                        <a
+                          href={thesisData.room.location}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-brand-primary underline hover:text-brand-primary-hover">
+                          {thesisData.room.location}
+                        </a>
+                      ) : (
+                        <span>{thesisData.room.location}</span>
+                      )}
+                      {")"}
+                    </>
+                  )}
+                </>
+              ) : (
+                "To be Announced"
+              )}
+            </p>
+          </div>
         </div>
 
         <div>
