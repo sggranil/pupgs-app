@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { JwtPayload } from 'jsonwebtoken';
-import cookie from 'cookie';
+import * as cookie from 'cookie'
 
 import { decodeToken } from './TokenUtilities';
 
