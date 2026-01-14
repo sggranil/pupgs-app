@@ -33,7 +33,8 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
   setIsUpdated,
   setIsModalOpen,
 }) => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false);
+  const [updateLoading, setUpdateLoading] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { mutateAsync: addReceipt } = useAddReceipt();
@@ -111,7 +112,7 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
       return;
     }
 
-    setLoading(true);
+    setUploadLoading(true);
 
     try {
       const values = getValues();
@@ -138,9 +139,9 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
       };
 
       if (receiptData) {
-        updateReceipt(
+        await updateReceipt(
           {
-            receipt_id: Number(receiptData.id), // <-- Corrected key in original code, but issue remains
+            receipt_id: Number(receiptData.id),
             user_id: Number(userId),
             payload: payload,
           },
@@ -161,7 +162,7 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
           }
         );
       } else {
-        addReceipt(
+        await addReceipt(
           { user_id: Number(userId), payload: payload },
           {
             onSuccess: () => {
@@ -179,14 +180,14 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
     } catch (error: any) {
       showToast(`An error occurred. Please try again.`, "error");
     } finally {
-      setLoading(false);
+      setUploadLoading(false);
     }
   }
 
   async function onHandleDelete(id: number) {
-    setLoading(true);
+    setUpdateLoading(true);
     try {
-      deleteReceipt(id, {
+      await deleteReceipt(id, {
         onSuccess: () => {
           showToast("You delete a receipt.", "success", "Receipt Deleted");
           setIsModalOpen(false);
@@ -199,7 +200,7 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
       });
     } catch (error) {
     } finally {
-      setLoading(false);
+      setUpdateLoading(false);
     }
   }
 
@@ -296,17 +297,19 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
         <div className="flex flex-row gap-2">
           <button
             type="submit"
-            disabled={!filePath || loading}
+            disabled={!filePath || uploadLoading || updateLoading}
             className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75">
-            {loading ? "Uploading..." : receiptData ? "Update" : "Upload"}
+            {uploadLoading ? "Uploading..." : receiptData ? "Update" : "Upload"}
           </button>
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => onHandleDelete(receiptData?.id ?? 0)}
-            className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75">
-            {loading ? "Deleting..." : "Delete"}
-          </button>
+          {receiptData && (
+            <button
+              type="button"
+              disabled={uploadLoading || updateLoading}
+              onClick={() => onHandleDelete(receiptData?.id ?? 0)}
+              className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75">
+              {updateLoading ? "Deleting..." : "Delete"}
+            </button>
+          )}
         </div>
       </div>
     </form>
