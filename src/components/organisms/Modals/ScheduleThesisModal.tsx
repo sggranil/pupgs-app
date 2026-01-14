@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react"; // Added React import
+import React, { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -35,7 +35,7 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
   setIsModalOpen,
   setIsUpdated,
 }) => {
-  const [loading, setLoading] = useState<boolean>(false); // For form submission
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { data: roomData, isLoading: isRoomLoading } = useAllRooms();
   const { data: adviserData, isLoading: isAdviserLoading } = useAllAdvisers();
@@ -114,7 +114,7 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
             {isRoomLoading ? "-- Loading Rooms --" : "-- Select Room --"}
           </option>
           {listRoomData?.map((room: any) => (
-            <option key={room.id} value={room.id}>
+            <option key={room.id} value={room.id.toString()}>
               {room.name}
             </option>
           ))}
@@ -126,7 +126,7 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         )}
       </div>
 
-      {/* Date and Time (omitted for brevity, they remain unchanged) */}
+      {/* Date and Time */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Defense Date</label>
         <input
@@ -173,9 +173,9 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
           <option value={""} disabled>
             {secretaryPlaceholder}
           </option>
-          {!isAdviserLoading && // <-- Add this check
+          {!isAdviserLoading &&
             listAdviserData?.map((adviser: Adviser) => (
-              <option key={adviser.id} value={adviser.id}>
+              <option key={adviser.id} value={adviser.id.toString()}>
                 {adviser?.user?.first_name} {adviser?.user?.last_name}
               </option>
             ))}
@@ -193,15 +193,15 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         <label className="font-medium text-sm">Panelist</label>
         <select
           multiple
-          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100"
+          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100 min-h-[100px]"
           {...register("panelists")}
           disabled={isAdviserLoading}>
-          <option value={0} disabled>
+          <option value="" disabled>
             {panelistsPlaceholder}
           </option>
-          {!isAdviserLoading && // <-- Add this check
+          {!isAdviserLoading &&
             listAdviserData?.map((adviser: Adviser) => (
-              <option key={adviser.id} value={adviser.id}>
+              <option key={adviser.id} value={adviser.id.toString()}>
                 {adviser?.user?.first_name} {adviser?.user?.last_name}
               </option>
             ))}
@@ -220,8 +220,6 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         type="submit"
         className="w-full mt-2 py-2 bg-brand-primary text-sm text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75"
         disabled={loading || isAdviserLoading || isRoomLoading}>
-        {" "}
-        {/* Disable if anything is loading */}
         {loading ? "Updating..." : "Update Information"}
       </button>
     </form>
