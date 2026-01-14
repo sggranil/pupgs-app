@@ -7,7 +7,7 @@ import ThesisCard from "@/components/molecules/ThesisCard";
 import { UserData } from "@/interface/user.interface";
 
 interface ThesisCardListProps {
-  users?: UserData | null;
+  users: UserData | null;
   thesisData: Thesis[];
 }
 
@@ -18,13 +18,15 @@ const ThesisCardList: React.FC<ThesisCardListProps> = ({
   return (
     <div className="w-full mt-2">
       {thesisData.length > 0 ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 py-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pb-2">
           {thesisData.map((thesis) => (
             <Link
               className="cursor-pointer"
               key={thesis.id}
               href={
-                users?.role === "student"
+                !users
+                  ? "#"
+                  : users.role === "student"
                   ? `/thesis/${thesis.id}`
                   : `/d033e22ae/thesis/${thesis.id}`
               }>
