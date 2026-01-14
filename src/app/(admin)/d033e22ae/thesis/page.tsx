@@ -1,5 +1,3 @@
-// ThesisDashboard.tsx (Assuming this is intended for a faculty/advisor user)
-
 "use client";
 
 import { useState } from "react";
@@ -12,6 +10,7 @@ import ThesisCardContainerSkeleton from "@/components/template/SkeletonContainer
 
 import { useUserContext } from "@/providers/UserProvider";
 import ThesisTable from "@/components/organisms/Thesis/ThesisTable";
+import Link from "next/link";
 
 export default function ThesisDashboard() {
   const { user, isLoading: isUserContextLoading } = useUserContext();
@@ -49,12 +48,17 @@ export default function ThesisDashboard() {
       <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full">
         <div className="bg-white w-full pb-2 rounded-md">
           <div
-            className="w-full h-24 rounded-md"
+            className="w-full h-24 rounded-md z-[0]"
             style={{ backgroundImage: "url('/maroon-bg.jpg')" }}>
             <div className="flex items-end justify-between h-full">
               <h1 className="text-white text-xl font-bold p-2 pl-4">
                 Thesis Management
               </h1>
+              <Link
+                href="thesis/honorarium"
+                className="m-2 px-3 py-2 rounded-md bg-white text-brand-primary">
+                Export Honorarium
+              </Link>
             </div>
           </div>
 
