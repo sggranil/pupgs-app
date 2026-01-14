@@ -14,6 +14,7 @@ import ThesisInformation from "@/components/organisms/Thesis/ThesisInformation";
 import ThesisReceiptCardList from "@/components/organisms/ThesisReceipt/ThesisReceiptCardList";
 import { useUserContext } from "@/providers/UserProvider";
 import ThesisFiles from "@/components/template/Thesis/ThesisFiles";
+import { useAllAdvisers } from "@/hooks/adviser";
 
 export default function ThesisInfoPage({
   params,
@@ -22,6 +23,12 @@ export default function ThesisInfoPage({
 }) {
   const { id } = use(params);
   const { user } = useUserContext();
+
+  const {
+    data: adviserData,
+    isLoading: isUserLoading,
+    refetch: refetchAdviser,
+  } = useAllAdvisers();
 
   const {
     data: thesisData,
@@ -35,6 +42,49 @@ export default function ThesisInfoPage({
   };
 
   const thesisInfo = thesisData?.data as Thesis;
+  const advisers = adviserData?.data || [];
+
+  const dean = thesisInfo?.student
+    ? advisers.find(
+        (data: any) =>
+          data.user.department === thesisInfo.student?.user?.department &&
+          data.user.position === "Dean"
+      )
+    : null;
+
+  const programChair = thesisInfo?.student
+    ? advisers.find(
+        (data: any) =>
+          data.user.program === thesisInfo.student?.user?.program &&
+          data.user.position === "Program Chair"
+      )
+    : null;
+
+  console.log(dean);
+
+  const programChairUser = programChair?.user;
+  const programChairName = programChairUser
+    ? [
+        programChairUser.prefix,
+        programChairUser.first_name,
+        programChairUser.last_name,
+        programChairUser.ext_name,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : "No Program Chair Assigned";
+
+  const deanUser = dean?.user;
+  const deanName = deanUser
+    ? [
+        deanUser.prefix,
+        deanUser.first_name,
+        deanUser.last_name,
+        deanUser.ext_name,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : "No Dean Assigned";
 
   if (isThesisLoading) {
     return <ThesisInfoLoadingState />;
@@ -94,8 +144,8 @@ export default function ThesisInfoPage({
             <ThesisFiles
               thesisData={thesisInfo}
               thesisReceipt={null}
-              programChair={null}
-              dean={null}
+              programChair={programChairName}
+              dean={deanName}
             />
           </div>
         </div>
