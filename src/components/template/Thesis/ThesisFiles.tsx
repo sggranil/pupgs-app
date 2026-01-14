@@ -153,7 +153,7 @@ const ThesisFiles: React.FC<ThesisFilesProps> = ({
                   title="Thesis/Dissertation Final Defense Evaluation Sheet"
                   document={
                     <FormThirteen
-                      // programChair={programChair}
+                      programChair={programChair}
                       thesisData={thesisData}
                     />
                   }
