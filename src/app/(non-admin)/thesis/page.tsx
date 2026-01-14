@@ -38,7 +38,7 @@ export default function StudentDashboard() {
     <>
       <div className="flex flex-col items-start justify-center md:flex-row gap-4 w-full lg:px-32 py-4 px-8">
         {/* Announcements Panel */}
-        <div className="bg-white w-full md:w-1/3 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-4 pb-2 md:mb-0 rounded-md md:block hidden">
+        {/* <div className="bg-white w-full md:w-1/3 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-4 pb-2 md:mb-0 rounded-md md:block hidden">
           <div className="flex flex-col justify-between">
             <h3 className="text-content-primary text-md font-bold">
               Announcements
@@ -47,9 +47,9 @@ export default function StudentDashboard() {
           <p className="text-gray-500 text-center text-sm py-16">
             No announcements yet.
           </p>
-        </div>
+        </div> */}
 
-        <div className="bg-white w-full md:w-1/2 ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-4 pb-2 rounded-md">
+        <div className="bg-white w-full ring-1 ring-black ring-opacity-10 transition-opacity px-4 pt-4 pb-2 rounded-md">
           <div className="flex items-center justify-between">
             <h1 className="text-content-primary text-md font-bold">
               My Thesis
@@ -69,7 +69,7 @@ export default function StudentDashboard() {
               Error fetching data: {error.message}
             </p>
           ) : listData.length > 0 ? (
-            <ThesisCardList thesisData={listData} />
+            <ThesisCardList users={user} thesisData={listData} />
           ) : (
             <p className="text-gray-500 text-center py-24">
               No thesis proposals found. Make a proposal now.
