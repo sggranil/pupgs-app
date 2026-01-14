@@ -1,133 +1,114 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { z } from "zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
-
-import useUserRequest from "@/hooks/user";
-import { updateUserSchema } from "@/types/api/auth.types";
-
 import { useRouter } from "next/navigation";
 
+import { useUpdateUser } from "@/hooks/user";
+import {
+  UpdatePasswordSchemaType,
+  updateUserSchema,
+} from "@/types/api/auth.types";
 import { showToast, removeToasts } from "@/components/template/Toaster";
 
-type UpdateSchemaType = z.infer<typeof updateUserSchema>;
+const PasswordField = ({
+  label,
+  error,
+  registration,
+}: {
+  label: string;
+  error?: string;
+  registration: any;
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <div className="relative">
+      <label className="block mb-1 font-medium">{label}</label>
+      <div className="relative">
+        <input
+          type={isVisible ? "text" : "password"}
+          className="w-full p-2 border rounded-md pr-10"
+          {...registration}
+        />
+        <button
+          type="button"
+          onClick={() => setIsVisible(!isVisible)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          tabIndex={-1}>
+          {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+    </div>
+  );
+};
 
 export default function ChangePasswordPage() {
-  const [loading, setLoading] = useState(false);
-  const { updateUser } = useUserRequest();
-
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
   const router = useRouter();
+  const { mutateAsync: updateUpdateUser } = useUpdateUser();
 
   const {
     register,
-    getValues,
-    formState: { errors },
+    handleSubmit,
     reset,
-  } = useForm<UpdateSchemaType>({
+    formState: { errors, isSubmitting },
+  } = useForm<UpdatePasswordSchemaType>({
     resolver: zodResolver(updateUserSchema),
   });
 
-  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const isLoading = isSubmitting;
+
+  async function onFormSubmit(values: UpdatePasswordSchemaType) {
     removeToasts();
-    setLoading(true);
 
     try {
-      const formData = getValues();
-      const responseData = await updateUser(formData);
+      const response = await updateUpdateUser(values);
 
-      if (!responseData) {
-        throw new Error("No response received from the server.");
-      }
-
-      if (responseData.error) {
-        throw new Error(responseData.error);
-      }
-
-      showToast(
-        responseData.message || "Password Updated Successfully",
-        "success"
-      );
+      showToast("Password Updated Successfully", "success");
       reset();
       router.push("/profile");
-    } catch (error) {
-      if (error instanceof Error) {
-        showToast(error.message, "error");
-      } else {
-        showToast(
-          "An unexpected error occurred. Please try again later.",
-          "error"
-        );
-      }
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred";
+      showToast(errorMessage, "error");
     }
-  };
-
-  const renderPasswordField = (
-    label: string,
-    fieldName: keyof UpdateSchemaType,
-    visible: boolean,
-    toggle: () => void,
-    errorMessage?: string
-  ) => (
-    <div className="relative">
-      <label className="block mb-1 font-medium">{label}</label>
-      <input
-        type={visible ? "text" : "password"}
-        className="w-full p-2 border rounded-md pr-10"
-        {...register(fieldName)}
-      />
-      <button
-        type="button"
-        onClick={toggle}
-        className="absolute right-4 top-10 text-gray-600"
-        tabIndex={-1}>
-        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
-      </button>
-      {errorMessage && (
-        <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-      )}
-    </div>
-  );
+  }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6">
-      <h2 className="text-2xl font-medium mb-6 text-center">Change Password</h2>
-      <form onSubmit={handleFormSubmit} className="space-y-4">
-        {renderPasswordField(
-          "Current Password",
-          "old_password",
-          showCurrent,
-          () => setShowCurrent(!showCurrent),
-          errors.old_password?.message
-        )}
-        {renderPasswordField(
-          "New Password",
-          "password",
-          showNew,
-          () => setShowNew(!showNew),
-          errors.password?.message
-        )}
-        {renderPasswordField(
-          "Confirm New Password",
-          "confirm_password",
-          showConfirm,
-          () => setShowConfirm(!showConfirm),
-          errors.confirm_password?.message
-        )}
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-xl shadow-sm">
+      <h2 className="text-2xl font-semibold mb-6 text-center">
+        Change Password
+      </h2>
+
+      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+        <PasswordField
+          label="Current Password"
+          registration={register("old_password")}
+          error={errors.old_password?.message}
+        />
+
+        <PasswordField
+          label="New Password"
+          registration={register("password")}
+          error={errors.password?.message}
+        />
+
+        <PasswordField
+          label="Confirm New Password"
+          registration={register("confirm_password")}
+          error={errors.confirm_password?.message}
+        />
+
         <button
           type="submit"
-          disabled={loading}
-          className="w-full mt-6 py-2 bg-bgPrimary text-textWhite font-bold rounded-lg hover:opacity-75 disabled:opacity-50">
-          {loading ? "Updating..." : "Change Password"}
+          disabled={isLoading}
+          className="w-full mt-6 py-2 bg-bgPrimary text-white font-bold rounded-lg hover:brightness-90 disabled:opacity-50 transition-all">
+          {isLoading ? "Updating..." : "Change Password"}
         </button>
       </form>
     </div>
