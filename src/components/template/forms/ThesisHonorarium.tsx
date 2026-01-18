@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Thesis } from "@/interface/thesis.interface";
 import { formatStatus } from "@/utilities/StringFormatter";
@@ -26,7 +28,6 @@ const formatCurrency = (amount: number): string => {
   if (typeof amount !== "number" || isNaN(amount)) {
     return "Php 0.00";
   }
-  // Added Intl.NumberFormat for comma separators
   return `Php ${amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -45,7 +46,6 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
     );
   }
 
-  // 1. DATE RANGE LOGIC
   const getDefenseDateRange = () => {
     const dates = thesesData
       .map((t) =>
@@ -68,45 +68,57 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
       return firstDate.toLocaleDateString("en-US", options);
     }
 
-    // Format: January 31 - February 10, 2026
     return `${firstDate.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
     })} - ${lastDate.toLocaleDateString("en-US", options)}`;
   };
 
-  // 2. OVERALL SUMMARY LOGIC (Multiplies based on occurrences)
   const overallSummaryMap = new Map<
     number,
-    { faculty: any; roles: Map<string, number>; total: number }
+    {
+      faculty: any;
+      breakdown: Map<string, { count: number; rate: number }>;
+      total: number;
+    }
   >();
 
   thesesData.forEach((thesis) => {
-    // Determine rate based on specific thesis phase
     const isFinal = thesis.defense_phase === "final_defense";
-    const currentRateKey = isFinal ? "FINAL" : "PROPOSAL";
+    const phaseLabel = isFinal ? "Final" : "Proposal";
+    const rateKey = isFinal ? "FINAL" : "PROPOSAL";
 
-    const processRole = (faculty: any, roleName: string, rateValue: number) => {
+    const processRole = (
+      faculty: any,
+      roleBase: "ADVISER" | "PANELIST" | "SECRETARY",
+      displayLabel: string
+    ) => {
       if (!faculty) return;
+      const rateValue = rates[roleBase][rateKey];
+      const compositeKey = `${displayLabel} (${phaseLabel})`;
+
       const existing = overallSummaryMap.get(faculty.id) || {
         faculty,
-        roles: new Map<string, number>(),
+        breakdown: new Map<string, { count: number; rate: number }>(),
         total: 0,
       };
 
-      // Increment count for this role and add to total
-      const currentRoleCount = existing.roles.get(roleName) || 0;
-      existing.roles.set(roleName, currentRoleCount + 1);
-      existing.total += rateValue;
+      const currentDetails = existing.breakdown.get(compositeKey) || {
+        count: 0,
+        rate: rateValue,
+      };
+      existing.breakdown.set(compositeKey, {
+        count: currentDetails.count + 1,
+        rate: rateValue,
+      });
 
+      existing.total += rateValue;
       overallSummaryMap.set(faculty.id, existing);
     };
 
-    processRole(thesis.adviser, "Adviser", rates.ADVISER[currentRateKey]);
-    thesis.panelists?.forEach((p) =>
-      processRole(p, "Panelist", rates.PANELIST[currentRateKey])
-    );
-    processRole(thesis.secretary, "Secretary", rates.SECRETARY[currentRateKey]);
+    processRole(thesis.adviser, "ADVISER", "Adviser");
+    thesis.panelists?.forEach((p) => processRole(p, "PANELIST", "Panelist"));
+    processRole(thesis.secretary, "SECRETARY", "Secretary");
   });
 
   const overallSummaryList = Array.from(overallSummaryMap.values());
@@ -118,19 +130,13 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
         dangerouslySetInnerHTML={{
           __html: `
         @media print {
-          @page {
-            size: A4;
-            margin: 20mm;
-          }
-          body {
-            -webkit-print-color-adjust: exact;
-          }
+          @page { size: A4; margin: 20mm; }
+          body { -webkit-print-color-adjust: exact; }
         }
       `,
         }}
       />
 
-      {/* 1. OFFICIAL REQUEST LETTER */}
       <div className="px-10 py-2 leading-relaxed print:break-after-page">
         <p className="mb-8 text-base">
           {new Date().toLocaleDateString("en-US", {
@@ -141,7 +147,7 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
         </p>
 
         <div className="text-base space-y-0">
-          <p className="m-0 py-[3px] leading-none font-bold">
+          <p className="m-0 py-[3px] font-bold leading-none">
             MANUEL M. MUHI, D. Tech.
           </p>
           <p className="m-0 py-[3px] leading-none">University President</p>
@@ -153,7 +159,7 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
             <p>Through:</p>
             <div className="block ml-16">
               <div className="text-base space-y-0">
-                <p className="m-0 py-[3px] leading-none font-bold">
+                <p className="m-0 py-[3px] font-bold leading-none">
                   DR. EMANUEL C. DE GUZMAN
                 </p>
                 <p className="m-0 py-[3px] leading-none">
@@ -161,7 +167,7 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
                 </p>
               </div>
               <div className="text-base space-y-0 pt-6">
-                <p className="m-0 py-[3px] leading-none font-bold">
+                <p className="m-0 py-[3px] font-bold leading-none">
                   Prof. ALBERTO C. GUILLO
                 </p>
                 <p className="m-0 py-[3px] leading-none">
@@ -173,16 +179,16 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
         </div>
 
         <div>
-          <p className="leading-none py-4">Dear President Muhi:</p>
-          <p className="text-justify leading-tight mb-4">
+          <p className="py-4 leading-none">Dear President Muhi:</p>
+          <p className="mb-4 text-justify leading-tight">
             May I respectfully request the release of payment for the following
             faculty members who served as panelists during the oral defense
             activities held on{" "}
             <span className="font-bold">{getDefenseDateRange()}</span>.
           </p>
 
-          <div className="w-full flex justify-center">
-            <table className="border border-gray-400 w-[400px]">
+          <div className="flex w-full justify-center">
+            <table className="w-[400px] border border-gray-400">
               <thead className="bg-green-100">
                 <tr>
                   <th className="border border-gray-400 px-4 py-2 text-center align-middle">
@@ -202,48 +208,44 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
               </tbody>
             </table>
           </div>
-          <p className="text-justify leading-tight py-2">
+          <p className="py-2 text-justify leading-tight">
             The dedication and effort of these faculty members in supporting our
             students’ academic progress are highly commendable. I certify that
             they performed their duties as panelists diligently and outside
             their official time.
           </p>
 
-          <p className="text-justify leading-tight py-2">
+          <p className="py-2 text-justify leading-tight">
             Thank you for your attention and usual support. Should you require
             any further information or documentation, please do not hesitate to
             contact us through local 203.
           </p>
-          <p className="text-justify leading-tight py-2">Respectfully yours,</p>
-          <div className="text-base space-y-0 py-6">
-            <p className="m-0 py-[3px] leading-none font-bold">
+          <p className="py-2 text-justify leading-tight">Respectfully yours,</p>
+          <div className="space-y-0 py-6 text-base">
+            <p className="m-0 py-[3px] font-bold leading-none">
               DR. BENILDA ELEONOR V. COMENDADOR
             </p>
-
             <p className="m-0 py-[3px] leading-none">Chairperson</p>
           </div>
 
-          <p className="text-justify leading-tight py-2">Noted by:</p>
+          <p className="py-2 text-justify leading-tight">Noted by:</p>
 
-          <div className="text-base space-y-0 py-6">
-            <p className="m-0 py-[3px] leading-none font-bold">
+          <div className="space-y-0 py-6 text-base">
+            <p className="m-0 py-[3px] font-bold leading-none">
               ASSOC. MARIANNE C. ORTIZ
             </p>
-
             <p className="m-0 py-[3px] leading-none">IODE Director</p>
           </div>
 
-          <div className="text-base space-y-0 py-6">
-            <p className="m-0 py-[3px] leading-none font-bold">
+          <div className="space-y-0 py-6 text-base">
+            <p className="m-0 py-[3px] font-bold leading-none">
               DR. RUDOLF ANTHONY A. LACERNA
             </p>
-
             <p className="m-0 py-[3px] leading-none">Executive Director</p>
           </div>
         </div>
       </div>
 
-      {/* 2. INDIVIDUAL PROPONENT REPORTS */}
       {thesesData?.map((thesis, index) => {
         const relevantPhase = thesis.defense_phase || "final_defense";
         const currentRateKey =
@@ -283,21 +285,21 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
         return (
           <div
             key={index}
-            className="block mb-12 last:mb-0 break-inside-avoid print:break-before-page">
-            <div className="w-full flex justify-center">
-              <h3 className="underline uppercase font-semibold mb-4 text-center">
+            className="mb-12 block last:mb-0 break-inside-avoid print:break-before-page">
+            <div className="flex w-full justify-center">
+              <h3 className="mb-4 text-center font-semibold uppercase underline">
                 {formatStatus(relevantPhase)} - Proponent {index + 1}
               </h3>
             </div>
-            <div className="overflow-x-auto w-full mb-4">
+            <div className="mb-4 w-full overflow-x-auto">
               <table className="w-full table-auto border border-gray-300">
                 <thead>
                   <tr className="border-b border-gray-300 bg-gray-100">
-                    <th className="px-4 py-2 pt-0 text-left w-1/4">Program</th>
-                    <th className="px-4 py-2 pt-0 text-left w-1/4">
+                    <th className="w-1/4 px-4 py-2 pt-0 text-left">Program</th>
+                    <th className="w-1/4 px-4 py-2 pt-0 text-left">
                       Name of Proponent
                     </th>
-                    <th className="px-4 py-2 pt-0 text-left w-1/2">
+                    <th className="w-1/2 px-4 py-2 pt-0 text-left">
                       Title of Thesis
                     </th>
                   </tr>
@@ -316,26 +318,26 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
                   <tr>
                     <td
                       colSpan={2}
-                      className="px-4 py-2 pt-0 font-semibold text-right">
-                      Date and Time:
+                      className="px-4 py-2 pt-0 text-right font-semibold border-b border-gray-300">
+                      Date, Time and Room:
                     </td>
-                    <td className="px-4 py-2 pt-0">
+                    <td className="px-4 py-2 pt-0 border-b border-gray-300">
                       {thesis.defense_schedule
-                        ? new Date(thesis.defense_schedule).toLocaleString(
+                        ? `${new Date(thesis.defense_schedule).toLocaleString(
                             "en-US",
                             {
                               timeZone: "Asia/Manila",
                               dateStyle: "medium",
                               timeStyle: "short",
                             }
-                          )
+                          )} - ${thesis.room?.name || "No Room Assigned"}`
                         : "To be Announced"}
                     </td>
                   </tr>
                   <tr>
                     <td
                       colSpan={2}
-                      className="px-4 py-2 pt-0 font-semibold text-right">
+                      className="px-4 py-2 pt-0 text-right font-semibold">
                       Proof of Payment:
                     </td>
                     <td className="px-4 py-2 pt-0">
@@ -348,8 +350,8 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
               </table>
             </div>
 
-            <div className="flex justify-center items-center mb-4">
-              <div className="w-full border p-4 flex items-center justify-center">
+            <div className="mb-4 flex items-center justify-center">
+              <div className="flex w-full items-center justify-center border p-4">
                 {latestReceipt?.attachment ? (
                   latestReceipt.attachment.endsWith(".pdf") ? (
                     <p className="text-center text-gray-500">
@@ -365,7 +367,7 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
                     />
                   )
                 ) : (
-                  <p className="text-center text-red-500 font-medium">
+                  <p className="text-center font-medium text-red-500">
                     Proof of Payment Attachment is missing or not found for this
                     phase.
                   </p>
@@ -373,27 +375,27 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
               </div>
             </div>
 
-            <div className="overflow-x-auto w-full">
-              <table className="min-w-full border border-gray-300 table-auto">
+            <div className="w-full overflow-x-auto">
+              <table className="min-w-full table-auto border border-gray-300">
                 <thead>
                   <tr>
                     <th
                       colSpan={4}
-                      className="border border-gray-300 text-center text-base font-semibold bg-gray-200 pt-0 pb-2">
+                      className="border border-gray-300 bg-gray-200 pb-2 pt-0 text-center text-base font-semibold">
                       EVALUATION COMMITTEE HONORARIUM (Defense Summary)
                     </th>
                   </tr>
                   <tr className="bg-gray-100">
-                    <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                    <th className="border border-gray-300 px-4 pb-2 pt-0 text-left">
                       Role
                     </th>
-                    <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                    <th className="border border-gray-300 px-4 pb-2 pt-0 text-left">
                       Name
                     </th>
-                    <th className="border border-gray-300 text-center pt-0 pb-2 px-4">
+                    <th className="border border-gray-300 px-4 pb-2 pt-0 text-center">
                       Rate
                     </th>
-                    <th className="border border-gray-300 text-right pt-0 pb-2 px-4">
+                    <th className="border border-gray-300 px-4 pb-2 pt-0 text-right">
                       Amount Due
                     </th>
                   </tr>
@@ -401,17 +403,17 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
                 <tbody>
                   {roleEntries.map((entry, rIndex) => (
                     <tr key={rIndex}>
-                      <td className="border border-gray-300 pt-0 pb-2 px-4 text-sm font-semibold">
+                      <td className="border border-gray-300 px-4 pb-2 pt-0 text-sm font-semibold">
                         {entry.role}
                       </td>
-                      <td className="border border-gray-300 pt-0 pb-2 px-4">
+                      <td className="border border-gray-300 px-4 pb-2 pt-0">
                         {entry.faculty.user?.first_name}{" "}
                         {entry.faculty.user?.last_name}
                       </td>
-                      <td className="border border-gray-300 pt-0 pb-2 px-4 text-center text-xs">
+                      <td className="border border-gray-300 px-4 pb-2 pt-0 text-center text-xs">
                         {formatCurrency(entry.rate)}
                       </td>
-                      <td className="border border-gray-300 pt-0 pb-2 px-4 text-right font-bold bg-yellow-50">
+                      <td className="border border-gray-300 bg-yellow-50 px-4 pb-2 pt-0 text-right font-bold">
                         {formatCurrency(entry.rate)}
                       </td>
                     </tr>
@@ -423,26 +425,28 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
         );
       })}
 
-      {/* 3. OVERALL SUMMARY AT THE BOTTOM */}
-      <div className="pt-6 border-t-2 border-dashed border-gray-400 print:break-before-page">
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full border border-gray-300 table-auto">
+      <div className="border-t-2 border-dashed border-gray-400 pt-6 print:break-before-page">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-full table-auto border border-gray-300">
             <thead>
               <tr>
                 <th
-                  colSpan={3}
-                  className="border border-gray-300 text-center text-lg font-bold bg-gray-800 text-white pt-2 pb-2">
+                  colSpan={4}
+                  className="border border-gray-300 bg-gray-800 pb-2 pt-2 text-center text-lg font-bold text-white">
                   OVERALL EVALUATION COMMITTEE HONORARIUM SUMMARY
                 </th>
               </tr>
               <tr className="bg-gray-100">
-                <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                <th className="border border-gray-300 px-4 pb-2 pt-0 text-left">
                   Faculty Name
                 </th>
-                <th className="border border-gray-300 text-left pt-0 pb-2 px-4">
+                <th className="border border-gray-300 px-4 pb-2 pt-0 text-left">
                   Roles & Occurrences
                 </th>
-                <th className="border border-gray-300 text-right pt-0 pb-2 px-4">
+                <th className="border border-gray-300 px-4 pb-2 pt-0 text-center">
+                  Breakdown of Computation
+                </th>
+                <th className="border border-gray-300 px-4 pb-2 pt-0 text-right">
                   Total Amount Due
                 </th>
               </tr>
@@ -450,16 +454,27 @@ const ThesisHonorarium: React.FC<ThesisHonorariumProps> = ({
             <tbody>
               {overallSummaryList.map((item, idx) => (
                 <tr key={idx}>
-                  <td className="border border-gray-300 pt-0 pb-2 px-4">
+                  <td className="border border-gray-300 px-4 pb-2 pt-0 font-semibold">
                     {item.faculty.user?.first_name}{" "}
                     {item.faculty.user?.last_name}
                   </td>
-                  <td className="border border-gray-300 pt-0 pb-2 px-4 text-sm italic">
-                    {Array.from(item.roles.entries())
-                      .map(([role, count]) => `${role} (${count}x)`)
+                  <td className="border border-gray-300 px-4 pb-2 pt-0 text-sm italic">
+                    {Array.from(item.breakdown.entries())
+                      .map(
+                        ([rolePhase, details]) =>
+                          `${rolePhase} (x${details.count})`
+                      )
                       .join(", ")}
                   </td>
-                  <td className="border border-gray-300 pt-0 pb-2 px-4 text-right font-bold bg-yellow-50">
+                  <td className="border border-gray-300 px-4 pb-2 pt-0 text-xs text-center text-gray-600">
+                    {Array.from(item.breakdown.entries())
+                      .map(
+                        ([_, details]) =>
+                          `(${formatCurrency(details.rate)} × ${details.count})`
+                      )
+                      .join(" + ")}
+                  </td>
+                  <td className="border border-gray-300 bg-yellow-50 px-4 pb-2 pt-0 text-right font-bold">
                     {formatCurrency(item.total)}
                   </td>
                 </tr>
