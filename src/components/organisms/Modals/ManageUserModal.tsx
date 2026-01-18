@@ -19,6 +19,7 @@ interface ManageUserProps {
   isShowEdit: (showEdit: boolean) => void;
   setIsModalOpen: (isOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
+  fromProfile?: false;
 }
 
 const ManageUserModal: React.FC<ManageUserProps> = ({
@@ -304,8 +305,8 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
               {...register("tel_number")}
             />
           </div>
-          {user?.role === "admin" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mb-4">
+          {!fromUserProfile && user?.role === "admin" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mb-4 col-span-2 border-t pt-4">
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"

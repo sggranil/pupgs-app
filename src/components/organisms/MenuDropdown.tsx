@@ -131,7 +131,7 @@ const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, department }) => {
           setIsUpdated={handleUserUpdated}
           isShowEdit={setShowEdit}
           userData={userInfo}
-          fromUserProfile={fromUserProfile}
+          fromUserProfile={true}
         />
       </Modal>
     </div>
