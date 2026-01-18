@@ -1,11 +1,10 @@
-import React, { FormEvent, useState } from "react";
+"use client";
+
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useUpdateReceipt } from "@/hooks/receipts";
 import { showToast, removeToasts } from "@/components/template/Toaster";
-
 import { CONFIRMATION_OPTIONS, RECEIPT_MESSAGES } from "@/constants/filters";
 import { ThesisReceipt } from "@/interface/thesis.interface";
 import {
@@ -14,7 +13,6 @@ import {
 } from "@/types/api/thesis.types";
 
 interface SubjectConfirmationProps {
-  // Renamed prop for clarity (it handles closure now)
   setIsModalOpen: (modalOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
   receiptData: ThesisReceipt;
@@ -26,36 +24,44 @@ const ReceiptConfirmationModal: React.FC<SubjectConfirmationProps> = ({
   setIsUpdated,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { mutateAsync: updateReceipt } = useUpdateReceipt();
+  const { mutateAsync: updateReceipt, isPending: isUpdating } =
+    useUpdateReceipt();
 
-  async function onSubjectConfirmation(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const isLoading = loading || isUpdating;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ManageThesisReceiptSchemaType>({
+    resolver: zodResolver(manageThesisReceiptSchema),
+    defaultValues: {
+      status: receiptData?.status,
+      message: receiptData?.message,
+    },
+  });
+
+  async function onSubjectConfirmation(values: ManageThesisReceiptSchemaType) {
     removeToasts();
-
     setLoading(true);
 
     try {
-      const values = getValues();
-
-      const payload = {
-        status: values.status,
-        message: values.message,
-      };
-
-      updateReceipt(
+      await updateReceipt(
         {
           receipt_id: receiptData?.id,
           user_id: receiptData.student_id,
-          payload: payload,
+          payload: {
+            status: values.status,
+            message: values.message,
+          },
         },
         {
           onSuccess: () => {
-            setIsModalOpen(false); // Closes the modal
+            setIsModalOpen(false);
             setIsUpdated(true);
             showToast("You updated a receipt.", "success", "Receipt Updated");
           },
           onError: (error) => {
-            setIsModalOpen(false); // Closes the modal even on error
             showToast(error.message, "error");
           },
         }
@@ -70,21 +76,8 @@ const ReceiptConfirmationModal: React.FC<SubjectConfirmationProps> = ({
     }
   }
 
-  const {
-    register,
-    getValues,
-    // setValue, // Unused, can be removed
-    formState: { errors }, // Unused, can be removed
-  } = useForm<ManageThesisReceiptSchemaType>({
-    resolver: zodResolver(manageThesisReceiptSchema),
-    defaultValues: {
-      status: receiptData?.status,
-      message: receiptData?.message,
-    },
-  });
-
   return (
-    <form onSubmit={onSubjectConfirmation}>
+    <form onSubmit={handleSubmit(onSubjectConfirmation)}>
       <div className="w-full py-4">
         <div className="mb-4">
           <label
@@ -105,6 +98,9 @@ const ReceiptConfirmationModal: React.FC<SubjectConfirmationProps> = ({
               </option>
             ))}
           </select>
+          {errors.status && (
+            <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>
+          )}
         </div>
         <div className="mb-4">
           <label className="block text-textPrimary font-semibold mb-1">
@@ -126,13 +122,28 @@ const ReceiptConfirmationModal: React.FC<SubjectConfirmationProps> = ({
               </optgroup>
             ))}
           </select>
+          {errors.message && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.message.message}
+            </p>
+          )}
         </div>
       </div>
       <div className="flex flex-row gap-2">
         <button
           type="submit"
-          className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50">
-          {loading ? "Uploading..." : "Update"}
+          disabled={isLoading}
+          className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50 flex items-center justify-center gap-2">
+          {isLoading ? (
+            <>
+              <span className="material-symbols-rounded animate-spin">
+                progress_activity
+              </span>
+              <span>Updating...</span>
+            </>
+          ) : (
+            "Update"
+          )}
         </button>
       </div>
     </form>

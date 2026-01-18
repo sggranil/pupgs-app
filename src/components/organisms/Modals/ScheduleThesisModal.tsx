@@ -1,17 +1,13 @@
 "use client";
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
 import { useAllRooms } from "@/hooks/room";
 import { useAllAdvisers } from "@/hooks/adviser";
 import { useUpdateThesis } from "@/hooks/thesis";
-
 import { Room, Thesis } from "@/interface/thesis.interface";
 import { Adviser } from "@/interface/user.interface";
 import { showToast } from "@/components/template/Toaster";
-
 import {
   updateThesisScheduleSchema,
   UpdateThesisScheduleSchemaType,
@@ -39,7 +35,10 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
 
   const { data: roomData, isLoading: isRoomLoading } = useAllRooms();
   const { data: adviserData, isLoading: isAdviserLoading } = useAllAdvisers();
-  const { mutateAsync: updateThesis } = useUpdateThesis();
+  const { mutateAsync: updateThesis, isPending: isUpdating } =
+    useUpdateThesis();
+
+  const isLoading = loading || isUpdating;
 
   const listRoomData = roomData?.data || ([] as Room[]);
   const listAdviserData = adviserData?.data || ([] as Adviser[]);
@@ -47,6 +46,7 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<UpdateThesisScheduleSchemaType>({
     resolver: zodResolver(updateThesisScheduleSchema),
@@ -58,6 +58,18 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
       secretary_id: thesisData?.secretary_id?.toString() ?? "",
     },
   });
+
+  useEffect(() => {
+    if (!isAdviserLoading && listAdviserData.length > 0) {
+      reset({
+        defense_date: getLocalDateString(thesisData?.defense_schedule),
+        defense_time: getLocalTimeStringFormatted(thesisData?.defense_schedule),
+        room_id: thesisData?.room_id?.toString() ?? "",
+        panelists: thesisData?.panelists?.map((p) => p.id.toString()) ?? [],
+        secretary_id: thesisData?.secretary_id?.toString() ?? "",
+      });
+    }
+  }, [isAdviserLoading, listAdviserData, thesisData, reset]);
 
   async function handleFormSubmit(values: UpdateThesisScheduleSchemaType) {
     setLoading(true);
@@ -83,9 +95,7 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         "Schedule Updated"
       );
     } catch (error: any) {
-      setIsModalOpen(false);
-      const errorMessage =
-        error.message || "An error occurred during update. Please try again.";
+      const errorMessage = error.message || "An error occurred during update.";
       showToast(errorMessage, "error");
     } finally {
       setLoading(false);
@@ -103,7 +113,6 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
       className="flex flex-col gap-4 py-2">
-      {/* Room Selection */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Room</label>
         <select
@@ -126,14 +135,14 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         )}
       </div>
 
-      {/* Date and Time */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Defense Date</label>
         <input
           className="w-full p-2 border rounded-md bg-white text-sm"
           type="date"
           min={getTodayDate()}
-          {...register("defense_date")}></input>
+          {...register("defense_date")}
+        />
         {errors.defense_date && (
           <p className="text-state-danger text-sm mt-1">
             {errors.defense_date.message}
@@ -163,7 +172,6 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         )}
       </div>
 
-      {/* Thesis Secretary Selection */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Thesis Secretary</label>
         <select
@@ -188,12 +196,11 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
         )}
       </div>
 
-      {/* Panelist Selection */}
       <div className="flex flex-col gap-2">
         <label className="font-medium text-sm">Panelist</label>
         <select
           multiple
-          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100 min-h-[100px]"
+          className="w-full p-2 border rounded-md bg-white text-sm disabled:bg-gray-100 min-h-[120px]"
           {...register("panelists")}
           disabled={isAdviserLoading}>
           <option value="" disabled>
@@ -218,9 +225,18 @@ const ThesisScheduleModal: React.FC<ThesisScheduleProps> = ({
 
       <button
         type="submit"
-        className="w-full mt-2 py-2 bg-brand-primary text-sm text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75"
-        disabled={loading || isAdviserLoading || isRoomLoading}>
-        {loading ? "Updating..." : "Update Information"}
+        className="w-full mt-2 py-2 bg-brand-primary text-sm text-white font-bold rounded-lg hover:bg-brand-primary-hover disabled:opacity-75 flex items-center justify-center gap-2"
+        disabled={isLoading || isAdviserLoading || isRoomLoading}>
+        {isLoading ? (
+          <>
+            <span className="material-symbols-rounded animate-spin">
+              progress_activity
+            </span>
+            <span>Updating Information...</span>
+          </>
+        ) : (
+          "Update Information"
+        )}
       </button>
     </form>
   );
