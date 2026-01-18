@@ -141,7 +141,8 @@ const AttachmentCardList: React.FC<AttachmentCardList> = ({
       <Modal
         title="Upload Documents"
         isModalOpen={isModalOpen}
-        setModalOpen={setModalOpen}>
+        setModalOpen={setModalOpen}
+        modalType="info">
         <ManageAttachmentModal
           thesisId={thesisId}
           setIsUpdated={setIsUpdated}

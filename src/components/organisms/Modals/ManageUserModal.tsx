@@ -1,17 +1,15 @@
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+"use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { User } from "@/interface/user.interface";
 import { useUpdateUser } from "@/hooks/user";
 import { useForm } from "react-hook-form";
-
 import { updateUserSchema, UpdateUserSchemaType } from "@/types/api/auth.types";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { DEPARTMENTS } from "@/constants/departments";
 import { COURSES } from "@/constants/course";
 import { POSITIONS } from "@/constants/positions";
-
 import { showToast } from "@/components/template/Toaster";
 import { useUserContext } from "@/providers/UserProvider";
 
@@ -21,6 +19,7 @@ interface ManageUserProps {
   isShowEdit: (showEdit: boolean) => void;
   setIsModalOpen: (isOpen: boolean) => void;
   setIsUpdated: (isUpdated: boolean) => void;
+  fromProfile?: false;
 }
 
 const ManageUserModal: React.FC<ManageUserProps> = ({
@@ -33,9 +32,11 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
   const { user } = useUserContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState(userData?.role === "admin");
-  const { mutateAsync: updateUser } = useUpdateUser();
+  const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
 
-  let newRole;
+  const router = useRouter();
+
+  const isLoading = loading || isUpdating;
 
   const isoDateTime = (dateOnly: string | undefined) =>
     dateOnly + "T00:00:00.000Z";
@@ -77,9 +78,11 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
         finalRole = "admin";
       } else if (currentPosition) {
         if (
-          currentPosition === "Program Coordinator" ||
-          currentPosition === "Academic Program Head" ||
-          currentPosition === "Program Chair"
+          [
+            "Program Coordinator",
+            "Academic Program Head",
+            "Program Chair",
+          ].includes(currentPosition)
         ) {
           finalRole = "chairperson";
         } else if (currentPosition === "Dean") {
@@ -91,7 +94,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
         finalRole = userData?.role || "student";
       }
 
-      updateUser(
+      await updateUser(
         {
           user_id: userData?.id,
           payload: {
@@ -114,20 +117,19 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             );
           },
           onError: (error) => {
-            setIsModalOpen(false);
             showToast(error.message, "error");
           },
         }
       );
     } catch (error) {
       const errorMessage =
-        (error as any)?.message ||
-        "An error occurred during updated. Please try again.";
+        (error as any)?.message || "An error occurred during update.";
       showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }
   }
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="w-full py-4">
@@ -197,7 +199,6 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             </label>
             <input
               type="date"
-              placeholder="YYYY-MM-DD (ISO-8601)"
               className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               {...register("start_date")}
             />
@@ -208,7 +209,6 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             </label>
             <input
               type="date"
-              placeholder="YYYY-MM-DD (ISO-8601)"
               className="w-full p-2 border border-gray-300 rounded-md text-context-primary bg-white text-sm"
               {...register("pass_date")}
             />
@@ -228,12 +228,10 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
                     ? "text-gray-400"
                     : "text-context-primary"
                 }`}
-                placeholder="Position"
                 {...register("standing")}
               />
             </div>
           )}
-
           <div>
             <label
               htmlFor="program"
@@ -242,7 +240,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             </label>
             <select
               id="program"
-              className="w-full p-2 border text-sm border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+              className="w-full p-2 border text-sm border-gray-300 rounded-md text-context-primary bg-white"
               {...register("program")}>
               <option value="" disabled>
                 Select a Program
@@ -262,7 +260,7 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             </label>
             <select
               id="department"
-              className="w-full p-2 border text-sm border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border text-sm border-gray-300 rounded-md text-context-primary bg-white"
               {...register("department")}>
               <option value="" disabled>
                 Select a Department
@@ -278,12 +276,12 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
             <div>
               <label
                 htmlFor="position"
-                className="block text-sma text-context-primary font-semibold mb-1">
+                className="block text-sm text-context-primary font-semibold mb-1">
                 Position
               </label>
               <select
                 id="position"
-                className="w-full text-sm p-2 border border-gray-300 rounded-md text-context-primary bg-white focus:ring-blue-500 focus:border-blue-500" // Added focus styles
+                className="w-full text-sm p-2 border border-gray-300 rounded-md text-context-primary bg-white"
                 {...register("position")}>
                 <option value="" disabled>
                   Position
@@ -307,16 +305,14 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
               {...register("tel_number")}
             />
           </div>
-          {user?.role === "admin" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mb-4">
-              {/* Archive User */}
+          {!fromUserProfile && user?.role === "admin" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 mb-4 col-span-2 border-t pt-4">
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="is_deleted"
                   {...register("is_archived")}
-                  defaultChecked={userData?.is_archived}
-                  className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                  className="w-4 h-4 text-red-600 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="is_deleted"
@@ -324,25 +320,22 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
                   Archive User
                 </label>
               </div>
-
-              {/* Make Admin FIX */}
-              {userData?.id == user?.id ||
-                (userData?.role != "student" && (
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="is_admin"
-                      checked={isAdmin}
-                      onChange={(e) => setIsAdmin(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label
-                      htmlFor="is_admin"
-                      className="text-context-primary font-medium">
-                      Make Admin
-                    </label>
-                  </div>
-                ))}
+              {(userData?.id == user?.id || userData?.role != "student") && (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="is_admin"
+                    checked={isAdmin}
+                    onChange={(e) => setIsAdmin(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="is_admin"
+                    className="text-context-primary font-medium">
+                    Make Admin
+                  </label>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -350,15 +343,25 @@ const ManageUserModal: React.FC<ManageUserProps> = ({
       <div className="flex flex-row gap-2">
         <button
           type="button"
-          // onClick={() => router.push("/profile/change-password")}
-          className="w-full py-2 bg-white border border-red-700 text-context-primary font-bold rounded-md">
+          onClick={() => router.push("/profile/change-password")}
+          disabled={isLoading}
+          className="w-full py-2 bg-white border border-red-700 text-context-primary font-bold rounded-md disabled:opacity-50">
           Change Password
         </button>
         <button
           type="submit"
-          disabled={loading}
-          className="w-full py-2 bg-brand-primary text-white font-bold rounded-md hover:bg-brand-primary-hover disabled:opacity-75">
-          {loading ? "Updating..." : "Update"}
+          disabled={isLoading}
+          className="w-full py-2 bg-brand-primary text-white font-bold rounded-md hover:bg-brand-primary-hover disabled:opacity-75 flex items-center justify-center gap-2">
+          {isLoading ? (
+            <>
+              <span className="material-symbols-rounded animate-spin">
+                progress_activity
+              </span>
+              <span>Updating...</span>
+            </>
+          ) : (
+            "Update"
+          )}
         </button>
       </div>
     </form>

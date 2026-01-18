@@ -1,13 +1,13 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import {
   updateThesisSchema,
   UpdateThesisSchemaType,
 } from "@/types/api/thesis.types";
 import { showToast, removeToasts } from "@/components/template/Toaster";
-
 import { useAllAdvisers } from "@/hooks/adviser";
 import { Adviser } from "@/interface/user.interface";
 import {
@@ -37,7 +37,10 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
 
   const { data: advisersResponse, isLoading: isAdviserLoading } =
     useAllAdvisers();
-  const { mutateAsync: updateThesis } = useUpdateThesis();
+  const { mutateAsync: updateThesis, isPending: isUpdating } =
+    useUpdateThesis();
+
+  const isLoading = loading || isUpdating;
 
   const {
     register,
@@ -51,13 +54,14 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
       status: thesisData?.status ?? "pending_review",
       message: thesisData?.message ?? "",
       adviser_id: thesisData?.adviser_id ?? undefined,
+      defense_phase: thesisData?.defense_phase ?? "",
     },
   });
 
   const isConfirmed = watch("status");
 
   useEffect(() => {
-    if (advisersResponse && advisersResponse.data) {
+    if (advisersResponse?.data) {
       setAdviserData(advisersResponse.data);
     }
   }, [advisersResponse]);
@@ -102,21 +106,21 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
     setLoading(true);
 
     try {
-      const payload = {
-        status: data.status,
-        defense_phase: data.defense_phase,
-        adviser_id: data.adviser_id,
-        message: data.message,
-      };
-
-      await updateThesis({ thesis_id: thesisData?.id, payload: payload });
+      await updateThesis({
+        thesis_id: thesisData?.id,
+        payload: {
+          status: data.status,
+          defense_phase: data.defense_phase,
+          adviser_id: data.adviser_id,
+          message: data.message,
+        },
+      });
 
       showToast("You updated the receipt.", "success", "Receipt Updated");
       setIsModalOpen(false);
       setIsUpdated(true);
     } catch (error: any) {
-      const errorMessage = error.message || "An unknown error occurred.";
-      showToast(errorMessage, "error");
+      showToast(error.message || "An unknown error occurred.", "error");
     } finally {
       setLoading(false);
     }
@@ -125,7 +129,6 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
   return (
     <form onSubmit={handleSubmit(onThesisConfirmation)}>
       <div className="w-full py-4">
-        {/* Confirmation Status Dropdown */}
         <div className="mb-4">
           <label className="block text-textPrimary font-semibold mb-1">
             Confirmation
@@ -150,16 +153,13 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
             className="block text-textPrimary font-semibold mb-1">
             Defense Phase
           </label>
-
           <select
             id="defense-phase-select"
-            defaultValue=""
             className="w-full p-2 border border-gray-300 rounded-md text-textPrimary bg-white focus:ring-2 focus:ring-brand-primary outline-none transition-all"
             {...register("defense_phase")}>
             <option value="" disabled>
               Select Phase Confirmation
             </option>
-
             {Object.values(DEFENSE_PHASE).map((phase) => (
               <option key={phase} value={phase}>
                 {formatStatus(phase)}
@@ -168,7 +168,6 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
           </select>
         </div>
 
-        {/* Message Dropdown */}
         <div className="mb-4">
           <label className="block text-textPrimary font-semibold mb-1">
             Message *
@@ -191,7 +190,6 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
           </select>
         </div>
 
-        {/* Adviser Selection (Conditional) */}
         {isConfirmed !== "pending_review" && (
           <div className="mb-4 relative adviser-dropdown">
             <label className="block text-textPrimary font-semibold mb-1">
@@ -244,11 +242,6 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
                 )}
               </ul>
             )}
-            {dropdownOpen && isAdviserLoading && (
-              <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-md px-4 py-2 text-gray-500">
-                Loading advisers...
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -256,9 +249,18 @@ const ThesisConfirmationModal: React.FC<ThesisConfirmationProps> = ({
       <div className="flex flex-row gap-2">
         <button
           type="submit"
-          className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50"
-          disabled={loading || isAdviserLoading}>
-          {loading ? "Uploading..." : "Update"}
+          className="w-full mt-6 py-2 bg-brand-primary text-white font-bold rounded-lg hover:opacity-75 disabled:opacity-50 flex items-center justify-center gap-2"
+          disabled={isLoading || isAdviserLoading}>
+          {isLoading ? (
+            <>
+              <span className="material-symbols-rounded animate-spin text-white">
+                progress_activity
+              </span>
+              <span>Updating...</span>
+            </>
+          ) : (
+            "Update"
+          )}
         </button>
       </div>
     </form>

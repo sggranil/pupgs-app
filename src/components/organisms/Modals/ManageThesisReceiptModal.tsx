@@ -248,21 +248,28 @@ const ManageThesisReceiptModal: React.FC<ManageThesisReceiptProps> = ({
               </p>
 
               {filePath.startsWith("data:image/") ||
-              filePath.includes("/uploads/") ? (
-                <img
-                  src={filePath}
-                  alt="File preview"
-                  className="mt-2 w-1/2 max-h-48 object-cover border rounded"
-                />
-              ) : (
-                <a
-                  href={filePath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline text-sm truncate">
-                  {filePath.split("/").pop()}
-                </a>
-              )}
+              filePath.includes("/uploads/") ||
+              filePath.includes("blob.vercel-storage.com") ? (
+                filePath.match(/\.(jpeg|jpg|gif|png|webp)$/i) ||
+                filePath.startsWith("data:image/") ? (
+                  <img
+                    src={filePath}
+                    alt="File preview"
+                    className="mt-2 w-1/2 max-h-48 object-cover border rounded"
+                  />
+                ) : (
+                  <a
+                    href={filePath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline text-sm block truncate">
+                    {decodeURIComponent(
+                      filePath.split("/").pop()?.split("?")[0] ??
+                        "Download File"
+                    )}
+                  </a>
+                )
+              ) : null}
 
               <button
                 type="button"

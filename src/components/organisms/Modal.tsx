@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   title: string;
@@ -17,7 +18,19 @@ const Modal = ({
   children,
   modalType = "form",
 }: ModalProps) => {
-  // Define width mapping for cleaner logic
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Prevent scrolling of background when modal is open
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
+
   const widthMap = {
     pdf: "100%",
     info: "600px",
@@ -27,15 +40,12 @@ const Modal = ({
 
   const modalStyle = {
     width: widthMap[modalType] || "1100px",
-    maxWidth: "95vw", // Added safety for mobile screens
+    maxWidth: "95vw",
   };
 
-  if (!isModalOpen) return null;
+  if (!isModalOpen || !mounted) return null;
 
-  return (
-    /* Z-INDEX: 9999 ensures it stays above Sidenav (50), Header (30), 
-       and Dropdowns (100). 
-    */
+  return createPortal(
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       style={{ zIndex: 9999 }}
@@ -44,7 +54,6 @@ const Modal = ({
         className="bg-white p-4 rounded-lg shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200"
         style={modalStyle}
         onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="flex flex-row items-center justify-between border-b border-gray-100 pb-3 mb-2">
           <h2 className="text-content-primary text-xl font-bold">{title}</h2>
           <button
@@ -57,12 +66,12 @@ const Modal = ({
           </button>
         </div>
 
-        {/* Content Body */}
         <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300">
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
