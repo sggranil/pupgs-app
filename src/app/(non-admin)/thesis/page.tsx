@@ -81,7 +81,7 @@ export default function StudentDashboard() {
       <Modal
         title="Upload Proposal/Concept Paper"
         isModalOpen={thesisProposalModal}
-        modalType="form"
+        modalType="info"
         setModalOpen={setThesisProposalModal}>
         <ManageThesisModal
           setIsModalOpen={setThesisProposalModal}
